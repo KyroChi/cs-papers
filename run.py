@@ -57,7 +57,12 @@ def main():
                     print("ERROR:", e)
         return
 
-    con.sql(sql).show(max_rows=200)
+    # Support multi-statement .sql files: show each SELECT's result.
+    statements = [s.strip() for s in sql.split(";") if s.strip()]
+    for stmt in statements:
+        rel = con.sql(stmt)
+        if rel is not None:
+            rel.show(max_rows=200)
 
 
 if __name__ == "__main__":
