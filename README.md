@@ -38,6 +38,8 @@ python run.py "SELECT count(*) FROM papers"   # or inline SQL
 | `queries/04_growth_by_subject.sql` | Growth by subject group and top categories |
 | `queries/05_new_author_influx.sql` | First-time authors per year (early-career proxy) |
 | `queries/06_decompose_the_surge.sql` | How much of the increase each field / team size added |
+| `queries/07_last_author_seniority.sql` | CS last-author (senior) career age & output, by year and team size |
+| `queries/08_affiliations_besteffort.sql` | Parenthetical affiliation tags — *documents why institution analysis fails here* |
 
 ## What the data says
 
@@ -62,6 +64,23 @@ fastest-growing on a percentage basis.
 arXiv in 2025 alone, up from ~64k in 2010 — consistent with the surge being
 fueled by a constantly expanding population of new (largely early-career)
 researchers.
+
+**CS growth is senior-led, i.e. labs.** In CS the last author is conventionally
+the PI. Their median career age (years on arXiv) rose from ~0 in 2000 to **9
+years in 2025**, while the share of papers whose last author is a first-timer
+fell from 65% to ~12%. And seniority scales with team size: solo CS papers have
+a median last-author career of 3 years / 8 papers; 7-10-author papers, **9 years
+/ 72 papers**. The picture is established PIs running progressively larger groups
+— consistent with growth driven by lab teams (senior author + more students).
+
+### Institutions — not answerable from this metadata
+
+Emails are stripped (71 of 3.1M author strings have an `@`) and there is no
+affiliation field. Parenthetical lab tags exist for only ~2-6% of papers, are
+mostly footnote markers (`1`, `2`), and skew heavily to one region — so
+`queries/08` exists to *demonstrate* the dead-end, not to draw conclusions. For
+real institution analysis, enrich by arXiv ID via **OpenAlex** or **Semantic
+Scholar** (both expose affiliations through free APIs) — still no PDFs needed.
 
 ### The PhD-student question — read this caveat
 

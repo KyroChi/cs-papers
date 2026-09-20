@@ -58,7 +58,10 @@ def main():
         return
 
     # Support multi-statement .sql files: show each SELECT's result.
-    statements = [s.strip() for s in sql.split(";") if s.strip()]
+    # Strip line comments first so a ';' inside a comment doesn't split a
+    # statement (our SQL has no '--' inside string literals).
+    no_comments = "\n".join(line.split("--", 1)[0] for line in sql.splitlines())
+    statements = [s.strip() for s in no_comments.split(";") if s.strip()]
     for stmt in statements:
         rel = con.sql(stmt)
         if rel is not None:
