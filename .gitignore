@@ -1,0 +1,15 @@
+# Data — never commit (1.6 GB). Fetch it with download_data.py.
+data/
+*.parquet
+*.duckdb
+*.duckdb.wal
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
