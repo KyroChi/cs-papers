@@ -5,6 +5,7 @@ Reads the arXiv metadata parquet (setup.sql views) and, for the region figure,
 the conference data (conf_setup.sql). Output is small aggregates only — safe to
 embed directly in the HTML document.
 """
+import datetime
 import glob
 import json
 import os
@@ -13,7 +14,10 @@ import sys
 import duckdb
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "figures.json")
+# Findings are written to results/figures.json (the "latest", read by the
+# distill build) and archived per-run under results/archive/ so every re-run
+# is preserved.
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "results", "figures.json")
 
 # author-list expression (strip parenthetical affiliations, split on comma/"and")
 AUTH = (r"list_filter(regexp_split_to_array(regexp_replace(authors,'\([^)]*\)','','g'),"
@@ -297,9 +301,17 @@ def main():
           AND year(first_version_date) BETWEEN 2019 AND 2026
         GROUP BY 1 ORDER BY 1""")
 
+    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
-    print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes)")
+    # archive a timestamped copy so every re-run is preserved
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    archive_dir = os.path.join(os.path.dirname(OUT) or ".", "archive")
+    os.makedirs(archive_dir, exist_ok=True)
+    archive = os.path.join(archive_dir, f"figures-{stamp}.json")
+    with open(archive, "w") as f:
+        json.dump(fig, f, default=float)
+    print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes); archived -> {archive}")
     for k, v in fig.items():
         print(f"  {k}: {len(v) if isinstance(v, list) else v}")
 

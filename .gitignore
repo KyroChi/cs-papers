@@ -1,18 +1,21 @@
-# Data — never commit (1.6 GB). Fetch it with download_data.py.
+# External data — fetched with the download_*.py scripts, never committed.
+# (arXiv metadata, Paper Copilot conference files, berenslab ICLR decisions)
 data/
-*.parquet
-*.duckdb
-*.duckdb.wal
 
-# Python
+# Python / environment
 .venv/
 __pycache__/
 *.pyc
+
+# Local DuckDB / build caches
+*.duckdb
+*.duckdb.wal
+*chartjs.cache
 
 # OS / editor
 .DS_Store
 .idea/
 .vscode/
 
-# Private, exploratory analyses — never commit (rough name-origin proxy, etc.)
-private/
+# Local scratch (never commit)
+scratch/
