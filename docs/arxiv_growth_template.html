@@ -126,6 +126,7 @@ figcaption b{font-weight:600;}
     <li>Indexed to 2021, China's submissions grew <b>~10×</b> vs <b>~2.5×</b> for the US.<span class="ref">Fig 6c</span></li>
     <li>At the <b>first-author</b> level (who led the paper), <b>PhD students dominate in every region</b>; switching to "all authors" pulls faculty/PIs up — the two bases tell different stories.<span class="ref">Fig 7</span></li>
     <li>China's PhD-led surge is <b>headcount, not output</b>: ~9× more distinct PhD first-authors, with papers-per-student flat (~1.2) and a stable seniority ratio. The US shows a mild per-student rise (1.2→1.45).<span class="ref">Fig 7</span></li>
+    <li>The inflow of <b>new PhD-student first-authors grows fastest for China</b> (~5× over 2022–25 vs ~2.6× for the US), though the US still added more per year through 2025.<span class="ref">Fig 7c</span></li>
   </ul>
 
   <figure class="fig-wide">
@@ -168,6 +169,12 @@ figcaption b{font-weight:600;}
       <button class="toggle" data-f7venue="iclr" aria-pressed="false">ICLR</button>
     </div>
     <div class="plot tall"><canvas id="f7"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 7c.</b> New PhD-student first-authors per year, by region</figcaption>
+    <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then); 2026 partial/ICLR-only.</p>
+    <div class="plot"><canvas id="f7c"></canvas></div>
   </figure>
 
   <p class="sec">Mathematics</p>
@@ -364,6 +371,13 @@ function renderAll(){
 
   // F7 — first-author seniority over time (region/venue filtered)
   drawF7();
+
+  // F7c — new PhD-student first-authors per year by region (drop censored 2021)
+  {const regs=[['China','China'],['United States','US'],['Other','Other']];
+   const rows=DATA.newphd.filter(r=>r.year>=2022);
+   const {yrs,map}=pivot(rows,r=>r.region,r=>r.n,['China','US','Other']);
+   lineChart('f7c',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
+     backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));}
 
   // Mathematics — Figures 8-11 (mirror of CS)
   {const b=DATA.m2_buckets;

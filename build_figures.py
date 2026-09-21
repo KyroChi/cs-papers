@@ -205,6 +205,21 @@ def main():
             WHERE seniority <> 'Unknown'
             GROUP BY year, venue, region, seniority ORDER BY year""")
 
+        # Figure 7c: NEW PhD-student first-authors per year, by region.
+        # debut = first year a profile appears as a PhD-student first author
+        # (proxy for new publishing PhD students). 2021 is left-censored.
+        fig["newphd"] = rows("""
+            WITH p AS (
+              SELECT or_profile, year, region FROM conf_authors
+              WHERE author_no=1 AND seniority='PhD student' AND or_profile<>''
+                AND region IN ('China','US','Other')
+            ), deb AS (
+              SELECT or_profile, min(year) AS debut, arg_min(region, year) AS region
+              FROM p GROUP BY or_profile
+            )
+            SELECT debut AS year, region, count(*) AS n
+            FROM deb GROUP BY debut, region ORDER BY year""")
+
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
     print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes)")
