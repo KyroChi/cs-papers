@@ -115,8 +115,15 @@ figcaption b{font-weight:600;}
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7.</b> First-author seniority of submissions over time</figcaption>
-    <p class="sub">Each paper attributed to its <b>first author's</b> self-reported OpenReview position (not paper counts, not the PI). Filter by region and venue.</p>
+    <figcaption><b>Figure 7.</b> Seniority of submissions over time</figcaption>
+    <p class="sub"><b>Basis</b> — “first author” counts each paper once by who led it; “all authors” counts every authorship (a PI on many papers is tallied each time). Self-reported OpenReview position. Filter by region and venue.</p>
+    <div class="bar"><span class="lbl">Basis</span>
+      <button class="toggle" data-f7basis="first" aria-pressed="true">first author</button>
+      <button class="toggle" data-f7basis="all" aria-pressed="false">all authors</button>
+      <span class="lbl" style="margin-left:8px">Scale</span>
+      <button class="toggle" data-f7scale="pct" aria-pressed="true">share %</button>
+      <button class="toggle" data-f7scale="abs" aria-pressed="false">counts</button>
+    </div>
     <div class="bar"><span class="lbl">Region</span>
       <button class="toggle" data-f7region="all" aria-pressed="true">all</button>
       <button class="toggle" data-f7region="China" aria-pressed="false">China</button>
@@ -168,8 +175,8 @@ figcaption b{font-weight:600;}
 const DATA = __FIGDATA__;
 const CAT_L=['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#4a3aa7','#e34948'];
 const CAT_D=['#3987e5','#d95926','#199e70','#c98500','#d55181','#008300','#9085e9','#e66767'];
-const ORD_L=['#86b6ef','#5598e7','#2a78d6','#1c5cab','#104281'];
-const ORD_D=['#9ec5f4','#6da7ec','#3987e5','#256abf','#184f95'];
+const ORD_L=['#86b6ef','#5598e7','#3987e5','#256abf','#1c5cab','#104281'];
+const ORD_D=['#b7d3f6','#86b6ef','#6da7ec','#3987e5','#256abf','#184f95'];
 const charts=[];
 
 function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
@@ -343,12 +350,13 @@ function renderAll(){
 }
 
 // ---- Figure 7: first-author seniority, filtered by region & venue ----
-let f7region='all', f7venue='all', f7chart=null;
+let f7region='all', f7venue='all', f7basis='first', f7scale='pct', f7chart=null;
 function f7data(){
-  const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
+  const src=f7basis==='first'?DATA.fa:DATA.fa_all;
+  const yrs=[...new Set(src.map(r=>r.year))].sort((a,b)=>a-b);
   const order=DATA.f7_order;
   const series=order.map(()=>yrs.map(()=>0));
-  DATA.fa.forEach(r=>{
+  src.forEach(r=>{
     if(f7region!=='all'&&r.region!==f7region)return;
     if(f7venue!=='all'&&r.venue!==f7venue)return;
     const si=order.indexOf(r.seniority); if(si<0)return;
@@ -360,17 +368,21 @@ function drawF7(){
   if(f7chart)f7chart.destroy();
   const {yrs,order,series}=f7data();
   const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
-  o.scales.y.max=100; o.scales.y.ticks.callback=v=>v+'%';
-  const pct=toPct(series);
+  const vals=f7scale==='pct'?toPct(series):series;
+  if(f7scale==='pct'){o.scales.y.max=100; o.scales.y.ticks.callback=v=>v+'%';}
+  else{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
   f7chart=new Chart(document.getElementById('f7'),{type:'bar',data:{labels:yrs,
-    datasets:order.map((nm,i)=>({label:nm,data:pct[i],backgroundColor:cat(i),
+    datasets:order.map((nm,i)=>({label:nm,data:vals[i],backgroundColor:cat(i),
       borderColor:css('--surface'),borderWidth:{top:2,right:0,bottom:0,left:0},
       borderRadius:3,maxBarThickness:34,stack:'s'}))},options:o});
 }
-document.querySelectorAll('[data-f7region]').forEach(b=>b.onclick=()=>{f7region=b.dataset.f7region;
-  document.querySelectorAll('[data-f7region]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});
-document.querySelectorAll('[data-f7venue]').forEach(b=>b.onclick=()=>{f7venue=b.dataset.f7venue;
-  document.querySelectorAll('[data-f7venue]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});
+function wireF7(attr,set){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
+  set(b.dataset[attr.replace('data-','').replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]);
+  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});}
+wireF7('data-f7region',v=>f7region=v);
+wireF7('data-f7venue',v=>f7venue=v);
+wireF7('data-f7basis',v=>f7basis=v);
+wireF7('data-f7scale',v=>f7scale=v);
 
 document.getElementById('themeBtn').onclick=()=>{
   const cur=document.documentElement.getAttribute('data-theme');

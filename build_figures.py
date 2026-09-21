@@ -128,14 +128,15 @@ def main():
         GROUP BY year, bucket ORDER BY year""")
 
     # ==== Mathematics — mirror of the CS figures (8-11) ====
-    fig["m2_buckets"] = ['1','2-3','4-5','6-8','9+']
+    fig["m2_buckets"] = ['1','2','3','4','5','6+']
     fig["m2"] = rows("""
         SELECT year,
-          count(*) FILTER (WHERE author_count=1)             AS "1",
-          count(*) FILTER (WHERE author_count BETWEEN 2 AND 3) AS "2-3",
-          count(*) FILTER (WHERE author_count BETWEEN 4 AND 5) AS "4-5",
-          count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
-          count(*) FILTER (WHERE author_count > 8)           AS "9+"
+          count(*) FILTER (WHERE author_count=1) AS "1",
+          count(*) FILTER (WHERE author_count=2) AS "2",
+          count(*) FILTER (WHERE author_count=3) AS "3",
+          count(*) FILTER (WHERE author_count=4) AS "4",
+          count(*) FILTER (WHERE author_count=5) AS "5",
+          count(*) FILTER (WHERE author_count>5) AS "6+"
         FROM papers_enriched
         WHERE year BETWEEN 2000 AND 2026 AND author_count>0 AND primary_category LIKE 'math.%'
         GROUP BY year ORDER BY year""")
@@ -195,6 +196,13 @@ def main():
             SELECT year, venue, region, seniority, count(*) AS n
             FROM conf_authors
             WHERE author_no = 1 AND seniority <> 'Unknown'
+            GROUP BY year, venue, region, seniority ORDER BY year""")
+        # all-author-instances basis (every authorship counted, incl. PIs on
+        # many papers) — the earlier metric; kept alongside first-author.
+        fig["fa_all"] = rows("""
+            SELECT year, venue, region, seniority, count(*) AS n
+            FROM conf_authors
+            WHERE seniority <> 'Unknown'
             GROUP BY year, venue, region, seniority ORDER BY year""")
 
     with open(OUT, "w") as f:
