@@ -344,10 +344,10 @@ function stackedBar(id,labels,names,series,colorf,mode0){
   return c;
 }
 
-function lineChart(id,labels,datasets){
-  const o=base();
-  const c=new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:datasets()},options:o});
-  charts.push({chart:c,rebuild:()=>{c.options=base();c.data.datasets=datasets();c.update('none');}});
+function lineChart(id,labels,datasets,tweak){
+  const mk=()=>{const o=base(); if(tweak)tweak(o); return o;};
+  const c=new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:datasets()},options:mk()});
+  charts.push({chart:c,rebuild:()=>{c.options=mk();c.data.datasets=datasets();c.update('none');}});
   return c;
 }
 
@@ -466,10 +466,8 @@ function renderAll(){
     lineChart('f13',yrs,()=>[{label:'Acceptance rate',
       data:DATA.acc.map(r=>+(100*r.accepted/r.submissions).toFixed(1)),
       borderColor:dark()?'#199e70':'#1baf7a',backgroundColor:withA(dark()?'#199e70':'#1baf7a',.13),
-      borderWidth:2,fill:true,tension:.25,pointRadius:2.5,pointHoverRadius:5}]);
-    const c=charts[charts.length-1].chart;
-    c.options.scales.y.suggestedMin=0; c.options.scales.y.suggestedMax=50;
-    c.options.scales.y.ticks.callback=v=>v+'%'; c.update('none');
+      borderWidth:2,fill:true,tension:.25,pointRadius:2.5,pointHoverRadius:5}],
+      o=>{o.scales.y.min=0; o.scales.y.max=50; o.scales.y.ticks.callback=v=>v+'%';});
   }
 }
 
