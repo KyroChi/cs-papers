@@ -62,6 +62,19 @@ def main():
         FROM papers_enriched WHERE year BETWEEN 1991 AND 2026 AND author_count>0
         GROUP BY year ORDER BY year""")
 
+    # ---- Figure 2b: papers by number of authors, CS only ----
+    fig["f2cs_buckets"] = ['1','2-3','4-5','6-8','9+']
+    fig["f2cs"] = rows("""
+        SELECT year,
+          count(*) FILTER (WHERE author_count=1)             AS "1",
+          count(*) FILTER (WHERE author_count BETWEEN 2 AND 3) AS "2-3",
+          count(*) FILTER (WHERE author_count BETWEEN 4 AND 5) AS "4-5",
+          count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
+          count(*) FILTER (WHERE author_count > 8)           AS "9+"
+        FROM papers_enriched
+        WHERE year BETWEEN 2000 AND 2026 AND author_count>0 AND primary_category LIKE 'cs.%'
+        GROUP BY year ORDER BY year""")
+
     # ---- Figure 3: top-5 CS sub-disciplines in 2026, tracked over time ----
     top5 = [r["primary_category"] for r in rows("""
         SELECT primary_category, count(*) c FROM papers_enriched
@@ -123,6 +136,24 @@ def main():
               count(*) FILTER (WHERE majority_region='Other') AS other
             FROM conf_paper_region WHERE year BETWEEN 2021 AND 2026
             GROUP BY year ORDER BY year""")
+
+        # Figure 7: seniority composition by region (pooled 2021-2026)
+        fig["f7_order"] = ['PhD student','Junior student (MS/UG)','Postdoc','Faculty',
+            'Researcher (unspecified)','Industry/research staff','Other']
+        fig["f7"] = rows("""
+            SELECT region, seniority, count(*) AS n
+            FROM conf_authors
+            WHERE region IN ('China','US','Other') AND seniority <> 'Unknown'
+            GROUP BY region, seniority""")
+
+        # Figure 7b: PhD-student share of authorships by region, over time
+        fig["f7b"] = rows("""
+            SELECT year, region,
+              round(100.0 * count(*) FILTER (WHERE seniority='PhD student')
+                    / count(*) FILTER (WHERE seniority<>'Unknown'), 1) AS pct_phd
+            FROM conf_authors
+            WHERE region IN ('China','US','Other') AND year BETWEEN 2021 AND 2026
+            GROUP BY year, region ORDER BY year""")
 
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
