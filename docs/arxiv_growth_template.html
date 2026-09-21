@@ -58,7 +58,7 @@ figcaption b{font-weight:600;}
   <ul class="find">
     <li>arXiv submissions have grown <b>~9× since 2000</b> (≈31k → ≈284k in 2025) and are still accelerating.<span class="ref">Fig 1a</span></li>
     <li>The rise is driven by <b>Computer Science</b> — specifically the AI/ML subfields — and by <b>teams, not solo authors</b>.<span class="ref">Fig 1b</span><span class="ref">Fig 2</span><span class="ref">Fig 3</span></li>
-    <li>At the top ML venues, <b>China has drawn level with the US</b> in submissions since 2021, driven almost entirely by a <b>~9× rise in the number of PhD-student first authors</b> — not by students each writing more.<span class="ref">Fig 6</span><span class="ref">Fig 7</span></li>
+    <li>At the top ML venues, <b>China's submission share rose steeply</b> (~13% → ~23% by 2025; level with the US only in the partial-2026 ICLR-only cycle), driven mainly by a <b>~9× rise in PhD-student first authors</b> — not students each writing more.<span class="ref">Fig 6</span><span class="ref">Fig 7</span></li>
   </ul>
 
   <p class="sec">All of arXiv</p>
@@ -70,7 +70,7 @@ figcaption b{font-weight:600;}
 
   <figure class="fig-wide">
     <figcaption><b>Figure 1a.</b> Growth in submissions across all of arXiv</figcaption>
-    <p class="sub">Papers by year of first submission. 2026 is year-to-date (partial).</p>
+    <p class="sub">Papers by year of first submission, 1991–2025 (last complete year).</p>
     <div class="plot"><canvas id="f1a"></canvas></div>
   </figure>
 
@@ -90,7 +90,7 @@ figcaption b{font-weight:600;}
   <ul class="find">
     <li>CS is the single biggest driver of arXiv's rise — from <b>27 papers (1995) to ~129k (2025)</b>, now the largest area.<span class="ref">Fig 1b</span></li>
     <li>CS is even more team-heavy than arXiv overall; solo work is a small and shrinking sliver.<span class="ref">Fig 2b</span></li>
-    <li>Growth concentrates in the <b>AI/ML subfields</b> — the top-5 in 2026 are cs.CV, cs.LG, cs.CL, cs.AI, cs.RO.<span class="ref">Fig 3</span></li>
+    <li>Growth concentrates in the <b>AI/ML subfields</b> — the top-5 in 2025 are cs.CV, cs.LG, cs.CL, cs.AI, cs.RO.<span class="ref">Fig 3</span></li>
     <li>Mean papers per CS author per year is rising (<b>≈2.0→2.5</b>, 2021–25) with a growing right tail (s.d. up), while the median stays 1.<span class="ref">Fig 4</span></li>
     <li><b>Prolific authors are getting more prolific</b>: those with 21+ career papers went from ~8 to ~11 papers/yr; occasional authors are flat.<span class="ref">Fig 5</span></li>
   </ul>
@@ -103,7 +103,7 @@ figcaption b{font-weight:600;}
 
   <figure class="fig-wide">
     <figcaption><b>Figure 3.</b> Growth of the top-5 CS sub-disciplines</figcaption>
-    <p class="sub">The five largest CS categories in 2026, tracked back over time.</p>
+    <p class="sub">The five largest CS categories in 2025, tracked back over time.</p>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f3"></canvas></div>
   </figure>
@@ -122,17 +122,18 @@ figcaption b{font-weight:600;}
 
   <p class="sec">By region — NeurIPS · ICML · ICLR</p>
   <ul class="find">
-    <li><b>China's share drew level with the US</b>: China-majority submissions rose <b>~13% → ~31%</b> (2021→2026) as the US fell <b>~49% → ~30%</b>; "Other" held near 37%.<span class="ref">Fig 6a</span><span class="ref">Fig 6b</span></li>
-    <li>Indexed to 2021, China's submissions grew <b>~10×</b> vs <b>~2.5×</b> for the US.<span class="ref">Fig 6c</span></li>
+    <li><b>China's share rose sharply</b>: China-majority submissions went <b>~13% → ~23%</b> (2021→2025) as the US fell <b>~49% → ~37%</b>, "Other" near 40% — the gap narrowed (they cross only in the partial-2026 ICLR-only data; see the 2026 section).<span class="ref">Fig 6a</span><span class="ref">Fig 6b</span></li>
+    <li>Indexed to 2021, China's submissions grew <b>~10×</b> vs <b>~4×</b> for the US (through 2025).<span class="ref">Fig 6c</span></li>
     <li>At the <b>first-author</b> level (who led the paper), <b>PhD students dominate in every region</b>; switching to "all authors" pulls faculty/PIs up — the two bases tell different stories.<span class="ref">Fig 7</span></li>
     <li>China's PhD-led surge is <b>headcount, not output</b>: ~9× more distinct PhD first-authors, with papers-per-student flat (~1.2) and a stable seniority ratio. The US shows a mild per-student rise (1.2→1.45).<span class="ref">Fig 7</span></li>
     <li>The inflow of <b>new PhD-student first-authors grows fastest for China</b> (~5× over 2022–25 vs ~2.6× for the US), though the US still added more per year through 2025.<span class="ref">Fig 7c</span></li>
+    <li>First-author PhD submissions grew <b>~9.9×</b> for China (285→2,821) vs <b>~4.1×</b> for the US (1,413→5,853) over 2021–25 — China's first-author PhD output is growing ~2.4× faster, though the US base is larger.<span class="ref">Fig 7e</span></li>
     <li>Faculty are on the most papers per year (mean ≈3 in 2025) vs PhD students ≈1.9, but the <b>median is 1 for every tier</b> — the gap is a prolific minority, not typical behavior.<span class="ref">Fig 7d</span></li>
   </ul>
 
   <figure class="fig-wide">
     <figcaption><b>Figure 6a.</b> Submissions by institution region — absolute</figcaption>
-    <p class="sub">Each paper attributed to its author-majority region. Coverage begins 2021; 2026 is ICLR-only so far.</p>
+    <p class="sub">Each paper attributed to its author-majority region. Coverage 2021–2025.</p>
     <div class="plot"><canvas id="f6a"></canvas></div>
   </figure>
 
@@ -143,7 +144,7 @@ figcaption b{font-weight:600;}
 
   <figure class="fig-wide">
     <figcaption><b>Figure 6c.</b> Growth indexed to 2021 (= 100)</figcaption>
-    <p class="sub">Each region relative to its own 2021 level — steeper is faster growth. Venue coverage shifts year to year (see notes); 2026 is ICLR-only.</p>
+    <p class="sub">Each region relative to its own 2021 level — steeper is faster growth. Venue coverage shifts year to year (see notes).</p>
     <div class="plot"><canvas id="f6c"></canvas></div>
   </figure>
 
@@ -174,7 +175,7 @@ figcaption b{font-weight:600;}
 
   <figure class="fig-wide">
     <figcaption><b>Figure 7c.</b> New PhD-student first-authors per year, by region</figcaption>
-    <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then); 2026 partial/ICLR-only.</p>
+    <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then).</p>
     <div class="plot"><canvas id="f7c"></canvas></div>
   </figure>
 
@@ -186,6 +187,12 @@ figcaption b{font-weight:600;}
       <button class="toggle" data-f7dstat="median" aria-pressed="false">median</button>
     </div>
     <div class="plot tall"><canvas id="f7d"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 7e.</b> First-author PhD-student submissions — China vs US</figcaption>
+    <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
+    <div class="plot"><canvas id="f7e"></canvas></div>
   </figure>
 
   <p class="sec">Mathematics</p>
@@ -204,7 +211,7 @@ figcaption b{font-weight:600;}
 
   <figure class="fig-wide">
     <figcaption><b>Figure 9.</b> Growth of the top-5 Math sub-disciplines</figcaption>
-    <p class="sub">The five largest Math categories in 2026, tracked back over time.</p>
+    <p class="sub">The five largest Math categories in 2025, tracked back over time.</p>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f9"></canvas></div>
   </figure>
@@ -244,7 +251,7 @@ figcaption b{font-weight:600;}
   <p class="sec">Preliminary notes — is it more students, or students writing more?</p>
   <ul class="find">
     <li><b>Mostly more students.</b> PhD-student submissions (all authorships) grew <b>~6.1×</b> (2021→2025), decomposing into <b>~4.5× more distinct students</b> × <b>~1.34× more papers per student</b> — headcount is the dominant term.<span class="ref">Fig 14a</span></li>
-    <li>Per-student output rose ~34% for all authorship (1.40 → 1.88) but only <b>~16% for first-authorship</b> (1.18 → 1.37) — so the extra is mostly <b>co-authorship</b>, not students each <b>leading</b> more papers. First-author PhD growth is ~4.2× headcount.<span class="ref">Fig 14b</span></li>
+    <li>Per-student output rose ~34% for all authorship (1.40 → 1.88) but only <b>~16% for first-authorship</b> (1.18 → 1.37) — so the extra is mostly <b>co-authorship</b>, not students each <b>leading</b> more papers. First-author PhD growth is ~4.2× headcount. (A per-student productivity effect — e.g. AI-assisted writing — would surface here; the modest first-author rise is where to watch, but it's too early and confounded to attribute.)<span class="ref">Fig 14b</span></li>
     <li>The <b>median is 1 paper/year</b> for students throughout — the typical PhD student still submits one paper a year; the mean rises from a growing tail.<span class="ref">Fig 7d</span></li>
     <li><b>Caveats (why this is preliminary):</b> OpenReview coverage itself grew over 2021–25, inflating headcount; ML-venues only; positions are self-reported; the window is short and starts at 2021. Directional, not causal.</li>
   </ul>
@@ -261,8 +268,22 @@ figcaption b{font-weight:600;}
     <div class="plot"><canvas id="f14b"></canvas></div>
   </figure>
 
+  <p class="sec">2026 so far (through August, year-to-date)</p>
+  <ul class="find">
+    <li>Through <b>August 2026</b>, arXiv already logged <b>225,912</b> submissions — <b>~24% ahead</b> of the same Jan–Aug window in 2025 (181,969). On pace for another record year.<span class="ref">Fig 15</span></li>
+    <li>Computer Science is now <b>~48%</b> of Jan–Aug submissions (2026), up from 46% (2025) and 34% (2021) — nearly half of all new arXiv papers.<span class="ref">Fig 15</span></li>
+    <li><b>Conferences (preliminary, ICLR-only — NeurIPS/ICML 2026 not yet released):</b> ICLR 2026 drew ~22.8k submissions (vs 13.7k in 2025); by author-majority region <b>China (~31%) edged past the US (~30%)</b> for the first time — one venue, decisions still pending.</li>
+    <li>2026 is partial and excluded from the figures above; treat it as a leading indicator.</li>
+  </ul>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 15.</b> 2026 pace — arXiv submissions year-to-date (Jan–Aug)</figcaption>
+    <p class="sub">Same Jan–Aug window each year, so 2026 is comparable rather than penalized for being partial.</p>
+    <div class="plot"><canvas id="f15"></canvas></div>
+  </figure>
+
   <div class="notes">
-    <b>Notes.</b> Author counts split the raw author string on commas and “and” (collaborations count as one). Subject groups collapse arXiv archives; “Other” folds the smaller groups. Region uses OpenReview institution domains; company domains map to HQ country, so an academia-only cut is cleaner. 2026 is partial for arXiv (year-to-date) and ICLR-only for the conference figures. Author identity is by name string, so common names collide — trends are directional.
+    <b>Notes.</b> Author counts split the raw author string on commas and “and” (collaborations count as one). Subject groups collapse arXiv archives; “Other” folds the smaller groups. Region uses OpenReview institution domains; company domains map to HQ country, so an academia-only cut is cleaner. All figures above end at 2025, the last complete year; 2026 is shown separately in the final section. Author identity is by name string, so common names collide — trends are directional.
   </div>
 </div>
 
@@ -426,13 +447,21 @@ function renderAll(){
 
   // F7c — new PhD-student first-authors per year by region (drop censored 2021)
   {const regs=[['China','China'],['United States','US'],['Other','Other']];
-   const rows=DATA.newphd.filter(r=>r.year>=2022);
+   const rows=DATA.newphd.filter(r=>r.year>=2022 && r.year<=2025);
    const {yrs,map}=pivot(rows,r=>r.region,r=>r.n,['China','US','Other']);
    lineChart('f7c',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
      backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));}
 
   // F7d — submissions per person by seniority (mean/median toggle)
   drawF7d();
+
+  // F7e — first-author PhD-student submissions, China vs US (from DATA.fa)
+  {const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
+   const mk=reg=>yrs.map(y=>DATA.fa.filter(r=>r.year===y&&r.region===reg&&r.seniority==='PhD student').reduce((s,r)=>s+r.n,0));
+   lineChart('f7e',yrs,()=>[
+     {label:'China',data:mk('China'),borderColor:cat(0),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
+     {label:'United States',data:mk('US'),borderColor:cat(1),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}
+   ]);}
 
   // Mathematics — Figures 8-11 (mirror of CS)
   {const b=DATA.m2_buckets;
@@ -478,6 +507,18 @@ function renderAll(){
       {label:'First-author only',data:DATA.phddec.map(r=>r.fa_per_student),
         borderColor:cat(2),borderWidth:2,borderDash:[5,4],pointRadius:2.5,pointHoverRadius:5,tension:.2}
     ],o=>{o.scales.y.min=0; o.scales.y.suggestedMax=2;});
+  }
+
+  // F15 — 2026 pace: arXiv YTD (Jan–cutoff) by year, all + CS
+  if(DATA.ytd){
+    const yrs=DATA.ytd.map(r=>r.year);
+    const mn=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][DATA.ytd_month]||'';
+    lineChart('f15',yrs,()=>[
+      {label:'All arXiv (Jan–'+mn+')',data:DATA.ytd.map(r=>r.ytd_papers),borderColor:cat(0),
+        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
+      {label:'Computer Science',data:DATA.ytd.map(r=>r.ytd_cs),borderColor:cat(1),
+        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}
+    ],o=>{o.scales.y.min=0; o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
   }
 }
 

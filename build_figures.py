@@ -37,7 +37,7 @@ def main():
     # ---- Figure 1a: raw growth in submissions across all of arXiv ----
     fig["f1a"] = rows("""
         SELECT year, count(*) AS papers
-        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2025
         GROUP BY year ORDER BY year""")
 
     # ---- Figure 1b: relative distribution across major subjects (stacked) ----
@@ -46,7 +46,7 @@ def main():
         'Other/Physics-misc']
     fig["f1b"] = rows("""
         SELECT year, subject_group, count(*) AS papers
-        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2025
         GROUP BY year, subject_group ORDER BY year""")
 
     # ---- Figure 2: author-count buckets {1, 2-3, 4-5, 6-8, 9+} ----
@@ -59,7 +59,7 @@ def main():
           count(*) FILTER (WHERE author_count BETWEEN 4 AND 5) AS "4-5",
           count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
           count(*) FILTER (WHERE author_count > 8)           AS "9+"
-        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026 AND author_count>0
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2025 AND author_count>0
         GROUP BY year ORDER BY year""")
 
     # ---- Figure 2b: papers by number of authors, CS only ----
@@ -72,20 +72,20 @@ def main():
           count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
           count(*) FILTER (WHERE author_count > 8)           AS "9+"
         FROM papers_enriched
-        WHERE year BETWEEN 2000 AND 2026 AND author_count>0 AND primary_category LIKE 'cs.%'
+        WHERE year BETWEEN 2000 AND 2025 AND author_count>0 AND primary_category LIKE 'cs.%'
         GROUP BY year ORDER BY year""")
 
     # ---- Figure 3: top-5 CS sub-disciplines in 2026, tracked over time ----
     top5 = [r["primary_category"] for r in rows("""
         SELECT primary_category, count(*) c FROM papers_enriched
-        WHERE primary_category LIKE 'cs.%' AND year=2026
+        WHERE primary_category LIKE 'cs.%' AND year=2025
         GROUP BY 1 ORDER BY c DESC LIMIT 5""")]
     fig["f3_cats"] = top5
     inlist = ",".join(f"'{c}'" for c in top5)
     fig["f3"] = rows(f"""
         SELECT year, primary_category, count(*) AS papers
         FROM papers_enriched
-        WHERE primary_category IN ({inlist}) AND year BETWEEN 2010 AND 2026
+        WHERE primary_category IN ({inlist}) AND year BETWEEN 2010 AND 2025
         GROUP BY year, primary_category ORDER BY year""")
 
     # ---- Figures 4 & 5: CS per-author annual output ----
@@ -94,7 +94,7 @@ def main():
         WITH ev AS (
             SELECT trim(a) AS author, year
             FROM papers_enriched, UNNEST({AUTH}) AS t(a)
-            WHERE primary_category LIKE 'cs.%' AND year BETWEEN 1991 AND 2026
+            WHERE primary_category LIKE 'cs.%' AND year BETWEEN 1991 AND 2025
               AND trim(a) <> ''
         )
         SELECT author, year, count(*) AS n FROM ev GROUP BY author, year""")
@@ -103,7 +103,7 @@ def main():
     fig["f4"] = rows("""
         SELECT year, round(avg(n),3) AS mean, round(stddev_samp(n),3) AS std,
                median(n) AS median, count(*) AS active_authors
-        FROM cs_annual WHERE year BETWEEN 2005 AND 2026
+        FROM cs_annual WHERE year BETWEEN 2005 AND 2025
         GROUP BY year ORDER BY year""")
 
     # Fig 5: same annual output, split by cumulative career-total bucket
@@ -124,7 +124,7 @@ def main():
             FROM cum
         )
         SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
-        FROM b WHERE year BETWEEN 2005 AND 2026
+        FROM b WHERE year BETWEEN 2005 AND 2025
         GROUP BY year, bucket ORDER BY year""")
 
     # ==== Mathematics — mirror of the CS figures (8-11) ====
@@ -138,30 +138,30 @@ def main():
           count(*) FILTER (WHERE author_count=5) AS "5",
           count(*) FILTER (WHERE author_count>5) AS "6+"
         FROM papers_enriched
-        WHERE year BETWEEN 2000 AND 2026 AND author_count>0 AND primary_category LIKE 'math.%'
+        WHERE year BETWEEN 2000 AND 2025 AND author_count>0 AND primary_category LIKE 'math.%'
         GROUP BY year ORDER BY year""")
     mtop5 = [r["primary_category"] for r in rows("""
         SELECT primary_category, count(*) c FROM papers_enriched
-        WHERE primary_category LIKE 'math.%' AND year=2026
+        WHERE primary_category LIKE 'math.%' AND year=2025
         GROUP BY 1 ORDER BY c DESC LIMIT 5""")]
     fig["m3_cats"] = mtop5
     minlist = ",".join(f"'{c}'" for c in mtop5)
     fig["m3"] = rows(f"""
         SELECT year, primary_category, count(*) AS papers FROM papers_enriched
-        WHERE primary_category IN ({minlist}) AND year BETWEEN 2010 AND 2026
+        WHERE primary_category IN ({minlist}) AND year BETWEEN 2010 AND 2025
         GROUP BY year, primary_category ORDER BY year""")
     con.execute(f"""
         CREATE TEMP TABLE math_annual AS
         WITH ev AS (
             SELECT trim(a) AS author, year
             FROM papers_enriched, UNNEST({AUTH}) AS t(a)
-            WHERE primary_category LIKE 'math.%' AND year BETWEEN 1991 AND 2026 AND trim(a)<>''
+            WHERE primary_category LIKE 'math.%' AND year BETWEEN 1991 AND 2025 AND trim(a)<>''
         )
         SELECT author, year, count(*) AS n FROM ev GROUP BY author, year""")
     fig["m4"] = rows("""
         SELECT year, round(avg(n),3) AS mean, round(stddev_samp(n),3) AS std,
                median(n) AS median, count(*) AS active_authors
-        FROM math_annual WHERE year BETWEEN 2005 AND 2026 GROUP BY year ORDER BY year""")
+        FROM math_annual WHERE year BETWEEN 2005 AND 2025 GROUP BY year ORDER BY year""")
     fig["m5_buckets"] = ['1','2-3','4-8','9-20','21+']
     fig["m5"] = rows("""
         WITH cum AS (
@@ -175,7 +175,7 @@ def main():
             FROM cum
         )
         SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
-        FROM b WHERE year BETWEEN 2005 AND 2026 GROUP BY year, bucket ORDER BY year""")
+        FROM b WHERE year BETWEEN 2005 AND 2025 GROUP BY year, bucket ORDER BY year""")
 
     # ---- Figure 6: region (China / US / Other), conference submissions ----
     if "conf_paper_region" in [r["name"] for r in rows("SHOW TABLES")]:
@@ -184,7 +184,7 @@ def main():
               count(*) FILTER (WHERE majority_region='China') AS china,
               count(*) FILTER (WHERE majority_region='US')    AS us,
               count(*) FILTER (WHERE majority_region='Other') AS other
-            FROM conf_paper_region WHERE year BETWEEN 2021 AND 2026
+            FROM conf_paper_region WHERE year BETWEEN 2021 AND 2025
             GROUP BY year ORDER BY year""")
 
         # Figure 7: FIRST-AUTHOR seniority of submissions, finest grain
@@ -195,14 +195,14 @@ def main():
         fig["fa"] = rows("""
             SELECT year, venue, region, seniority, count(*) AS n
             FROM conf_authors
-            WHERE author_no = 1 AND seniority <> 'Unknown'
+            WHERE author_no = 1 AND seniority <> 'Unknown' AND year BETWEEN 2021 AND 2025
             GROUP BY year, venue, region, seniority ORDER BY year""")
         # all-author-instances basis (every authorship counted, incl. PIs on
         # many papers) — the earlier metric; kept alongside first-author.
         fig["fa_all"] = rows("""
             SELECT year, venue, region, seniority, count(*) AS n
             FROM conf_authors
-            WHERE seniority <> 'Unknown'
+            WHERE seniority <> 'Unknown' AND year BETWEEN 2021 AND 2025
             GROUP BY year, venue, region, seniority ORDER BY year""")
 
         # Figure 7c: NEW PhD-student first-authors per year, by region.
@@ -226,6 +226,7 @@ def main():
             WITH pp AS (
               SELECT year, seniority, or_profile, count(DISTINCT id) AS subs
               FROM conf_authors WHERE or_profile<>'' AND seniority<>'Unknown'
+                AND year BETWEEN 2021 AND 2025
               GROUP BY year, seniority, or_profile
             )
             SELECT year, seniority, round(avg(subs),3) AS mean, median(subs) AS median,
@@ -266,6 +267,18 @@ def main():
             FROM read_parquet('{best}')
             WHERE year BETWEEN 2017 AND 2025
             GROUP BY year ORDER BY year""")
+
+    # ---- 2026 so far: year-to-date pace vs prior years (same Jan–cutoff window) ----
+    cutoff = con.sql("SELECT max(month(first_version_date)) FROM papers "
+                     "WHERE year(first_version_date)=2026").fetchone()[0]
+    fig["ytd_month"] = cutoff
+    fig["ytd"] = rows(f"""
+        SELECT year(first_version_date) AS year, count(*) AS ytd_papers,
+          count(*) FILTER (WHERE primary_category LIKE 'cs.%') AS ytd_cs
+        FROM papers
+        WHERE month(first_version_date) <= {cutoff}
+          AND year(first_version_date) BETWEEN 2019 AND 2026
+        GROUP BY 1 ORDER BY 1""")
 
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
