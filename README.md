@@ -96,16 +96,18 @@ answered on the conference track below.
 ### Institution region at top-ML venues (NeurIPS / ICML / ICLR)
 
 Using real OpenReview institution domains (`aff_domain`), we attribute each
-submission to a region by the plurality of its authors' institutions. Domain
-coverage is populated ~2021+; 2026 is ICLR-only so far.
+submission to the region holding the **most** of its authors' institutions;
+ties are split fairly by a hash-of-id coin flip. Domain coverage is populated
+~2021+; 2026 is ICLR-only so far.
 
 **China's share of top-ML submissions is rising fast while the US share falls.**
-Pooled across the three venues, submissions whose dominant region is China went
-from **13% (2021) to 32% (2026)**, while US-dominant fell from **51% to 31%** —
-i.e. China has drawn level with the US at this level. Counting *any* author from
-a region, US-China co-authored papers also doubled (7% → 12%). "Other" (rest of
-world) held steady near 37%. Company domains are attributed to HQ country (a
-caveat), but an academia-only cut (`queries/12`) shows the same crossover.
+Pooled across the three venues, submissions with a China author-majority went
+from **12% (2021) to 31% (2026)**, while US-majority fell from **49% to 30%** —
+i.e. China has drawn level with the US at this level. Only ~6-7% of papers are
+ties decided by the coin flip. Counting *any* author from a region, US-China
+co-authored papers also doubled (7% → 12%). "Other" (rest of world) held steady
+near 40%. Company domains are attributed to HQ country (a caveat), but an
+academia-only cut (`queries/12`) shows the same crossover.
 
 **By seniority, top-ML authorship is trainee-heavy and getting more so.** PhD
 students are ~26-28% of all author-instances (the largest single tier alongside

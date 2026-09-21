@@ -132,10 +132,18 @@ WITH pa AS (
 SELECT *,
     (n_cn > 0)  AS any_china,
     (n_us > 0)  AS any_us,
-    CASE
-        WHEN n_known = 0                              THEN 'Unknown'
-        WHEN n_cn >= n_us AND n_cn >= n_other         THEN 'China'
-        WHEN n_us >= n_other                          THEN 'US'
-        ELSE 'Other'
-    END AS dominant_region
+    -- Attribute the paper to the region with the MOST authors. On a tie for
+    -- the top count, pick fairly among the tied regions — a "coin flip" made
+    -- deterministic by hashing the paper id, so it's uniform in aggregate but
+    -- reproducible across runs. Handles 2- and 3-way ties.
+    CASE WHEN n_known = 0 THEN 'Unknown' ELSE
+        list_transform(
+            list_filter(
+                [{'r':'China','n':n_cn}, {'r':'US','n':n_us}, {'r':'Other','n':n_other}],
+                x -> x.n = greatest(n_cn, n_us, n_other) AND x.n > 0),
+            x -> x.r
+        )[ CAST(hash(id) % len(list_filter(
+                [{'r':'China','n':n_cn}, {'r':'US','n':n_us}, {'r':'Other','n':n_other}],
+                x -> x.n = greatest(n_cn, n_us, n_other) AND x.n > 0)) AS BIGINT) + 1 ]
+    END AS majority_region
 FROM pa;
