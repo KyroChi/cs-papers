@@ -32,6 +32,7 @@ figcaption b{font-weight:600;}
 .bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
 .toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent; border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+.lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
 .controls{position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); right:16px; z-index:9;}
 .notes{color:var(--muted); font-size:12px; line-height:1.7; margin-top:44px; border-top:1px solid var(--grid); padding-top:16px;}
 .notes b{color:var(--ink2);}
@@ -114,14 +115,48 @@ figcaption b{font-weight:600;}
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7.</b> Seniority composition by region</figcaption>
-    <p class="sub">Share of author-instances by self-reported position, pooled 2021–2026. China skews more faculty; the US is the most PhD-student-heavy.</p>
-    <div class="plot"><canvas id="f7"></canvas></div>
+    <figcaption><b>Figure 7.</b> First-author seniority of submissions over time</figcaption>
+    <p class="sub">Each paper attributed to its <b>first author's</b> self-reported OpenReview position (not paper counts, not the PI). Filter by region and venue.</p>
+    <div class="bar"><span class="lbl">Region</span>
+      <button class="toggle" data-f7region="all" aria-pressed="true">all</button>
+      <button class="toggle" data-f7region="China" aria-pressed="false">China</button>
+      <button class="toggle" data-f7region="US" aria-pressed="false">US</button>
+      <button class="toggle" data-f7region="Other" aria-pressed="false">Other</button>
+    </div>
+    <div class="bar"><span class="lbl">Venue</span>
+      <button class="toggle" data-f7venue="all" aria-pressed="true">all</button>
+      <button class="toggle" data-f7venue="nips" aria-pressed="false">NeurIPS</button>
+      <button class="toggle" data-f7venue="icml" aria-pressed="false">ICML</button>
+      <button class="toggle" data-f7venue="iclr" aria-pressed="false">ICLR</button>
+    </div>
+    <div class="plot tall"><canvas id="f7"></canvas></div>
+  </figure>
+
+  <p class="sec">Mathematics</p>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 8.</b> Papers by number of authors — Math only</figcaption>
+    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
+    <div class="plot tall"><canvas id="f8"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7b.</b> PhD-student share of authorships by region</figcaption>
-    <div class="plot"><canvas id="f7b"></canvas></div>
+    <figcaption><b>Figure 9.</b> Growth of the top-5 Math sub-disciplines</figcaption>
+    <p class="sub">The five largest Math categories in 2026, tracked back over time.</p>
+    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
+    <div class="plot tall"><canvas id="f9"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 10.</b> Papers submitted per Math author each year</figcaption>
+    <p class="sub">Mean (band = ±1 s.d.) and median annual output among authors active that year.</p>
+    <div class="plot"><canvas id="f10"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 11.</b> Annual output by career total — Math</figcaption>
+    <p class="sub">Mean papers/year, authors bucketed by cumulative Math papers to date.</p>
+    <div class="plot"><canvas id="f11"></canvas></div>
   </figure>
 
   <div class="notes">
@@ -214,6 +249,7 @@ function lineChart(id,labels,datasets){
 
 function renderAll(){
   charts.splice(0).forEach(c=>c.chart.destroy());
+  if(f7chart){f7chart.destroy();f7chart=null;}
 
   // F1a — area line
   lineChart('f1a',years(DATA.f1a),()=>[{label:'Submissions',data:DATA.f1a.map(r=>r.papers),
@@ -282,21 +318,59 @@ function renderAll(){
         borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};});
   });
 
-  // F7 — seniority composition by region (100% stacked, x = regions)
-  {const regions=['China','US','Other'], order=DATA.f7_order;
-   const idx={China:0,US:1,Other:2};
-   const series=order.map(sen=>regions.map(()=>0));
-   DATA.f7.forEach(r=>{const si=order.indexOf(r.seniority); if(si>=0) series[si][idx[r.region]]+=r.n;});
-   stackedBar('f7',regions,order,series,cat,'pct');}
+  // F7 — first-author seniority over time (region/venue filtered)
+  drawF7();
 
-  // F7b — PhD-student share by region over time
-  {const regs=[['China','China'],['United States','US'],['Other','Other']];
-   const {yrs,map}=pivot(DATA.f7b,r=>r.region,r=>r.pct_phd,['China','US','Other']);
-   lineChart('f7b',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
-     borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));
-   charts[charts.length-1].chart.options.scales.y.ticks.callback=v=>v+'%';
-   charts[charts.length-1].chart.update('none');}
+  // Mathematics — Figures 8-11 (mirror of CS)
+  {const b=DATA.m2_buckets;
+   stackedBar('f8',years(DATA.m2),b,b.map(k=>DATA.m2.map(r=>r[k])),ord,'abs');}
+  {const cats=DATA.m3_cats;
+   const {yrs,map}=pivot(DATA.m3,r=>r.primary_category,r=>r.papers,cats);
+   stackedBar('f9',yrs,cats,cats.map(k=>map[k]),cat,'abs');}
+  lineChart('f10',years(DATA.m4),()=>{
+    const mean=DATA.m4.map(r=>r.mean),sd=DATA.m4.map(r=>r.std),med=DATA.m4.map(r=>r.median);
+    const up=mean.map((m,i)=>+(m+sd[i]).toFixed(2)),lo=mean.map((m,i)=>Math.max(0,+(m-sd[i]).toFixed(2)));
+    const band=withA(dark()?ORD_D[2]:'#2a78d6',.13);
+    return [
+      {label:'+1 s.d.',data:up,borderColor:'transparent',backgroundColor:band,fill:'+1',pointRadius:0,tension:.25},
+      {label:'−1 s.d.',data:lo,borderColor:'transparent',backgroundColor:band,fill:false,pointRadius:0,tension:.25},
+      {label:'Mean',data:mean,borderColor:cat(0),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25},
+      {label:'Median',data:med,borderColor:cat(1),borderWidth:2,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,tension:.25}
+    ];});
+  {const {yrs,map}=pivot(DATA.m5,r=>r.bucket,r=>r.mean_output,DATA.m5_buckets);
+   lineChart('f11',yrs,()=>DATA.m5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
+     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
 }
+
+// ---- Figure 7: first-author seniority, filtered by region & venue ----
+let f7region='all', f7venue='all', f7chart=null;
+function f7data(){
+  const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
+  const order=DATA.f7_order;
+  const series=order.map(()=>yrs.map(()=>0));
+  DATA.fa.forEach(r=>{
+    if(f7region!=='all'&&r.region!==f7region)return;
+    if(f7venue!=='all'&&r.venue!==f7venue)return;
+    const si=order.indexOf(r.seniority); if(si<0)return;
+    series[si][yrs.indexOf(r.year)]+=r.n;
+  });
+  return {yrs,order,series};
+}
+function drawF7(){
+  if(f7chart)f7chart.destroy();
+  const {yrs,order,series}=f7data();
+  const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
+  o.scales.y.max=100; o.scales.y.ticks.callback=v=>v+'%';
+  const pct=toPct(series);
+  f7chart=new Chart(document.getElementById('f7'),{type:'bar',data:{labels:yrs,
+    datasets:order.map((nm,i)=>({label:nm,data:pct[i],backgroundColor:cat(i),
+      borderColor:css('--surface'),borderWidth:{top:2,right:0,bottom:0,left:0},
+      borderRadius:3,maxBarThickness:34,stack:'s'}))},options:o});
+}
+document.querySelectorAll('[data-f7region]').forEach(b=>b.onclick=()=>{f7region=b.dataset.f7region;
+  document.querySelectorAll('[data-f7region]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});
+document.querySelectorAll('[data-f7venue]').forEach(b=>b.onclick=()=>{f7venue=b.dataset.f7venue;
+  document.querySelectorAll('[data-f7venue]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});
 
 document.getElementById('themeBtn').onclick=()=>{
   const cur=document.documentElement.getAttribute('data-theme');

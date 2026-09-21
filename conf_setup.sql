@@ -14,7 +14,7 @@ CREATE OR REPLACE VIEW conf_papers AS
 SELECT
     regexp_extract(filename, 'conf/([a-z]+)_', 1)              AS venue,
     CAST(regexp_extract(filename, '(\d{4})\.jsonl', 1) AS INT) AS year,
-    id, author, aff, aff_domain, position
+    id, author, aff, aff_domain, position, or_profile
 FROM read_json_auto('data/conf/*.jsonl', union_by_name := true, filename := true);
 
 CREATE OR REPLACE VIEW conf_authors AS
@@ -23,7 +23,8 @@ WITH split AS (
         string_split(coalesce(author, ''), ';')     AS a,
         string_split(coalesce(aff, ''), ';')         AS af,
         string_split(coalesce(aff_domain, ''), ';')  AS ad,
-        string_split(coalesce(position, ''), ';')    AS po
+        string_split(coalesce(position, ''), ';')    AS po,
+        string_split(coalesce(or_profile, ''), ';')  AS op
     FROM conf_papers
 ),
 exploded AS (
@@ -31,6 +32,7 @@ exploded AS (
         i                                                   AS author_no,
         trim(a[i])                                          AS author,
         trim(af[i])                                         AS aff,
+        trim(op[i])                                         AS or_profile,
         lower(trim(split_part(ad[i], '+', 1)))              AS domain,
         lower(trim(split_part(po[i], '+', 1)))              AS position
     FROM split, unnest(range(1, length(ad) + 1)) AS g(i)

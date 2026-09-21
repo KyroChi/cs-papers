@@ -127,6 +127,55 @@ def main():
         FROM b WHERE year BETWEEN 2005 AND 2026
         GROUP BY year, bucket ORDER BY year""")
 
+    # ==== Mathematics — mirror of the CS figures (8-11) ====
+    fig["m2_buckets"] = ['1','2-3','4-5','6-8','9+']
+    fig["m2"] = rows("""
+        SELECT year,
+          count(*) FILTER (WHERE author_count=1)             AS "1",
+          count(*) FILTER (WHERE author_count BETWEEN 2 AND 3) AS "2-3",
+          count(*) FILTER (WHERE author_count BETWEEN 4 AND 5) AS "4-5",
+          count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
+          count(*) FILTER (WHERE author_count > 8)           AS "9+"
+        FROM papers_enriched
+        WHERE year BETWEEN 2000 AND 2026 AND author_count>0 AND primary_category LIKE 'math.%'
+        GROUP BY year ORDER BY year""")
+    mtop5 = [r["primary_category"] for r in rows("""
+        SELECT primary_category, count(*) c FROM papers_enriched
+        WHERE primary_category LIKE 'math.%' AND year=2026
+        GROUP BY 1 ORDER BY c DESC LIMIT 5""")]
+    fig["m3_cats"] = mtop5
+    minlist = ",".join(f"'{c}'" for c in mtop5)
+    fig["m3"] = rows(f"""
+        SELECT year, primary_category, count(*) AS papers FROM papers_enriched
+        WHERE primary_category IN ({minlist}) AND year BETWEEN 2010 AND 2026
+        GROUP BY year, primary_category ORDER BY year""")
+    con.execute(f"""
+        CREATE TEMP TABLE math_annual AS
+        WITH ev AS (
+            SELECT trim(a) AS author, year
+            FROM papers_enriched, UNNEST({AUTH}) AS t(a)
+            WHERE primary_category LIKE 'math.%' AND year BETWEEN 1991 AND 2026 AND trim(a)<>''
+        )
+        SELECT author, year, count(*) AS n FROM ev GROUP BY author, year""")
+    fig["m4"] = rows("""
+        SELECT year, round(avg(n),3) AS mean, round(stddev_samp(n),3) AS std,
+               median(n) AS median, count(*) AS active_authors
+        FROM math_annual WHERE year BETWEEN 2005 AND 2026 GROUP BY year ORDER BY year""")
+    fig["m5_buckets"] = ['1','2-3','4-8','9-20','21+']
+    fig["m5"] = rows("""
+        WITH cum AS (
+            SELECT author, year, n, sum(n) OVER (PARTITION BY author ORDER BY year) AS total
+            FROM math_annual
+        ), b AS (
+            SELECT year, n,
+                CASE WHEN total=1 THEN '1' WHEN total BETWEEN 2 AND 3 THEN '2-3'
+                     WHEN total BETWEEN 4 AND 8 THEN '4-8' WHEN total BETWEEN 9 AND 20 THEN '9-20'
+                     ELSE '21+' END AS bucket
+            FROM cum
+        )
+        SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
+        FROM b WHERE year BETWEEN 2005 AND 2026 GROUP BY year, bucket ORDER BY year""")
+
     # ---- Figure 6: region (China / US / Other), conference submissions ----
     if "conf_paper_region" in [r["name"] for r in rows("SHOW TABLES")]:
         fig["f6"] = rows("""
@@ -137,23 +186,16 @@ def main():
             FROM conf_paper_region WHERE year BETWEEN 2021 AND 2026
             GROUP BY year ORDER BY year""")
 
-        # Figure 7: seniority composition by region (pooled 2021-2026)
+        # Figure 7: FIRST-AUTHOR seniority of submissions, finest grain
+        # (year x venue x region x seniority) so the page can filter/aggregate.
+        # Each paper counts once, by its first author's self-reported position.
         fig["f7_order"] = ['PhD student','Junior student (MS/UG)','Postdoc','Faculty',
             'Researcher (unspecified)','Industry/research staff','Other']
-        fig["f7"] = rows("""
-            SELECT region, seniority, count(*) AS n
+        fig["fa"] = rows("""
+            SELECT year, venue, region, seniority, count(*) AS n
             FROM conf_authors
-            WHERE region IN ('China','US','Other') AND seniority <> 'Unknown'
-            GROUP BY region, seniority""")
-
-        # Figure 7b: PhD-student share of authorships by region, over time
-        fig["f7b"] = rows("""
-            SELECT year, region,
-              round(100.0 * count(*) FILTER (WHERE seniority='PhD student')
-                    / count(*) FILTER (WHERE seniority<>'Unknown'), 1) AS pct_phd
-            FROM conf_authors
-            WHERE region IN ('China','US','Other') AND year BETWEEN 2021 AND 2026
-            GROUP BY year, region ORDER BY year""")
+            WHERE author_no = 1 AND seniority <> 'Unknown'
+            GROUP BY year, venue, region, seniority ORDER BY year""")
 
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
