@@ -42,6 +42,11 @@ figcaption b{font-weight:600;}
 .lead{font-family:var(--sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:30px 0 0;}
 .notes{color:var(--muted); font-size:12px; line-height:1.7; margin-top:44px; border-top:1px solid var(--grid); padding-top:16px;}
 .notes b{color:var(--ink2);}
+.methods{margin:14px 0 0;}
+.methods dt{font-family:var(--sans); font-weight:600; font-size:12.5px; color:var(--ink); margin-top:14px;}
+.methods dd{margin:3px 0 0; font-size:12.5px; line-height:1.6; color:var(--ink2);}
+.methods code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; background:var(--grid); padding:0 4px; border-radius:3px;}
+.methods a{color:var(--ink2);}
 </style>
 
 <div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>
@@ -304,9 +309,64 @@ figcaption b{font-weight:600;}
     <div class="plot"><canvas id="f15"></canvas></div>
   </figure>
 
-  <div class="notes">
-    <b>Notes.</b> Author counts split the raw author string on commas and “and” (collaborations count as one). Subject groups collapse arXiv archives; “Other” folds the smaller groups. Region uses OpenReview institution domains; company domains map to HQ country, so an academia-only cut is cleaner. All figures above end at 2025, the last complete year; 2026 is shown separately in the final section. Author identity is by name string, so common names collide — trends are directional.
-  </div>
+  <p class="sec">Methods &amp; data</p>
+  <dl class="methods">
+    <dt>Data sources</dt>
+    <dd>arXiv metadata for 3.15M papers from the <code>metadata</code> config of
+      <a href="https://huggingface.co/datasets/secemp9/arxiv-complete">secemp9/arxiv-complete</a>
+      (Hugging Face; a 1.6 GB parquet, not the full 16 TiB corpus). arXiv metadata is distributed by Cornell under CC0.
+      Conference author affiliations (NeurIPS, ICML, ICLR) from the Paper Copilot OpenReview archive
+      (<a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>). ICLR accept/reject decisions from the
+      berenslab/iclr-dataset. All data is fetched by scripts; none is redistributed here.</dd>
+    <dt>Author counting</dt>
+    <dd>The raw author string is split on commas and the word “and” after stripping parenthetical
+      affiliations. A named collaboration (e.g. “ATLAS Collaboration”) counts as one author. This is a
+      standard proxy, imperfect for unusual formatting.</dd>
+    <dt>Author identity &amp; de-duplication</dt>
+    <dd>On arXiv, authors are identified by name string, so common names collide (“Y. Wang” merges many
+      people) — per-author figures are directional. Conference figures de-duplicate by OpenReview profile id
+      (<code>or_profile</code>), which is reliable.</dd>
+    <dt>Subject groups</dt>
+    <dd>arXiv archives are collapsed into coarse groups (Computer Science, Physics, Mathematics, Statistics,
+      EESS, …) by primary category; the smallest groups fold into “Other”. Sub-discipline figures use the raw
+      <code>primary_category</code>.</dd>
+    <dt>Institution region</dt>
+    <dd>From the author's OpenReview institutional email <b>domain</b> (the local part is masked). <code>.cn</code>
+      and major Chinese firms → China; <code>.edu</code>/US firms → US; other ccTLDs → their country; the rest
+      → Other. Company domains map to <b>HQ country, not office location</b> (a Google-Beijing author counts as
+      US), so an academia-only cut is cleaner. Personal-email domains (gmail, qq, …) are treated as
+      unknown-institution, not a company. ~11% of domains are unclassifiable and excluded from region shares.</dd>
+    <dt>Paper-level region attribution</dt>
+    <dd>Each paper is assigned to the region holding the <b>most</b> of its authors' institutions; ties are
+      broken by a deterministic hash of the paper id (a “fair coin” that is uniform in aggregate but
+      reproducible). ~6–7% of papers are ties.</dd>
+    <dt>Seniority</dt>
+    <dd>Self-reported OpenReview <code>position</code> (“PhD student”, “Full Professor”, …) mapped to tiers —
+      <b>not</b> inferred from paper counts. Figures distinguish a <b>first-author</b> basis (each paper counted
+      once, by who led it) from an <b>all-authors</b> basis (every authorship; a PI on many papers is tallied
+      each time).</dd>
+    <dt>Coverage &amp; time windows</dt>
+    <dd>arXiv spans 1991–2025 (main figures end at 2025, the last complete year; 2026 is year-to-date through
+      August, shown separately). Conference affiliation/position data populates from ~2021. ICLR includes
+      <b>all submissions incl. rejected</b>; NeurIPS/ICML are largely accepted + opt-in, so pooled conference
+      numbers mix submissions and acceptances. ICLR 2026 decisions are not yet released.</dd>
+    <dt>Bucket definitions</dt>
+    <dd>Author-count and career-total buckets are made non-overlapping where the requested edges overlapped
+      (e.g. author counts {1, 2–3, 4–5, 6–8, 9+}; CS career totals {1, 2–3, 4–8, 9–20, 21+}; Math author counts
+      {1, 2, 3, 4, 5, 6+}).</dd>
+    <dt>LLM-control metric</dt>
+    <dd>To separate productivity from team growth, per-person output is measured as <b>first-author papers per
+      person per year</b> (each paper counted once). arXiv's deep history provides a pre-LLM baseline; the
+      conference data (2021+) does not.</dd>
+    <dt>Reproducibility</dt>
+    <dd>Open-source: <code>download_*.py</code> fetch the data, <code>build_figures.py</code> computes the
+      aggregates via DuckDB, and <code>build_html.py</code> assembles this self-contained page. Raw data is
+      git-ignored.</dd>
+    <dt>Caveats</dt>
+    <dd>All findings are <b>directional, not causal</b>: name/position self-reporting, domain-to-country
+      heuristics, ML-venue-only conference coverage, OpenReview coverage that itself grows over time, and short
+      post-2021 windows all introduce noise. Treat magnitudes as approximate and trends as the signal.</dd>
+  </dl>
 </div>
 
 <script>
