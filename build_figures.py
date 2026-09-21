@@ -232,6 +232,23 @@ def main():
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
+    # ---- Figures 12/13: ICLR acceptance over time (berenslab decisions) ----
+    dec = glob.glob(os.path.join(HERE, "data", "iclr_decisions", "*.parquet"))
+    if dec:
+        best = max(dec, key=lambda p: con.sql(
+            f"SELECT count(*) FROM read_parquet('{p}')").fetchone()[0])
+        fig["acc"] = rows(f"""
+            SELECT year,
+              count(*) AS submissions,
+              count(*) FILTER (WHERE lower(decision) LIKE 'accept%') AS accepted,
+              count(*) FILTER (WHERE lower(decision) LIKE '%reject%') AS rejected,
+              count(*) FILTER (WHERE lower(decision) LIKE '%withdraw%'
+                 OR (lower(decision) NOT LIKE 'accept%'
+                     AND lower(decision) NOT LIKE '%reject%')) AS withdrawn_other
+            FROM read_parquet('{best}')
+            WHERE year BETWEEN 2017 AND 2025
+            GROUP BY year ORDER BY year""")
+
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
     print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes)")

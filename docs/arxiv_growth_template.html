@@ -221,6 +221,26 @@ figcaption b{font-weight:600;}
     <div class="plot"><canvas id="f11"></canvas></div>
   </figure>
 
+  <p class="sec">Peer review — ICLR (submissions incl. rejected)</p>
+  <ul class="find">
+    <li><b>Acceptance kept pace with submissions.</b> ICLR submissions grew <b>~24×</b> (489 in 2017 → 11,663 in 2025), but the acceptance <b>rate held ~30–32%</b> since 2019 — so accepted papers scaled up too (~200 → <b>~3,700, ~19×</b>), rather than staying fixed.<span class="ref">Fig 12</span><span class="ref">Fig 13</span></li>
+    <li>The total-submissions bar explodes while the accepted slice stays a roughly constant share — the conference raised its accepted count, not its selectivity.<span class="ref">Fig 12</span></li>
+    <li>ICLR 2026 decisions aren't released yet, so acceptance is shown through 2025.</li>
+  </ul>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 12.</b> ICLR outcomes over time — accepted / rejected / withdrawn</figcaption>
+    <p class="sub">Bar height = total submissions. Toggle to share % to read the accepted fraction directly.</p>
+    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
+    <div class="plot tall"><canvas id="f12"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 13.</b> ICLR acceptance rate over time</figcaption>
+    <p class="sub">Accepted ÷ all submissions. Roughly flat near 30–32% since 2019 despite the submission explosion.</p>
+    <div class="plot"><canvas id="f13"></canvas></div>
+  </figure>
+
   <div class="notes">
     <b>Notes.</b> Author counts split the raw author string on commas and “and” (collaborations count as one). Subject groups collapse arXiv archives; “Other” folds the smaller groups. Region uses OpenReview institution domains; company domains map to HQ country, so an academia-only cut is cleaner. 2026 is partial for arXiv (year-to-date) and ICLR-only for the conference figures. Author identity is by name string, so common names collide — trends are directional.
   </div>
@@ -413,6 +433,22 @@ function renderAll(){
   {const {yrs,map}=pivot(DATA.m5,r=>r.bucket,r=>r.mean_output,DATA.m5_buckets);
    lineChart('f11',yrs,()=>DATA.m5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
      borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
+
+  // F12/F13 — ICLR acceptance over time
+  if(DATA.acc){
+    const yrs=DATA.acc.map(r=>r.year);
+    const outcome=()=>dark()?['#199e70','#e66767','#8a8984']:['#1baf7a','#e34948','#b8b6ad'];
+    stackedBar('f12',yrs,['Accepted','Rejected','Withdrawn / other'],
+      [DATA.acc.map(r=>r.accepted),DATA.acc.map(r=>r.rejected),DATA.acc.map(r=>r.withdrawn_other)],
+      i=>outcome()[i],'abs');
+    lineChart('f13',yrs,()=>[{label:'Acceptance rate',
+      data:DATA.acc.map(r=>+(100*r.accepted/r.submissions).toFixed(1)),
+      borderColor:dark()?'#199e70':'#1baf7a',backgroundColor:withA(dark()?'#199e70':'#1baf7a',.13),
+      borderWidth:2,fill:true,tension:.25,pointRadius:2.5,pointHoverRadius:5}]);
+    const c=charts[charts.length-1].chart;
+    c.options.scales.y.suggestedMin=0; c.options.scales.y.suggestedMax=50;
+    c.options.scales.y.ticks.callback=v=>v+'%'; c.update('none');
+  }
 }
 
 // ---- Figure 7: first-author seniority, filtered by region & venue ----
