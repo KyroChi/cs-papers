@@ -26,6 +26,11 @@ def connect():
     con.execute(f"SET file_search_path = '{HERE}'")
     with open(os.path.join(HERE, "setup.sql")) as fh:
         con.execute(fh.read())
+    # Conference views (NeurIPS/ICML/ICLR) — only if that data is present.
+    import glob
+    if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
+        with open(os.path.join(HERE, "conf_setup.sql")) as fh:
+            con.execute(fh.read())
     return con
 
 

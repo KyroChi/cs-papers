@@ -39,7 +39,19 @@ python run.py "SELECT count(*) FROM papers"   # or inline SQL
 | `queries/05_new_author_influx.sql` | First-time authors per year (early-career proxy) |
 | `queries/06_decompose_the_surge.sql` | How much of the increase each field / team size added |
 | `queries/07_last_author_seniority.sql` | CS last-author (senior) career age & output, by year and team size |
-| `queries/08_affiliations_besteffort.sql` | Parenthetical affiliation tags — *documents why institution analysis fails here* |
+| `queries/08_affiliations_besteffort.sql` | Parenthetical affiliation tags — *documents why arXiv institution analysis fails* |
+
+### Conference track — NeurIPS / ICML / ICLR (needs `data/conf/`)
+
+Run `python download_conf_data.py` first (~70 MB). These use real author
+**institution domains** and **positions** from OpenReview (via Paper Copilot).
+
+| File | Question |
+|---|---|
+| `queries/10_conf_country_trend.sql` | Author-instance share by country, per venue/year |
+| `queries/11_conf_seniority_trend.sql` | Author share by seniority (PhD student, faculty, …) over time |
+| `queries/12_conf_china_us_pooled.sql` | China vs US, pooled, with an academia-only cut |
+| `queries/13_submissions_by_region.sql` | **Submissions by region (China / US / Other)** — the headline |
 
 ## What the data says
 
@@ -73,14 +85,37 @@ a median last-author career of 3 years / 8 papers; 7-10-author papers, **9 years
 / 72 papers**. The picture is established PIs running progressively larger groups
 — consistent with growth driven by lab teams (senior author + more students).
 
-### Institutions — not answerable from this metadata
+### Institutions on arXiv — not answerable from that metadata
 
-Emails are stripped (71 of 3.1M author strings have an `@`) and there is no
+arXiv strips submitter emails (71 of 3.1M author strings have an `@`) and has no
 affiliation field. Parenthetical lab tags exist for only ~2-6% of papers, are
 mostly footnote markers (`1`, `2`), and skew heavily to one region — so
-`queries/08` exists to *demonstrate* the dead-end, not to draw conclusions. For
-real institution analysis, enrich by arXiv ID via **OpenAlex** or **Semantic
-Scholar** (both expose affiliations through free APIs) — still no PDFs needed.
+`queries/08` exists to *demonstrate* the dead-end. Institutions are instead
+answered on the conference track below.
+
+### Institution region at top-ML venues (NeurIPS / ICML / ICLR)
+
+Using real OpenReview institution domains (`aff_domain`), we attribute each
+submission to a region by the plurality of its authors' institutions. Domain
+coverage is populated ~2021+; 2026 is ICLR-only so far.
+
+**China's share of top-ML submissions is rising fast while the US share falls.**
+Pooled across the three venues, submissions whose dominant region is China went
+from **13% (2021) to 32% (2026)**, while US-dominant fell from **51% to 31%** —
+i.e. China has drawn level with the US at this level. Counting *any* author from
+a region, US-China co-authored papers also doubled (7% → 12%). "Other" (rest of
+world) held steady near 37%. Company domains are attributed to HQ country (a
+caveat), but an academia-only cut (`queries/12`) shows the same crossover.
+
+**By seniority, top-ML authorship is trainee-heavy and getting more so.** PhD
+students are ~26-28% of all author-instances (the largest single tier alongside
+faculty at ~30%), and junior (MS/undergrad) authors roughly doubled from ~5% to
+~12% of authorships between 2021 and 2025 — consistent with the arXiv finding
+that expanding student cohorts drive volume.
+
+Company domains reflect HQ, not office location; `Other/Unknown` domains
+(~11%) are excluded from region shares. Directional, but far more robust than
+any name-based guess.
 
 ### The PhD-student question — read this caveat
 
@@ -98,7 +133,9 @@ Scholar, or arXiv author IDs) — a possible next step, still without any PDFs.
 
 ## Data & licensing
 
-- Data is **not** committed (see `.gitignore`); run `download_data.py` to fetch
-  it. Source: `secemp9/arxiv-complete` on Hugging Face. arXiv metadata is
-  distributed by Cornell under CC0.
+- Data is **not** committed (see `.gitignore`); run `download_data.py` (arXiv)
+  and `download_conf_data.py` (conferences) to fetch it. Sources:
+  `secemp9/arxiv-complete` on Hugging Face (arXiv metadata, Cornell/CC0) and
+  Paper Copilot's OpenReview archive (`github.com/papercopilot/openreview`,
+  cite arXiv:2510.13201) for NeurIPS/ICML/ICLR author affiliations.
 - This code is released under the MIT License (see `LICENSE`).

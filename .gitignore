@@ -13,3 +13,6 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# Private, exploratory analyses — never commit (rough name-origin proxy, etc.)
+private/
