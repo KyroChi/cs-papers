@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""Compute the aggregate data for the interactive figures and dump figures.json.
+
+Reads the arXiv metadata parquet (setup.sql views) and, for the region figure,
+the conference data (conf_setup.sql). Output is small aggregates only — safe to
+embed directly in the HTML document.
+"""
+import glob
+import json
+import os
+import sys
+
+import duckdb
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "figures.json")
+
+# author-list expression (strip parenthetical affiliations, split on comma/"and")
+AUTH = (r"list_filter(regexp_split_to_array(regexp_replace(authors,'\([^)]*\)','','g'),"
+        r"',|\s+and\s+'), x -> trim(x) <> '')")
+
+
+def main():
+    con = duckdb.connect()
+    con.execute(f"SET file_search_path = '{HERE}'")
+    con.execute(open(os.path.join(HERE, "setup.sql")).read())
+    if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
+        con.execute(open(os.path.join(HERE, "conf_setup.sql")).read())
+
+    def rows(sql):
+        r = con.sql(sql)
+        cols = [d[0] for d in r.description]
+        return [dict(zip(cols, row)) for row in r.fetchall()]
+
+    fig = {}
+
+    # ---- Figure 1a: raw growth in submissions across all of arXiv ----
+    fig["f1a"] = rows("""
+        SELECT year, count(*) AS papers
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026
+        GROUP BY year ORDER BY year""")
+
+    # ---- Figure 1b: relative distribution across major subjects (stacked) ----
+    fig["f1b_groups"] = ['Computer Science','Physics','Mathematics','Statistics',
+        'Elec Eng & Systems','Quantitative Biology','Economics','Quantitative Finance',
+        'Other/Physics-misc']
+    fig["f1b"] = rows("""
+        SELECT year, subject_group, count(*) AS papers
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026
+        GROUP BY year, subject_group ORDER BY year""")
+
+    # ---- Figure 2: author-count buckets {1, 2-3, 4-5, 6-8, 9+} ----
+    # (last bucket is >8; the given "8+"/"6-8" overlap is resolved non-overlapping)
+    fig["f2_buckets"] = ['1','2-3','4-5','6-8','9+']
+    fig["f2"] = rows("""
+        SELECT year,
+          count(*) FILTER (WHERE author_count=1)             AS "1",
+          count(*) FILTER (WHERE author_count BETWEEN 2 AND 3) AS "2-3",
+          count(*) FILTER (WHERE author_count BETWEEN 4 AND 5) AS "4-5",
+          count(*) FILTER (WHERE author_count BETWEEN 6 AND 8) AS "6-8",
+          count(*) FILTER (WHERE author_count > 8)           AS "9+"
+        FROM papers_enriched WHERE year BETWEEN 1991 AND 2026 AND author_count>0
+        GROUP BY year ORDER BY year""")
+
+    # ---- Figure 3: top-5 CS sub-disciplines in 2026, tracked over time ----
+    top5 = [r["primary_category"] for r in rows("""
+        SELECT primary_category, count(*) c FROM papers_enriched
+        WHERE primary_category LIKE 'cs.%' AND year=2026
+        GROUP BY 1 ORDER BY c DESC LIMIT 5""")]
+    fig["f3_cats"] = top5
+    inlist = ",".join(f"'{c}'" for c in top5)
+    fig["f3"] = rows(f"""
+        SELECT year, primary_category, count(*) AS papers
+        FROM papers_enriched
+        WHERE primary_category IN ({inlist}) AND year BETWEEN 2010 AND 2026
+        GROUP BY year, primary_category ORDER BY year""")
+
+    # ---- Figures 4 & 5: CS per-author annual output ----
+    con.execute(f"""
+        CREATE TEMP TABLE cs_annual AS
+        WITH ev AS (
+            SELECT trim(a) AS author, year
+            FROM papers_enriched, UNNEST({AUTH}) AS t(a)
+            WHERE primary_category LIKE 'cs.%' AND year BETWEEN 1991 AND 2026
+              AND trim(a) <> ''
+        )
+        SELECT author, year, count(*) AS n FROM ev GROUP BY author, year""")
+
+    # Fig 4: mean / std / median of annual output, per year
+    fig["f4"] = rows("""
+        SELECT year, round(avg(n),3) AS mean, round(stddev_samp(n),3) AS std,
+               median(n) AS median, count(*) AS active_authors
+        FROM cs_annual WHERE year BETWEEN 2005 AND 2026
+        GROUP BY year ORDER BY year""")
+
+    # Fig 5: same annual output, split by cumulative career-total bucket
+    # buckets {1, 2-3, 4-8, 9-20, 21+} (non-overlapping resolution of 8-20/20+)
+    fig["f5_buckets"] = ['1','2-3','4-8','9-20','21+']
+    fig["f5"] = rows("""
+        WITH cum AS (
+            SELECT author, year, n,
+                   sum(n) OVER (PARTITION BY author ORDER BY year) AS total
+            FROM cs_annual
+        ), b AS (
+            SELECT year, n,
+                CASE WHEN total=1 THEN '1'
+                     WHEN total BETWEEN 2 AND 3 THEN '2-3'
+                     WHEN total BETWEEN 4 AND 8 THEN '4-8'
+                     WHEN total BETWEEN 9 AND 20 THEN '9-20'
+                     ELSE '21+' END AS bucket
+            FROM cum
+        )
+        SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
+        FROM b WHERE year BETWEEN 2005 AND 2026
+        GROUP BY year, bucket ORDER BY year""")
+
+    # ---- Figure 6: region (China / US / Other), conference submissions ----
+    if "conf_paper_region" in [r["name"] for r in rows("SHOW TABLES")]:
+        fig["f6"] = rows("""
+            SELECT year,
+              count(*) FILTER (WHERE majority_region='China') AS china,
+              count(*) FILTER (WHERE majority_region='US')    AS us,
+              count(*) FILTER (WHERE majority_region='Other') AS other
+            FROM conf_paper_region WHERE year BETWEEN 2021 AND 2026
+            GROUP BY year ORDER BY year""")
+
+    with open(OUT, "w") as f:
+        json.dump(fig, f, default=float)
+    print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes)")
+    for k, v in fig.items():
+        print(f"  {k}: {len(v) if isinstance(v, list) else v}")
+
+
+if __name__ == "__main__":
+    main()
