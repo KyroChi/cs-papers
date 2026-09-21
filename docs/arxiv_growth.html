@@ -56,6 +56,12 @@ figcaption b{font-weight:600;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
 .lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
 .controls{position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); right:16px; z-index:9;}
+.find{list-style:none; padding:0; margin:14px 0 4px;}
+.find li{position:relative; padding-left:20px; margin:0 0 9px; font-size:14.5px; line-height:1.55; color:var(--ink2);}
+.find li:before{content:""; position:absolute; left:2px; top:9px; width:6px; height:6px; border-radius:50%; background:var(--muted);}
+.find b{color:var(--ink); font-weight:600;}
+.ref{color:var(--muted); font-size:11.5px; font-family:var(--sans); white-space:nowrap; border:1px solid var(--grid); border-radius:4px; padding:1px 5px; margin-left:4px;}
+.lead{font-family:var(--sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:30px 0 0;}
 .notes{color:var(--muted); font-size:12px; line-height:1.7; margin-top:44px; border-top:1px solid var(--grid); padding-top:16px;}
 .notes b{color:var(--ink2);}
 </style>
@@ -70,7 +76,19 @@ figcaption b{font-weight:600;}
     Paper Copilot OpenReview archive (<a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>).
   </div>
 
+  <p class="lead">Key findings</p>
+  <ul class="find">
+    <li>arXiv submissions have grown <b>~9× since 2000</b> (≈31k → ≈284k in 2025) and are still accelerating.<span class="ref">Fig 1a</span></li>
+    <li>The rise is driven by <b>Computer Science</b> — specifically the AI/ML subfields — and by <b>teams, not solo authors</b>.<span class="ref">Fig 1b</span><span class="ref">Fig 2</span><span class="ref">Fig 3</span></li>
+    <li>At the top ML venues, <b>China has drawn level with the US</b> in submissions since 2021, driven almost entirely by a <b>~9× rise in the number of PhD-student first authors</b> — not by students each writing more.<span class="ref">Fig 6</span><span class="ref">Fig 7</span></li>
+  </ul>
+
   <p class="sec">All of arXiv</p>
+  <ul class="find">
+    <li>Submissions grew <b>~9×</b> from 2000 (≈31k) to 2025 (≈284k), fastest in the most recent years (≈+16%/yr in 2024–25).<span class="ref">Fig 1a</span></li>
+    <li><b>Computer Science overtook physics</b> to become the largest area; its share of arXiv climbed steeply as physics and math shares shrank.<span class="ref">Fig 1b</span></li>
+    <li>Growth is <b>collaborative</b>: solo-authored papers fell from <b>~44% (1991) to ~11% (2025)</b>; the median author count rose from 2 to 4.<span class="ref">Fig 2</span></li>
+  </ul>
 
   <figure class="fig-wide">
     <figcaption><b>Figure 1a.</b> Growth in submissions across all of arXiv</figcaption>
@@ -91,6 +109,13 @@ figcaption b{font-weight:600;}
   </figure>
 
   <p class="sec">Computer Science</p>
+  <ul class="find">
+    <li>CS is the single biggest driver of arXiv's rise — from <b>27 papers (1995) to ~129k (2025)</b>, now the largest area.<span class="ref">Fig 1b</span></li>
+    <li>CS is even more team-heavy than arXiv overall; solo work is a small and shrinking sliver.<span class="ref">Fig 2b</span></li>
+    <li>Growth concentrates in the <b>AI/ML subfields</b> — the top-5 in 2026 are cs.CV, cs.LG, cs.CL, cs.AI, cs.RO.<span class="ref">Fig 3</span></li>
+    <li>Mean papers per CS author per year is rising (<b>≈2.0→2.5</b>, 2021–25) with a growing right tail (s.d. up), while the median stays 1.<span class="ref">Fig 4</span></li>
+    <li><b>Prolific authors are getting more prolific</b>: those with 21+ career papers went from ~8 to ~11 papers/yr; occasional authors are flat.<span class="ref">Fig 5</span></li>
+  </ul>
 
   <figure class="fig-wide">
     <figcaption><b>Figure 2b.</b> Papers by number of authors — CS only</figcaption>
@@ -118,6 +143,12 @@ figcaption b{font-weight:600;}
   </figure>
 
   <p class="sec">By region — NeurIPS · ICML · ICLR</p>
+  <ul class="find">
+    <li><b>China's share drew level with the US</b>: China-majority submissions rose <b>~13% → ~31%</b> (2021→2026) as the US fell <b>~49% → ~30%</b>; "Other" held near 37%.<span class="ref">Fig 6a</span><span class="ref">Fig 6b</span></li>
+    <li>Indexed to 2021, China's submissions grew <b>~10×</b> vs <b>~2.5×</b> for the US.<span class="ref">Fig 6c</span></li>
+    <li>At the <b>first-author</b> level (who led the paper), <b>PhD students dominate in every region</b>; switching to "all authors" pulls faculty/PIs up — the two bases tell different stories.<span class="ref">Fig 7</span></li>
+    <li>China's PhD-led surge is <b>headcount, not output</b>: ~9× more distinct PhD first-authors, with papers-per-student flat (~1.2) and a stable seniority ratio. The US shows a mild per-student rise (1.2→1.45).<span class="ref">Fig 7</span></li>
+  </ul>
 
   <figure class="fig-wide">
     <figcaption><b>Figure 6a.</b> Submissions by institution region — absolute</figcaption>
@@ -162,6 +193,12 @@ figcaption b{font-weight:600;}
   </figure>
 
   <p class="sec">Mathematics</p>
+  <ul class="find">
+    <li><b>Even math is going collaborative</b>: solo papers fell <b>52% → 29%</b> (2000→2025) while 3+-author papers rose <b>15% → 38%</b> — the growth is multi-author, not solo.<span class="ref">Fig 8</span></li>
+    <li>Top-5 2026 subfields: combinatorics (math.CO), analysis of PDEs (math.AP), optimization &amp; control (math.OC), numerical analysis (math.NA), number theory (math.NT).<span class="ref">Fig 9</span></li>
+    <li>Per-author output is <b>roughly flat</b> (mean ≈1.6→1.7, median 1) — far below CS.<span class="ref">Fig 10</span></li>
+    <li>Unlike CS, math's <b>most prolific authors are not speeding up</b> — the 21+ bucket's output drifted <b>down</b> (~4.6 → 3.1 papers/yr).<span class="ref">Fig 11</span></li>
+  </ul>
 
   <figure class="fig-wide">
     <figcaption><b>Figure 8.</b> Papers by number of authors — Math only</figcaption>
