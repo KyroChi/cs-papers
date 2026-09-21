@@ -220,6 +220,18 @@ def main():
             SELECT debut AS year, region, count(*) AS n
             FROM deb GROUP BY debut, region ORDER BY year""")
 
+        # Figure 7d: mean/median submissions per person per year, by seniority.
+        # subs = distinct papers a profile is an author on that year.
+        fig["f7d"] = rows("""
+            WITH pp AS (
+              SELECT year, seniority, or_profile, count(DISTINCT id) AS subs
+              FROM conf_authors WHERE or_profile<>'' AND seniority<>'Unknown'
+              GROUP BY year, seniority, or_profile
+            )
+            SELECT year, seniority, round(avg(subs),3) AS mean, median(subs) AS median,
+                   count(*) AS people
+            FROM pp GROUP BY year, seniority ORDER BY year""")
+
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
     print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes)")

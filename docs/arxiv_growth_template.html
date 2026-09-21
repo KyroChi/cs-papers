@@ -127,6 +127,7 @@ figcaption b{font-weight:600;}
     <li>At the <b>first-author</b> level (who led the paper), <b>PhD students dominate in every region</b>; switching to "all authors" pulls faculty/PIs up — the two bases tell different stories.<span class="ref">Fig 7</span></li>
     <li>China's PhD-led surge is <b>headcount, not output</b>: ~9× more distinct PhD first-authors, with papers-per-student flat (~1.2) and a stable seniority ratio. The US shows a mild per-student rise (1.2→1.45).<span class="ref">Fig 7</span></li>
     <li>The inflow of <b>new PhD-student first-authors grows fastest for China</b> (~5× over 2022–25 vs ~2.6× for the US), though the US still added more per year through 2025.<span class="ref">Fig 7c</span></li>
+    <li>Faculty are on the most papers per year (mean ≈3 in 2025) vs PhD students ≈1.9, but the <b>median is 1 for every tier</b> — the gap is a prolific minority, not typical behavior.<span class="ref">Fig 7d</span></li>
   </ul>
 
   <figure class="fig-wide">
@@ -175,6 +176,16 @@ figcaption b{font-weight:600;}
     <figcaption><b>Figure 7c.</b> New PhD-student first-authors per year, by region</figcaption>
     <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then); 2026 partial/ICLR-only.</p>
     <div class="plot"><canvas id="f7c"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 7d.</b> Submissions per person per year, by seniority</figcaption>
+    <p class="sub">Distinct papers a person is an author on each year, averaged within their self-reported position. Median is ~1 for every tier — most people are on one paper a year; the mean spreads them by seniority.</p>
+    <div class="bar"><span class="lbl">Stat</span>
+      <button class="toggle" data-f7dstat="mean" aria-pressed="true">mean</button>
+      <button class="toggle" data-f7dstat="median" aria-pressed="false">median</button>
+    </div>
+    <div class="plot tall"><canvas id="f7d"></canvas></div>
   </figure>
 
   <p class="sec">Mathematics</p>
@@ -301,6 +312,7 @@ function lineChart(id,labels,datasets){
 function renderAll(){
   charts.splice(0).forEach(c=>c.chart.destroy());
   if(f7chart){f7chart.destroy();f7chart=null;}
+  if(f7dchart){f7dchart.destroy();f7dchart=null;}
 
   // F1a — area line
   lineChart('f1a',years(DATA.f1a),()=>[{label:'Submissions',data:DATA.f1a.map(r=>r.papers),
@@ -379,6 +391,9 @@ function renderAll(){
    lineChart('f7c',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
      backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));}
 
+  // F7d — submissions per person by seniority (mean/median toggle)
+  drawF7d();
+
   // Mathematics — Figures 8-11 (mirror of CS)
   {const b=DATA.m2_buckets;
    stackedBar('f8',years(DATA.m2),b,b.map(k=>DATA.m2.map(r=>r[k])),ord,'abs');}
@@ -427,13 +442,27 @@ function drawF7(){
       borderColor:css('--surface'),borderWidth:{top:2,right:0,bottom:0,left:0},
       borderRadius:3,maxBarThickness:34,stack:'s'}))},options:o});
 }
-function wireF7(attr,set){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
+function wireF7(attr,set,redraw){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
   set(b.dataset[attr.replace('data-','').replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]);
-  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF7();});}
+  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));(redraw||drawF7)();});}
 wireF7('data-f7region',v=>f7region=v);
 wireF7('data-f7venue',v=>f7venue=v);
 wireF7('data-f7basis',v=>f7basis=v);
 wireF7('data-f7scale',v=>f7scale=v);
+
+// ---- Figure 7d: submissions per person by seniority (mean/median) ----
+let f7dstat='mean', f7dchart=null;
+function drawF7d(){
+  if(f7dchart)f7dchart.destroy();
+  const order=DATA.f7_order;
+  const {yrs,map}=pivot(DATA.f7d.map(r=>({year:r.year,k:r.seniority,v:r[f7dstat]})),
+                        r=>r.k,r=>r.v,order);
+  const o=base();
+  f7dchart=new Chart(document.getElementById('f7d'),{type:'line',data:{labels:yrs,
+    datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
+      borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
+}
+wireF7('data-f7dstat',v=>f7dstat=v,drawF7d);
 
 document.getElementById('themeBtn').onclick=()=>{
   const cur=document.documentElement.getAttribute('data-theme');
