@@ -43,7 +43,7 @@ tagged AS (
     FROM exploded
 )
 SELECT
-    venue, year, id, author_no, author, aff, domain, position,
+    venue, year, id, author_no, author, or_profile, aff, domain, position,
     -- sector: academia vs industry vs other
     CASE
         WHEN domain LIKE '%.edu' OR domain LIKE '%.edu.%' OR domain LIKE '%.ac.%'
