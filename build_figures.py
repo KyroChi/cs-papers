@@ -232,15 +232,23 @@ def main():
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
-        # Figure 14: PhD-student output decomposed — headcount vs papers/student
+        # Figure 14: PhD-student output decomposed — headcount, all-authorship
+        # per student, and FIRST-AUTHOR-only papers per student.
         fig["phddec"] = rows("""
             WITH s AS (
               SELECT year, or_profile, count(DISTINCT id) AS subs
               FROM conf_authors WHERE seniority='PhD student' AND or_profile<>''
               GROUP BY year, or_profile
-            )
-            SELECT year, count(*) AS students, round(avg(subs),3) AS papers_per_student
-            FROM s WHERE year BETWEEN 2021 AND 2025 GROUP BY year ORDER BY year""")
+            ), sg AS (SELECT year, count(*) AS students, avg(subs) AS pps FROM s GROUP BY year),
+            fa AS (
+              SELECT year, or_profile, count(DISTINCT id) AS fsub
+              FROM conf_authors WHERE author_no=1 AND seniority='PhD student' AND or_profile<>''
+              GROUP BY year, or_profile
+            ), fag AS (SELECT year, count(*) AS fa_students, avg(fsub) AS faps FROM fa GROUP BY year)
+            SELECT sg.year, sg.students, round(sg.pps,3) AS papers_per_student,
+                   fag.fa_students, round(fag.faps,3) AS fa_per_student
+            FROM sg JOIN fag USING(year)
+            WHERE sg.year BETWEEN 2021 AND 2025 ORDER BY sg.year""")
 
     # ---- Figures 12/13: ICLR acceptance over time (berenslab decisions) ----
     dec = glob.glob(os.path.join(HERE, "data", "iclr_decisions", "*.parquet"))
