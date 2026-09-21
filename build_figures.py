@@ -232,6 +232,16 @@ def main():
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
+        # Figure 14: PhD-student output decomposed — headcount vs papers/student
+        fig["phddec"] = rows("""
+            WITH s AS (
+              SELECT year, or_profile, count(DISTINCT id) AS subs
+              FROM conf_authors WHERE seniority='PhD student' AND or_profile<>''
+              GROUP BY year, or_profile
+            )
+            SELECT year, count(*) AS students, round(avg(subs),3) AS papers_per_student
+            FROM s WHERE year BETWEEN 2021 AND 2025 GROUP BY year ORDER BY year""")
+
     # ---- Figures 12/13: ICLR acceptance over time (berenslab decisions) ----
     dec = glob.glob(os.path.join(HERE, "data", "iclr_decisions", "*.parquet"))
     if dec:

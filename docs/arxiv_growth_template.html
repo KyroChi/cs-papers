@@ -241,6 +241,20 @@ figcaption b{font-weight:600;}
     <div class="plot"><canvas id="f13"></canvas></div>
   </figure>
 
+  <p class="sec">Preliminary notes — is it more students, or students writing more?</p>
+  <ul class="find">
+    <li><b>Mostly more students.</b> PhD-student submissions (all authorships) grew <b>~6.1×</b> (2021→2025), decomposing into <b>~4.5× more distinct students</b> × <b>~1.34× more papers per student</b> — headcount is the dominant term.<span class="ref">Fig 14</span></li>
+    <li>Per-student output <b>did rise ~34%</b> (1.40 → 1.88 papers/yr), but this is largely <b>co-authorship</b>: first-author output per student is flatter (~1.2). Students appear on more of each other's (larger) papers.<span class="ref">Fig 14</span><span class="ref">Fig 7</span></li>
+    <li>The <b>median is 1 paper/year</b> for students throughout — the typical PhD student still submits one paper a year; the mean rises from a growing tail.<span class="ref">Fig 7d</span></li>
+    <li><b>Caveats (why this is preliminary):</b> OpenReview coverage itself grew over 2021–25, inflating headcount; ML-venues only; positions are self-reported; the window is short and starts at 2021. Directional, not causal.</li>
+  </ul>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 14.</b> PhD-student growth decomposed — headcount vs output</figcaption>
+    <p class="sub">Indexed to 2021 = 100. Distinct PhD students vs mean papers per student — the gap shows growth is headcount-driven, not per-student productivity.</p>
+    <div class="plot"><canvas id="f14"></canvas></div>
+  </figure>
+
   <div class="notes">
     <b>Notes.</b> Author counts split the raw author string on commas and “and” (collaborations count as one). Subject groups collapse arXiv archives; “Other” folds the smaller groups. Region uses OpenReview institution domains; company domains map to HQ country, so an academia-only cut is cleaner. 2026 is partial for arXiv (year-to-date) and ICLR-only for the conference figures. Author identity is by name string, so common names collide — trends are directional.
   </div>
@@ -446,6 +460,18 @@ function renderAll(){
       borderColor:dark()?'#199e70':'#1baf7a',backgroundColor:withA(dark()?'#199e70':'#1baf7a',.13),
       borderWidth:2,fill:true,tension:.25,pointRadius:2.5,pointHoverRadius:5}],
       o=>{o.scales.y.min=0; o.scales.y.max=50; o.scales.y.ticks.callback=v=>v+'%';});
+  }
+
+  // F14 — PhD growth decomposition, indexed to 2021 = 100
+  if(DATA.phddec){
+    const yrs=DATA.phddec.map(r=>r.year);
+    const s0=DATA.phddec[0].students, p0=DATA.phddec[0].papers_per_student;
+    lineChart('f14',yrs,()=>[
+      {label:'# PhD students (headcount)',data:DATA.phddec.map(r=>Math.round(100*r.students/s0)),
+        borderColor:cat(0),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
+      {label:'Papers per student',data:DATA.phddec.map(r=>Math.round(100*r.papers_per_student/p0)),
+        borderColor:cat(1),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}
+    ]);
   }
 }
 
