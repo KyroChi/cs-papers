@@ -268,6 +268,19 @@ figcaption b{font-weight:600;}
     <div class="plot"><canvas id="f14b"></canvas></div>
   </figure>
 
+  <p class="sec">Controlling for LLMs — per-person output, deep history</p>
+  <ul class="find">
+    <li>Counting <b>first-authorships only</b> (which controls for growing team size), output per person was <b>flat-to-declining through 2022</b> — CS held ~1.35 for 18 years. There was <b>no secular productivity trend before LLMs</b>.<span class="ref">Fig 16</span></li>
+    <li>A <b>modest uptick begins in 2023</b> — strongest in CS (~1.35 → ~1.45, +7%), weak across all fields, negligible in math. It's concentrated in the <b>heaviest-LLM-use field</b> and timed to <b>ChatGPT (late 2022), not GPT-3 (2020)</b>.<span class="ref">Fig 16</span></li>
+    <li><b>Suggestive, not conclusive.</b> The bump is small and confounded (paper-splitting, LLMs-as-research-topic inflating CS, workshop tracks). First-author-per-person removes team-size effects but not these. Deep arXiv history (from 1991) gives the pre-LLM control that the 2021+ conference data cannot.</li>
+  </ul>
+
+  <figure class="fig-wide">
+    <figcaption><b>Figure 16.</b> First-author papers per person per year</figcaption>
+    <p class="sub">Per-person output, controlling for team size. Flat pre-2023 baseline; a small CS-led rise after ChatGPT.</p>
+    <div class="plot"><canvas id="f16"></canvas></div>
+  </figure>
+
   <p class="sec">2026 so far (through August, year-to-date)</p>
   <ul class="find">
     <li>Through <b>August 2026</b>, arXiv already logged <b>225,912</b> submissions — <b>~24% ahead</b> of the same Jan–Aug window in 2025 (181,969). On pace for another record year.<span class="ref">Fig 15</span></li>
@@ -507,6 +520,16 @@ function renderAll(){
       {label:'First-author only',data:DATA.phddec.map(r=>r.fa_per_student),
         borderColor:cat(2),borderWidth:2,borderDash:[5,4],pointRadius:2.5,pointHoverRadius:5,tension:.2}
     ],o=>{o.scales.y.min=0; o.scales.y.suggestedMax=2;});
+  }
+
+  // F16 — first-author papers per person (LLM control)
+  if(DATA.faperson){
+    const yrs=DATA.faperson.map(r=>r.year);
+    lineChart('f16',yrs,()=>[
+      {label:'All arXiv',data:DATA.faperson.map(r=>r.all_fields),borderColor:cat(0),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25},
+      {label:'Computer Science',data:DATA.faperson.map(r=>r.cs),borderColor:cat(1),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25},
+      {label:'Mathematics',data:DATA.faperson.map(r=>r.math),borderColor:cat(2),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}
+    ],o=>{o.scales.y.suggestedMin=1; o.scales.y.suggestedMax=1.6;});
   }
 
   // F15 — 2026 pace: arXiv YTD (Jan–cutoff) by year, all + CS

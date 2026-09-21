@@ -177,6 +177,23 @@ def main():
         SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
         FROM b WHERE year BETWEEN 2005 AND 2025 GROUP BY year, bucket ORDER BY year""")
 
+    # ---- Figure 16: first-author papers per person (LLM control, deep history) ----
+    # Controls for team-size growth by counting only first-authorships. Flat
+    # pre-2023 baseline; watch for a post-ChatGPT uptick.
+    fig["faperson"] = rows(f"""
+        WITH base AS (
+          SELECT lower(trim(list_extract({AUTH}, 1))) AS fa, year, primary_category
+          FROM papers_enriched WHERE year BETWEEN 2005 AND 2025 AND authors IS NOT NULL
+        ),
+        a AS (SELECT year, fa, count(*) n FROM base WHERE fa<>'' GROUP BY year, fa),
+        c AS (SELECT year, fa, count(*) n FROM base WHERE fa<>'' AND primary_category LIKE 'cs.%' GROUP BY year, fa),
+        m AS (SELECT year, fa, count(*) n FROM base WHERE fa<>'' AND primary_category LIKE 'math.%' GROUP BY year, fa)
+        SELECT y.year,
+          (SELECT round(avg(n),3) FROM a WHERE a.year=y.year) AS all_fields,
+          (SELECT round(avg(n),3) FROM c WHERE c.year=y.year) AS cs,
+          (SELECT round(avg(n),3) FROM m WHERE m.year=y.year) AS math
+        FROM (SELECT DISTINCT year FROM base) y ORDER BY y.year""")
+
     # ---- Figure 6: region (China / US / Other), conference submissions ----
     if "conf_paper_region" in [r["name"] for r in rows("SHOW TABLES")]:
         fig["f6"] = rows("""
