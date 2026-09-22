@@ -86,6 +86,12 @@ figcaption b{font-weight:600;}
   </figure>
 
   <figure class="fig-wide">
+    <figcaption><b>Figure 1c.</b> Year-over-year growth rate by subject</figcaption>
+    <p class="sub">Annual % change in submissions per major group (from 2005; earlier years omitted for stability). Click a legend entry to isolate a curve.</p>
+    <div class="plot tall"><canvas id="f1c"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
     <figcaption><b>Figure 2.</b> Papers by number of authors</figcaption>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f2"></canvas></div>
@@ -467,7 +473,15 @@ function renderAll(){
    const names=[...keep,'Other'];
    const rows=DATA.f1b.map(r=>({year:r.year,k:keep.includes(r.subject_group)?r.subject_group:'Other',v:r.papers}));
    const {yrs,map}=pivot(rows,r=>r.k,r=>r.v,names);
-   stackedBar('f1b',yrs,names,names.map(n=>map[n]),cat,'pct');}
+   stackedBar('f1b',yrs,names,names.map(n=>map[n]),cat,'pct');
+   // F1c — year-over-year growth rate per group (derived), from 2005
+   const start=yrs.indexOf(2005), yy=yrs.slice(start);
+   lineChart('f1c',yy,()=>names.map((nm,i)=>{
+     const s=map[nm];
+     return {label:nm,data:yy.map(y=>{const j=yrs.indexOf(y),prev=s[j-1];
+       return prev>0?+(100*(s[j]-prev)/prev).toFixed(1):null;}),
+       borderColor:cat(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25,spanGaps:true};
+   }),o=>{o.scales.y.ticks.callback=v=>v+'%';});}
 
   // F2 — author buckets, ordinal
   {const b=DATA.f2_buckets;
