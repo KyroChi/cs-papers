@@ -226,8 +226,9 @@ figcaption b{font-weight:600;}
     <figcaption><b>Figure 7f.</b> First-author papers per person per year, by seniority</figcaption>
     <p class="sub">Like 7d, but counting only papers where the person is the first author. First-authorship concentrates among students and is rare for faculty.</p>
     <div class="bar"><span class="lbl">Stat</span>
-      <button class="toggle" data-f7fstat="mean" aria-pressed="true">mean</button>
-      <button class="toggle" data-f7fstat="median" aria-pressed="false">median</button>
+      <button class="toggle" data-f7fstat="mean" aria-pressed="true">mean / person</button>
+      <button class="toggle" data-f7fstat="median" aria-pressed="false">median / person</button>
+      <button class="toggle" data-f7fstat="total" aria-pressed="false">total / year</button>
     </div>
     <div class="plot tall"><canvas id="f7f"></canvas></div>
   </figure>
@@ -718,10 +719,17 @@ wireF7('data-f7dstat',v=>f7dstat=v,drawF7d);
 let f7fstat='mean', f7fchart=null;
 function drawF7f(){
   if(f7fchart)f7fchart.destroy();
-  const order=DATA.f7_order;
-  const {yrs,map}=pivot(DATA.f7f.map(r=>({year:r.year,k:r.seniority,v:r[f7fstat]})),
-                        r=>r.k,r=>r.v,order);
-  const o=base();
+  const order=DATA.f7_order, o=base();
+  let yrs, map;
+  if(f7fstat==='total'){                       // raw first-author papers/year
+    yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
+    map={}; order.forEach(nm=>map[nm]=yrs.map(()=>0));
+    DATA.fa.forEach(r=>{if(map[r.seniority])map[r.seniority][yrs.indexOf(r.year)]+=r.n;});
+    o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;
+  }else{                                        // per-person mean or median
+    const p=pivot(DATA.f7f.map(r=>({year:r.year,k:r.seniority,v:r[f7fstat]})),r=>r.k,r=>r.v,order);
+    yrs=p.yrs; map=p.map;
+  }
   f7fchart=new Chart(document.getElementById('f7f'),{type:'line',data:{labels:yrs,
     datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
       borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
