@@ -76,7 +76,8 @@ def main():
     chartjs = open(cache, encoding="utf-8").read()
 
     runtime = runtime.replace("__FIGDATA__", data)
-    out = (f"<title>{title}</title>\n"
+    out = ('<meta charset="utf-8">\n'
+           f"<title>{title}</title>\n"
            f"<script>\n{chartjs}\n</script>\n"
            f"{style}\n"
            '<div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>\n'
