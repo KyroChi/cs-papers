@@ -41,7 +41,7 @@ We conclude with some brief thoughts on the situation that computer science, and
 ## An Exponential Growth in PhD Students
 Our primary finding is that the exponential growth in papers (See Figure ) is driven by a concomitant growth in the raw number of PhD students studying computer science (See Figure ).
 
-{{New Figure: left is raw number of submissions to the big-3 conferences. right is raw number of PhD student authors to the conferences}}
+{{fig:17}}
 
 ## LLM Use is Not Explanatory
 
@@ -87,8 +87,6 @@ _CS is the engine. Prose on the AI/ML subfields and team sizes._
 ## By region — NeurIPS · ICML · ICLR
 
 _China vs US vs Other over time; what the affiliation domains show._
-
-{{fig:17}}
 
 {{fig:6b}}
 

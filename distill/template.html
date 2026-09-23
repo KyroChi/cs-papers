@@ -1,35 +1,56 @@
 <meta charset="utf-8">
 <title>Who Fills arXiv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
 :root{
-  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
-  --serif:"Iowan Old Style",Georgia,Palatino,"Times New Roman",serif;
-  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --page:#fff; --surface:#fff; --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
+  --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --ring:rgba(0,0,0,.1);
+  --display:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:Consolas,Monaco,"Andale Mono","Ubuntu Mono",monospace;
 }
 :root:not([data-theme="light"]){ @media (prefers-color-scheme:dark){
-  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
 }}
 :root[data-theme="dark"]{
-  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
 }
-body{background:var(--page); color:var(--ink); font-family:var(--sans); margin:0;}
-.wrap{max-width:760px; margin:0 auto; padding-block:56px; padding-inline:20px;}
-.fig-wide{max-width:920px;}
-h1{font-family:var(--serif); font-weight:600; font-size:34px; line-height:1.15; letter-spacing:-.01em; margin:0 0 6px;}
-.byline{color:var(--ink2); font-size:14px; margin:0 0 4px;}
-.authors{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
-.disclaimer{font-family:var(--sans); font-style:italic; font-size:12px; color:var(--muted); margin:10px 0 0;}
-.cite{color:var(--muted); font-size:12.5px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px 0 8px;}
+body{background:var(--page); color:var(--ink2); font-family:var(--sans); margin:0;
+  font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:1080px; margin:0 auto; padding:64px 24px 96px;}
+/* narrow text column, wide figures — distill-style */
+.wrap>h1,.wrap>h2,.wrap>h3,.wrap>h4,.wrap>p,.wrap>ul,.wrap>ol,.wrap>blockquote,.wrap>hr,
+.wrap>.authors,.wrap>.byline,.wrap>.disclaimer,.wrap>.cite,.wrap>.lead,.wrap>.find,
+.wrap>.notes,.wrap>.methods,.wrap>pre{max-width:660px; margin-left:auto; margin-right:auto;}
+h1{font-family:var(--display); font-weight:700; font-size:44px; line-height:1.12; letter-spacing:-.02em; color:var(--ink); margin:0 0 10px;}
+h2{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
+h3{font-family:var(--display); font-weight:700; font-size:20px; line-height:1.4; color:var(--ink); margin:1.8em 0 .3em;}
+h4{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:1.6em 0 .3em;}
+p{margin:0 0 1.1em;}
+a{color:inherit; text-decoration:none; border-bottom:1px solid var(--axis);}
+a:hover{border-bottom-color:var(--ink);}
+ul,ol{padding-left:1.3em; margin:0 0 1.1em;}
+li{margin:.25em 0;}
+strong,b{color:var(--ink); font-weight:600;}
+blockquote{border-left:3px solid var(--grid); margin:1.5em auto; padding:.3em 0 .3em 1.3em; color:var(--ink2); font-size:18px; line-height:1.6;}
+code{font-family:var(--mono); font-size:.88em; background:var(--grid); padding:.1em .35em; border-radius:3px;}
+pre{overflow-x:auto; background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:14px; font-size:13px;}
+pre code{background:none; padding:0;}
+hr{border:none; border-top:1px solid var(--grid); margin:2.4em auto;}
+.byline{font-family:var(--sans); color:var(--muted); font-size:14px; margin:0 0 2px;}
+.authors{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:.3em 0 .1em;}
+.disclaimer{font-family:var(--sans); font-style:italic; font-size:12.5px; color:var(--muted); margin:12px 0 0;}
+.cite{color:var(--muted); font-size:13px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px auto 8px;}
 .cite a{color:var(--ink2);}
-.sec{font-family:var(--serif); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:52px 0 0; border-top:1px solid var(--grid); padding-top:14px;}
-figure{margin:26px auto 0; background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:16px 16px 12px;}
-figcaption{font-family:var(--serif); font-size:15px; color:var(--ink); margin:0 0 2px;}
-figcaption b{font-weight:600;}
-.sub{font-family:var(--sans); font-size:12.5px; color:var(--muted); margin:0 0 12px;}
+.sec{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
+figure{max-width:984px; margin:34px auto; background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:18px 18px 14px;}
+figcaption{font-family:var(--display); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
+figcaption b{font-weight:700;}
+.sub{font-family:var(--sans); font-size:13px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
 .plot{position:relative; width:100%; height:360px;}
 .plot.tall{height:400px;}
 .subplots{display:flex; gap:16px; flex-wrap:wrap;}

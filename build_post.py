@@ -50,9 +50,20 @@ def main():
     data = open(FIGURES, encoding="utf-8").read()
 
     md = open(POST, encoding="utf-8").read()
+    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)   # drop authoring comments
     title_m = re.search(r"^#\s+(.+)$", md, re.M)
     title = title_m.group(1).strip() if title_m else "Who Fills arXiv"
     body = markdown.markdown(md, extensions=["extra", "sane_lists", "toc"])
+
+    # warn on repeated figure tokens — the same block twice means duplicate
+    # canvas ids, so only the first instance renders.
+    counts = {}
+    for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
+        counts[fid] = counts.get(fid, 0) + 1
+    dups = [f for f, c in counts.items() if c > 1]
+    if dups:
+        print("WARNING: figure token used more than once (only the first will "
+              "render — duplicate canvas ids):", ", ".join(sorted(dups)))
 
     # inject figures: {{fig:ID}} (optionally wrapped in a <p> by Markdown)
     missing = []
@@ -76,8 +87,13 @@ def main():
     chartjs = open(cache, encoding="utf-8").read()
 
     runtime = runtime.replace("__FIGDATA__", data)
+    fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
+             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
+             'family=Libre+Franklin:wght@400;500;600;700&display=swap">\n')
     out = ('<meta charset="utf-8">\n'
            f"<title>{title}</title>\n"
+           f"{fonts}"
            f"<script>\n{chartjs}\n</script>\n"
            f"{style}\n"
            '<div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>\n'

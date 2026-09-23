@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <title>Who Fills arXiv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap">
 <script>
 /**
  * Skipped minification because the original files appears to be already minified.
@@ -25,33 +26,52 @@
 </script>
 <style>
 :root{
-  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
-  --serif:"Iowan Old Style",Georgia,Palatino,"Times New Roman",serif;
-  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --page:#fff; --surface:#fff; --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
+  --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --ring:rgba(0,0,0,.1);
+  --display:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:Consolas,Monaco,"Andale Mono","Ubuntu Mono",monospace;
 }
 :root:not([data-theme="light"]){ @media (prefers-color-scheme:dark){
-  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
 }}
 :root[data-theme="dark"]{
-  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
 }
-body{background:var(--page); color:var(--ink); font-family:var(--sans); margin:0;}
-.wrap{max-width:760px; margin:0 auto; padding-block:56px; padding-inline:20px;}
-.fig-wide{max-width:920px;}
-h1{font-family:var(--serif); font-weight:600; font-size:34px; line-height:1.15; letter-spacing:-.01em; margin:0 0 6px;}
-.byline{color:var(--ink2); font-size:14px; margin:0 0 4px;}
-.authors{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
-.disclaimer{font-family:var(--sans); font-style:italic; font-size:12px; color:var(--muted); margin:10px 0 0;}
-.cite{color:var(--muted); font-size:12.5px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px 0 8px;}
+body{background:var(--page); color:var(--ink2); font-family:var(--sans); margin:0;
+  font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:1080px; margin:0 auto; padding:64px 24px 96px;}
+/* narrow text column, wide figures — distill-style */
+.wrap>h1,.wrap>h2,.wrap>h3,.wrap>h4,.wrap>p,.wrap>ul,.wrap>ol,.wrap>blockquote,.wrap>hr,
+.wrap>.authors,.wrap>.byline,.wrap>.disclaimer,.wrap>.cite,.wrap>.lead,.wrap>.find,
+.wrap>.notes,.wrap>.methods,.wrap>pre{max-width:660px; margin-left:auto; margin-right:auto;}
+h1{font-family:var(--display); font-weight:700; font-size:44px; line-height:1.12; letter-spacing:-.02em; color:var(--ink); margin:0 0 10px;}
+h2{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
+h3{font-family:var(--display); font-weight:700; font-size:20px; line-height:1.4; color:var(--ink); margin:1.8em 0 .3em;}
+h4{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:1.6em 0 .3em;}
+p{margin:0 0 1.1em;}
+a{color:inherit; text-decoration:none; border-bottom:1px solid var(--axis);}
+a:hover{border-bottom-color:var(--ink);}
+ul,ol{padding-left:1.3em; margin:0 0 1.1em;}
+li{margin:.25em 0;}
+strong,b{color:var(--ink); font-weight:600;}
+blockquote{border-left:3px solid var(--grid); margin:1.5em auto; padding:.3em 0 .3em 1.3em; color:var(--ink2); font-size:18px; line-height:1.6;}
+code{font-family:var(--mono); font-size:.88em; background:var(--grid); padding:.1em .35em; border-radius:3px;}
+pre{overflow-x:auto; background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:14px; font-size:13px;}
+pre code{background:none; padding:0;}
+hr{border:none; border-top:1px solid var(--grid); margin:2.4em auto;}
+.byline{font-family:var(--sans); color:var(--muted); font-size:14px; margin:0 0 2px;}
+.authors{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:.3em 0 .1em;}
+.disclaimer{font-family:var(--sans); font-style:italic; font-size:12.5px; color:var(--muted); margin:12px 0 0;}
+.cite{color:var(--muted); font-size:13px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px auto 8px;}
 .cite a{color:var(--ink2);}
-.sec{font-family:var(--serif); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:52px 0 0; border-top:1px solid var(--grid); padding-top:14px;}
-figure{margin:26px auto 0; background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:16px 16px 12px;}
-figcaption{font-family:var(--serif); font-size:15px; color:var(--ink); margin:0 0 2px;}
-figcaption b{font-weight:600;}
-.sub{font-family:var(--sans); font-size:12.5px; color:var(--muted); margin:0 0 12px;}
+.sec{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
+figure{max-width:984px; margin:34px auto; background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:18px 18px 14px;}
+figcaption{font-family:var(--display); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
+figcaption b{font-weight:700;}
+.sub{font-family:var(--sans); font-size:13px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
 .plot{position:relative; width:100%; height:360px;}
 .plot.tall{height:400px;}
 .subplots{display:flex; gap:16px; flex-wrap:wrap;}
@@ -84,27 +104,6 @@ figcaption b{font-weight:600;}
 
 <p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
 
-<!--
-  Write prose in plain Markdown. Insert any figure with a token on its own line:
-      <figure class="fig-wide">
-    <figcaption><b>Figure 7f.</b> Mean submissions per person per year, by seniority</figcaption>
-    <p class="sub">Average papers per person in each self-reported position — toggle between first-authored papers and all authorships. First-authorship concentrates among students; all-authorship rises with seniority.</p>
-    <div class="bar"><span class="lbl">Count</span>
-      <button class="toggle" data-f7fmetric="fa" aria-pressed="true">first-author</button>
-      <button class="toggle" data-f7fmetric="subs" aria-pressed="false">all submissions</button>
-    </div>
-    <div class="plot tall"><canvas id="f7f"></canvas></div>
-  </figure>
-  Available figure ids:
-    1a 1b 1c 2 2cs 3 4 5            (arXiv overall + CS)
-    6a 6b 6c 7 7c 7d 7e 7f          (conferences: region + seniority)
-    8 9 10 11                       (mathematics)
-    12 13                           (ICLR peer review)
-    14a 14b 15 16                   (decomposition, 2026 YTD, LLM control)
-  Rebuild with:  make post   (or  .venv/bin/python build_post.py )
-  Only the figures you reference are shown.
--->
-
 <p>More than 60 thousand papers were submitted to ICLR in 2026 [LINK]. Naturally the association between the rise of LLMs and this increase in paper submissions is conspicuous. We asked each other a simple question: "Who are writing all of these papers!?".</p>
 <p>Our initial hypothesis was that LLM assistance was leading to a dearth of solo-authored papers from non-affiliated researchers. Our follow-up question was then: "how are these researchers getting referrals for the arXiv?"</p>
 <p>We set out to answer these questions by using metadata from arXiv, NeurIPS, ICLR, and ICML. What we found surprised us, although upon reflection this is not so surprising:</p>
@@ -120,7 +119,14 @@ figcaption b{font-weight:600;}
 - The average papers submitted per-capita has risen. This reflects a trend towards larger author lists and increased collaboration. </p>
 <h2 id="an-exponential-growth-in-phd-students">An Exponential Growth in PhD Students</h2>
 <p>Our primary finding is that the exponential growth in papers (See Figure ) is driven by a concomitant growth in the raw number of PhD students studying computer science (See Figure ).</p>
-<p>{{New Figure: left is raw number of submissions to the big-3 conferences. right is raw number of PhD student authors to the conferences}}</p>
+<figure class="fig-wide" id="f17">
+    <figcaption><b>Figure 17.</b> Big-3 submissions and the PhD-student author base</figcaption>
+    <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f17l"></canvas></div>
+      <div class="plot"><canvas id="f17r"></canvas></div>
+    </div>
+  </figure>
 <h2 id="llm-use-is-not-explanatory">LLM Use is Not Explanatory</h2>
 <h2 id="paper-submissions-by-career-seniority">Paper Submissions by Career Seniority</h2>
 <h2 id="phd-student-growth-by-region">PhD Student Growth by Region</h2>
@@ -168,14 +174,6 @@ figcaption b{font-weight:600;}
   </figure>
 <h2 id="by-region-neurips-icml-iclr">By region — NeurIPS · ICML · ICLR</h2>
 <p><em>China vs US vs Other over time; what the affiliation domains show.</em></p>
-<figure class="fig-wide" id="f17">
-    <figcaption><b>Figure 17.</b> Big-3 submissions and the PhD-student author base</figcaption>
-    <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
-    <div class="subplots">
-      <div class="plot"><canvas id="f17l"></canvas></div>
-      <div class="plot"><canvas id="f17r"></canvas></div>
-    </div>
-  </figure>
 <figure class="fig-wide">
     <figcaption><b>Figure 6b.</b> Submissions by institution region — share</figcaption>
     <div class="plot"><canvas id="f6b"></canvas></div>
