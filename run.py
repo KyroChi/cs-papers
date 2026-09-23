@@ -23,6 +23,11 @@ def connect():
     if not os.path.exists(DATA):
         sys.exit("Data not found. Run: python download_data.py")
     con = duckdb.connect()
+    # Cap memory hard (≤1 GiB) and spill to disk instead of OOMing.
+    con.execute("SET memory_limit='1GB'")
+    con.execute("SET threads=2")
+    con.execute("SET preserve_insertion_order=false")
+    con.execute(f"SET temp_directory='{os.path.join(HERE, '.duckdb_tmp')}'")
     con.execute(f"SET file_search_path = '{HERE}'")
     with open(os.path.join(HERE, "setup.sql")) as fh:
         con.execute(fh.read())

@@ -201,6 +201,16 @@ figcaption b{font-weight:600;}
   </figure>
 
   <figure class="fig-wide">
+    <figcaption><b>Figure 7f.</b> First-author papers per person per year, by seniority</figcaption>
+    <p class="sub">Like 7d, but counting only papers where the person is the first author. First-authorship concentrates among students and is rare for faculty.</p>
+    <div class="bar"><span class="lbl">Stat</span>
+      <button class="toggle" data-f7fstat="mean" aria-pressed="true">mean</button>
+      <button class="toggle" data-f7fstat="median" aria-pressed="false">median</button>
+    </div>
+    <div class="plot tall"><canvas id="f7f"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
     <figcaption><b>Figure 7e.</b> First-author PhD-student submissions — China vs US</figcaption>
     <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
     <div class="plot"><canvas id="f7e"></canvas></div>
@@ -462,6 +472,7 @@ function renderAll(){
   charts.splice(0).forEach(c=>c.chart.destroy());
   if(f7chart){f7chart.destroy();f7chart=null;}
   if(f7dchart){f7dchart.destroy();f7dchart=null;}
+  if(f7fchart){f7fchart.destroy();f7fchart=null;}
 
   // F1a — area line
   lineChart('f1a',years(DATA.f1a),()=>[{label:'Submissions',data:DATA.f1a.map(r=>r.papers),
@@ -551,6 +562,9 @@ function renderAll(){
 
   // F7d — submissions per person by seniority (mean/median toggle)
   drawF7d();
+
+  // F7f — first-author papers per person by seniority (mean/median toggle)
+  drawF7f();
 
   // F7e — first-author PhD-student submissions, China vs US (from DATA.fa)
   {const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
@@ -677,6 +691,20 @@ function drawF7d(){
       borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
 }
 wireF7('data-f7dstat',v=>f7dstat=v,drawF7d);
+
+// ---- Figure 7f: first-author papers per person by seniority (mean/median) ----
+let f7fstat='mean', f7fchart=null;
+function drawF7f(){
+  if(f7fchart)f7fchart.destroy();
+  const order=DATA.f7_order;
+  const {yrs,map}=pivot(DATA.f7f.map(r=>({year:r.year,k:r.seniority,v:r[f7fstat]})),
+                        r=>r.k,r=>r.v,order);
+  const o=base();
+  f7fchart=new Chart(document.getElementById('f7f'),{type:'line',data:{labels:yrs,
+    datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
+      borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
+}
+wireF7('data-f7fstat',v=>f7fstat=v,drawF7f);
 
 document.getElementById('themeBtn').onclick=()=>{
   const cur=document.documentElement.getAttribute('data-theme');

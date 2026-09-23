@@ -26,6 +26,11 @@ AUTH = (r"list_filter(regexp_split_to_array(regexp_replace(authors,'\([^)]*\)','
 
 def main():
     con = duckdb.connect()
+    # Cap memory hard (≤1 GiB) and let large ops spill to disk instead of OOMing.
+    con.execute("SET memory_limit='1GB'")
+    con.execute("SET threads=2")
+    con.execute("SET preserve_insertion_order=false")
+    con.execute(f"SET temp_directory='{os.path.join(HERE, '.duckdb_tmp')}'")
     con.execute(f"SET file_search_path = '{HERE}'")
     con.execute(open(os.path.join(HERE, "setup.sql")).read())
     if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
@@ -251,6 +256,20 @@ def main():
               GROUP BY year, seniority, or_profile
             )
             SELECT year, seniority, round(avg(subs),3) AS mean, median(subs) AS median,
+                   count(*) AS people
+            FROM pp GROUP BY year, seniority ORDER BY year""")
+
+        # Figure 7f: mean/median FIRST-AUTHOR papers per person per year, by
+        # seniority (how first-authorship concentrates by career stage).
+        fig["f7f"] = rows("""
+            WITH pp AS (
+              SELECT year, seniority, or_profile,
+                     count(DISTINCT id) FILTER (WHERE author_no=1) AS fa
+              FROM conf_authors WHERE or_profile<>'' AND seniority<>'Unknown'
+                AND year BETWEEN 2021 AND 2025
+              GROUP BY year, seniority, or_profile
+            )
+            SELECT year, seniority, round(avg(fa),3) AS mean, median(fa) AS median,
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
