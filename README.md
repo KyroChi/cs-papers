@@ -10,12 +10,18 @@ self-contained interactive page (open it in any browser, works offline). If
 GitHub Pages is enabled for this repo, it is served at
 `https://kyrochi.github.io/cs-papers/distill/`.
 
-**Writing it:** prose is plain Markdown in [`distill/post.md`](distill/post.md).
-Drop any figure with a token on its own line, e.g. `{{fig:7f}}`. Rebuild with
-`make post`. The figures themselves (interactive Chart.js blocks + their render
-code) live in `distill/template.html`; `build_post.py` renders the Markdown,
-injects the referenced figures, and inlines the latest data + Chart.js. Figures
-you don't reference simply aren't shown.
+**Writing it:** [`distill/post.md`](distill/post.md) has a YAML front-matter
+block (title, subtitle, authors, published, disclaimer) followed by plain
+Markdown. Drop any figure with a token on its own line, e.g. `{{fig:7f}}`.
+Rebuild with `make post`. `build_post.py` emits a genuine
+[distill.pub](https://distill.pub) article (`<d-title>`/`<d-byline>`/`<d-article>`,
+`template.v2.js` + MathJax), injects the referenced figures (interactive
+Chart.js from `distill/template.html`), and inlines the latest data + Chart.js.
+Figures you don't reference aren't shown.
+
+**Viewing:** open `distill/index.html` in a browser (`open distill/index.html`)
+or publish via GitHub Pages — both load the distill framework. Needs network
+for `template.v2.js`/MathJax, like the blog itself.
 
 ## Findings in brief
 

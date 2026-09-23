@@ -762,12 +762,14 @@ function drawF7f(){
 }
 wireF7('data-f7fmetric',v=>f7fmetric=v,drawF7f);
 
-document.getElementById('themeBtn').onclick=()=>{
+const _tb=document.getElementById('themeBtn');
+if(_tb) _tb.onclick=()=>{
   const cur=document.documentElement.getAttribute('data-theme');
   const next=cur==='dark'?'light':(cur==='light'?'dark':(dark()?'light':'dark'));
   document.documentElement.setAttribute('data-theme',next);
   renderAll();
 };
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',renderAll);
-renderAll();
+if(document.readyState!=='loading') renderAll();
+else addEventListener('DOMContentLoaded',renderAll);
 </script>

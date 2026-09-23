@@ -1,10 +1,14 @@
-# Who Fills arXiv
-
-<p class="authors">Kyle Chickering &amp; Dario Sučić</p>
-
-<p class="disclaimer">This post reflects the personal views of the authors and not those of their employer.</p>
-
-<p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
+---
+title: Who Fills arXiv
+subtitle: An interactive look at the growth of arXiv and the machine-learning conferences.
+description: Who is behind the surge in arXiv and ML-conference submissions?
+published: September 2026
+disclaimer: This post reflects the personal views of the authors and not those of their employer.
+authors:
+  - name: Kyle Chickering
+    url: https://kyrochi.github.io/
+  - name: Dario Sučić
+---
 
 <!--
   Write prose in plain Markdown. Insert any figure with a token on its own line:
