@@ -42,6 +42,8 @@ body{background:var(--page); color:var(--ink); font-family:var(--sans); margin:0
 .fig-wide{max-width:920px;}
 h1{font-family:var(--serif); font-weight:600; font-size:34px; line-height:1.15; letter-spacing:-.01em; margin:0 0 6px;}
 .byline{color:var(--ink2); font-size:14px; margin:0 0 4px;}
+.authors{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
+.disclaimer{font-family:var(--sans); font-style:italic; font-size:12px; color:var(--muted); margin:10px 0 0;}
 .cite{color:var(--muted); font-size:12.5px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px 0 8px;}
 .cite a{color:var(--ink2);}
 .sec{font-family:var(--serif); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:52px 0 0; border-top:1px solid var(--grid); padding-top:14px;}
@@ -73,7 +75,12 @@ figcaption b{font-weight:600;}
 <div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>
 <div class="wrap">
 <h1 id="who-fills-arxiv">Who Fills arXiv</h1>
-<p><em>An interactive look at the growth of arXiv and the machine-learning conferences.</em></p>
+<p class="authors">Kyle Chickering &amp; Dario Sučić</p>
+
+<p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
+
+<p class="disclaimer">This post reflects the personal views of the authors and not those of their employer.</p>
+
 <!--
   Write prose in plain Markdown. Insert any figure with a token on its own line:
       <figure class="fig-wide">

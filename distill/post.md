@@ -1,6 +1,10 @@
 # Who Fills arXiv
 
-*An interactive look at the growth of arXiv and the machine-learning conferences.*
+<p class="authors">Kyle Chickering &amp; Dario Sučić</p>
+
+<p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
+
+<p class="disclaimer">This post reflects the personal views of the authors and not those of their employer.</p>
 
 <!--
   Write prose in plain Markdown. Insert any figure with a token on its own line:
