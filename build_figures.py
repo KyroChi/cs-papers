@@ -26,8 +26,8 @@ AUTH = (r"list_filter(regexp_split_to_array(regexp_replace(authors,'\([^)]*\)','
 
 def main():
     con = duckdb.connect()
-    # Cap memory hard (≤1 GiB) and let large ops spill to disk instead of OOMing.
-    con.execute("SET memory_limit='1GB'")
+    # Cap memory (4 GiB) and spill to disk — bounded well below machine RAM.
+    con.execute("SET memory_limit='4GB'")
     con.execute("SET threads=2")
     con.execute("SET preserve_insertion_order=false")
     con.execute(f"SET temp_directory='{os.path.join(HERE, '.duckdb_tmp')}'")
