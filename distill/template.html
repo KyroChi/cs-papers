@@ -434,6 +434,7 @@ function toPct(cols){ // cols: array of series arrays -> percentage per column i
 }
 
 function stackedBar(id,labels,names,series,colorf,mode0){
+  if(!document.getElementById(id))return;   // figure not on this page — skip
   const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
   let mode=mode0||'abs';
   const build=()=>{
@@ -462,6 +463,7 @@ function stackedBar(id,labels,names,series,colorf,mode0){
 }
 
 function lineChart(id,labels,datasets,tweak){
+  if(!document.getElementById(id))return;   // figure not on this page — skip
   const mk=()=>{const o=base(); if(tweak)tweak(o); return o;};
   const c=new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:datasets()},options:mk()});
   charts.push({chart:c,rebuild:()=>{c.options=mk();c.data.datasets=datasets();c.update('none');}});
@@ -659,6 +661,7 @@ function f7data(){
   return {yrs,order,series};
 }
 function drawF7(){
+  if(!document.getElementById('f7'))return;
   if(f7chart)f7chart.destroy();
   const {yrs,order,series}=f7data();
   const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
@@ -681,6 +684,7 @@ wireF7('data-f7scale',v=>f7scale=v);
 // ---- Figure 7d: submissions per person by seniority (mean/median) ----
 let f7dstat='mean', f7dchart=null;
 function drawF7d(){
+  if(!document.getElementById('f7d'))return;
   if(f7dchart)f7dchart.destroy();
   const order=DATA.f7_order;
   const {yrs,map}=pivot(DATA.f7d.map(r=>({year:r.year,k:r.seniority,v:r[f7dstat]})),
@@ -695,6 +699,7 @@ wireF7('data-f7dstat',v=>f7dstat=v,drawF7d);
 // ---- Figure 7f: first-author papers per person by seniority (mean/median) ----
 let f7fmetric='fa', f7fchart=null;
 function drawF7f(){
+  if(!document.getElementById('f7f'))return;
   if(f7fchart)f7fchart.destroy();
   const order=DATA.f7_order, o=base();
   const src=f7fmetric==='fa'?DATA.f7f:DATA.f7d;   // mean first-author vs mean all submissions

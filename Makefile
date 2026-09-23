@@ -2,7 +2,7 @@
 # Usage: make setup && make data && make all
 PY := .venv/bin/python
 
-.PHONY: setup data figures html all clean
+.PHONY: setup data figures post all clean
 
 setup:                 ## create venv and install deps
 	python3 -m venv .venv
@@ -16,10 +16,10 @@ data:                  ## download all external data (~1.7 GB, not committed)
 figures:               ## compute aggregates -> results/figures.json (+ archive)
 	$(PY) build_figures.py
 
-html:                  ## assemble the self-contained distill page
-	$(PY) build_html.py
+post:                  ## build distill/index.html from distill/post.md + figures
+	$(PY) build_post.py
 
-all: figures html      ## rebuild findings and the distill document
+all: figures post      ## rebuild findings and the distill document
 
 clean:                 ## remove build caches (keeps data and results)
 	rm -f .chartjs.cache

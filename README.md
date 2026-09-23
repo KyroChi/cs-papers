@@ -10,6 +10,13 @@ self-contained interactive page (open it in any browser, works offline). If
 GitHub Pages is enabled for this repo, it is served at
 `https://kyrochi.github.io/cs-papers/distill/`.
 
+**Writing it:** prose is plain Markdown in [`distill/post.md`](distill/post.md).
+Drop any figure with a token on its own line, e.g. `{{fig:7f}}`. Rebuild with
+`make post`. The figures themselves (interactive Chart.js blocks + their render
+code) live in `distill/template.html`; `build_post.py` renders the Markdown,
+injects the referenced figures, and inlines the latest data + Chart.js. Figures
+you don't reference simply aren't shown.
+
 ## Findings in brief
 
 - arXiv submissions grew **~9× since 2000** (≈31k → ≈284k in 2025) and are still accelerating.
@@ -36,7 +43,7 @@ Or step by step:
 .venv/bin/python download_conf_data.py       # NeurIPS/ICML/ICLR author files (~70 MB)
 .venv/bin/python download_iclr_decisions.py  # ICLR accept/reject decisions
 .venv/bin/python build_figures.py            # -> results/figures.json (+ archive/)
-.venv/bin/python build_html.py               # -> distill/index.html (data inlined)
+.venv/bin/python build_post.py               # distill/post.md + figures -> distill/index.html
 ```
 
 Ad-hoc querying (DuckDB SQL over the metadata): `.venv/bin/python run.py -f queries/01_growth_by_year.sql`, or `run.py "<sql>"`, or `run.py` for a shell.
@@ -56,24 +63,29 @@ LFS objects are stored yet.
 
 ## How the findings flow
 
-`build_figures.py` runs the DuckDB queries and writes **`results/figures.json`**
-(the latest findings), plus a timestamped copy in **`results/archive/`** so every
-re-run is preserved. `build_html.py` inlines the *latest* `results/figures.json`
-into `distill/template.html` to produce `distill/index.html`. So to refresh the
-document after new data: `make all`.
+`build_figures.py` runs the DuckDB queries (capped at ≤1 GiB RAM, spilling to
+disk) and writes **`results/figures.json`** (the latest findings), plus a
+timestamped copy in **`results/archive/`** so every re-run is preserved.
+`build_post.py` renders `distill/post.md`, injects the referenced figures from
+`distill/template.html`, and inlines the *latest* `results/figures.json` +
+Chart.js into `distill/index.html`. So: `make figures` after new data, `make
+post` after editing prose, or `make all` for both.
 
 ## Layout
 
 ```
-distill/         template.html (edit this) + index.html (built, self-contained)
-results/         figures.json (latest findings) + archive/ (per-run history)
-queries/         standalone DuckDB SQL for the arXiv metadata questions
-setup.sql        DuckDB views over the arXiv parquet
-conf_setup.sql   DuckDB views over the conference author files
-build_figures.py compute all figure aggregates
-build_html.py    assemble the self-contained distill page
-run.py           ad-hoc SQL runner / shell
-download_*.py    fetch the external datasets
+distill/post.md      the prose (Markdown; edit this) with {{fig:ID}} tokens
+distill/template.html figure library + render code (interactive Chart.js blocks)
+distill/index.html   built, self-contained page (do not hand-edit)
+results/             figures.json (latest findings) + archive/ (per-run history)
+queries/             standalone DuckDB SQL for the arXiv metadata questions
+setup.sql            DuckDB views over the arXiv parquet
+conf_setup.sql       DuckDB views over the conference author files
+build_figures.py     compute all figure aggregates (memory-capped)
+build_post.py        Markdown prose + figures -> distill/index.html
+build_html.py        render template.html directly (all figures, for previewing)
+run.py               ad-hoc SQL runner / shell
+download_*.py        fetch the external datasets
 ```
 
 ## Requirements
