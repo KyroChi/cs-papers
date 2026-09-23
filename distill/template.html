@@ -32,6 +32,8 @@ figcaption b{font-weight:600;}
 .sub{font-family:var(--sans); font-size:12.5px; color:var(--muted); margin:0 0 12px;}
 .plot{position:relative; width:100%; height:360px;}
 .plot.tall{height:400px;}
+.subplots{display:flex; gap:16px; flex-wrap:wrap;}
+.subplots>.plot{flex:1 1 320px; min-width:280px;}
 .bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
 .toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent; border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
@@ -217,6 +219,15 @@ figcaption b{font-weight:600;}
     <figcaption><b>Figure 7e.</b> First-author PhD-student submissions — China vs US</figcaption>
     <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
     <div class="plot"><canvas id="f7e"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" id="f17">
+    <figcaption><b>Figure 17.</b> Big-3 submissions and the PhD-student author base</figcaption>
+    <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f17l"></canvas></div>
+      <div class="plot"><canvas id="f17r"></canvas></div>
+    </div>
   </figure>
 
   <p class="sec">Mathematics</p>
@@ -570,6 +581,23 @@ function renderAll(){
 
   // F7f — first-author papers per person by seniority (mean/median toggle)
   drawF7f();
+
+  // F17 — big-3 submissions (left) + unique PhD-student authors (right)
+  if(DATA.confpapers){
+    const yrs=[...new Set(DATA.confpapers.map(r=>r.year))].sort((a,b)=>a-b);
+    const V=[['NeurIPS','nips'],['ICML','icml'],['ICLR','iclr']];
+    const pick=v=>yrs.map(y=>{const r=DATA.confpapers.find(x=>x.year===y&&x.venue===v);return r?r.papers:null;});
+    lineChart('f17l',yrs,()=>V.map(([nm,v],i)=>({label:nm,data:pick(v),borderColor:cat(i),
+      borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2,spanGaps:true})),
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
+  if(DATA.phddec){
+    const yrs=DATA.phddec.map(r=>r.year);
+    lineChart('f17r',yrs,()=>[{label:'PhD-student authors',data:DATA.phddec.map(r=>r.students),
+      borderColor:cat(0),backgroundColor:withA(dark()?ORD_D[2]:'#2a78d6',.14),borderWidth:2,
+      fill:true,tension:.2,pointRadius:2.5,pointHoverRadius:5}],
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
 
   // F7e — first-author PhD-student submissions, China vs US (from DATA.fa)
   {const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);

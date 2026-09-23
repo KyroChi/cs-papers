@@ -54,6 +54,8 @@ figcaption b{font-weight:600;}
 .sub{font-family:var(--sans); font-size:12.5px; color:var(--muted); margin:0 0 12px;}
 .plot{position:relative; width:100%; height:360px;}
 .plot.tall{height:400px;}
+.subplots{display:flex; gap:16px; flex-wrap:wrap;}
+.subplots>.plot{flex:1 1 320px; min-width:280px;}
 .bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
 .toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent; border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
@@ -78,9 +80,9 @@ figcaption b{font-weight:600;}
 <h1 id="who-fills-arxiv">Who Fills arXiv</h1>
 <p class="authors">Kyle Chickering &amp; Dario Sučić</p>
 
-<p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
-
 <p class="disclaimer">This post reflects the personal views of the authors and not those of their employer.</p>
+
+<p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
 
 <!--
   Write prose in plain Markdown. Insert any figure with a token on its own line:
@@ -103,7 +105,31 @@ figcaption b{font-weight:600;}
   Only the figures you reference are shown.
 -->
 
-<p><em>Intro prose here — the question, the data, what we found in one paragraph.</em></p>
+<p>More than 60 thousand papers were submitted to ICLR in 2026 [LINK]. Naturally the association between the rise of LLMs and this increase in paper submissions is conspicuous. We asked each other a simple question: "Who are writing all of these papers!?".</p>
+<p>Our initial hypothesis was that LLM assistance was leading to a dearth of solo-authored papers from non-affiliated researchers. Our follow-up question was then: "how are these researchers getting referrals for the arXiv?"</p>
+<p>We set out to answer these questions by using metadata from arXiv, NeurIPS, ICLR, and ICML. What we found surprised us, although upon reflection this is not so surprising:</p>
+<blockquote>
+<p>The exponential growth in submitted papers tracks nearly perfectly an exponential growth in computer science PhD students in the United States and China. LLM assistance has not materially impacted the share of submissions from solo-authors. Most surprising of all, the introduction of LLM tools in 2022 has not increased the per-capita research productivity of PhD students (measured in first-author papers per year). Most surprising of all is that paper output by senior mathematicians has been steadily declining over the last two decades, and LLM use has not cause a boom in per-capita paper submissions. </p>
+</blockquote>
+<p>The remainder of this blog post walks through our findings with empirical support from our collected metadata datasets which are built on top of the excellent open source metadata datasets by ... We discuss our dataset collection and curation in the appendix. </p>
+<p>We conclude with some brief thoughts on the situation that computer science, and research in general, finds itself in.</p>
+<h1 id="who-submits-to-the-big-3-ml-conferences">Who Submits to the Big-3 ML Conferences?</h1>
+<p><strong>Main Findings:</strong>
+- The vast majority of the exponential growth in submitted papers can be attributed to an exponential growth in the number of CS PhD students.
+- First author papers per-capita has barely changed since the advent of LLM assistance. We conclude that LLM tools have not materially changed the number of papers PhD students are writing.
+- The average papers submitted per-capita has risen. This reflects a trend towards larger author lists and increased collaboration. </p>
+<h2 id="an-exponential-growth-in-phd-students">An Exponential Growth in PhD Students</h2>
+<p>Our primary finding is that the exponential growth in papers (See Figure ) is driven by a concomitant growth in the raw number of PhD students studying computer science (See Figure ).</p>
+<p>{{New Figure: left is raw number of submissions to the big-3 conferences. right is raw number of PhD student authors to the conferences}}</p>
+<h2 id="llm-use-is-not-explanatory">LLM Use is Not Explanatory</h2>
+<h2 id="paper-submissions-by-career-seniority">Paper Submissions by Career Seniority</h2>
+<h2 id="phd-student-growth-by-region">PhD Student Growth by Region</h2>
+<h1 id="arxiv-submissions-have-been-increasing-exponentially">arXiv Submissions Have Been Increasing Exponentially</h1>
+<h1 id="the-slop-cannon-anecdotal-observations">The Slop-Cannon: Anecdotal Observations</h1>
+<h1 id="where-do-we-go-from-here">Where do we go From Here?</h1>
+<h1 id="acknowledgements">Acknowledgements</h1>
+<h1 id="references">References</h1>
+<h1 id="appendix-data-collection-curation">Appendix: Data Collection &amp; Curation</h1>
 <h2 id="all-of-arxiv">All of arXiv</h2>
 <p><em>How much has arXiv grown, and how has its subject mix shifted?</em></p>
 <figure class="fig-wide">
@@ -142,6 +168,14 @@ figcaption b{font-weight:600;}
   </figure>
 <h2 id="by-region-neurips-icml-iclr">By region — NeurIPS · ICML · ICLR</h2>
 <p><em>China vs US vs Other over time; what the affiliation domains show.</em></p>
+<figure class="fig-wide" id="f17">
+    <figcaption><b>Figure 17.</b> Big-3 submissions and the PhD-student author base</figcaption>
+    <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f17l"></canvas></div>
+      <div class="plot"><canvas id="f17r"></canvas></div>
+    </div>
+  </figure>
 <figure class="fig-wide">
     <figcaption><b>Figure 6b.</b> Submissions by institution region — share</figcaption>
     <div class="plot"><canvas id="f6b"></canvas></div>
@@ -377,6 +411,23 @@ function renderAll(){
 
   // F7f — first-author papers per person by seniority (mean/median toggle)
   drawF7f();
+
+  // F17 — big-3 submissions (left) + unique PhD-student authors (right)
+  if(DATA.confpapers){
+    const yrs=[...new Set(DATA.confpapers.map(r=>r.year))].sort((a,b)=>a-b);
+    const V=[['NeurIPS','nips'],['ICML','icml'],['ICLR','iclr']];
+    const pick=v=>yrs.map(y=>{const r=DATA.confpapers.find(x=>x.year===y&&x.venue===v);return r?r.papers:null;});
+    lineChart('f17l',yrs,()=>V.map(([nm,v],i)=>({label:nm,data:pick(v),borderColor:cat(i),
+      borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2,spanGaps:true})),
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
+  if(DATA.phddec){
+    const yrs=DATA.phddec.map(r=>r.year);
+    lineChart('f17r',yrs,()=>[{label:'PhD-student authors',data:DATA.phddec.map(r=>r.students),
+      borderColor:cat(0),backgroundColor:withA(dark()?ORD_D[2]:'#2a78d6',.14),borderWidth:2,
+      fill:true,tension:.2,pointRadius:2.5,pointHoverRadius:5}],
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
 
   // F7e — first-author PhD-student submissions, China vs US (from DATA.fa)
   {const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);

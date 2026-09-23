@@ -213,6 +213,12 @@ def main():
             FROM conf_paper_region WHERE year BETWEEN 2021 AND 2025
             GROUP BY year ORDER BY year""")
 
+        # Figure 17 (left): raw papers submitted to each big-3 venue per year.
+        fig["confpapers"] = rows("""
+            SELECT venue, year, count(DISTINCT id) AS papers
+            FROM conf_papers WHERE year BETWEEN 2019 AND 2025
+            GROUP BY venue, year ORDER BY year""")
+
         # Figure 7: FIRST-AUTHOR seniority of submissions, finest grain
         # (year x venue x region x seniority) so the page can filter/aggregate.
         # Each paper counts once, by its first author's self-reported position.
