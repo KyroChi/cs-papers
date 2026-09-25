@@ -98,7 +98,7 @@ d-article figcaption b{font-weight:700;}
 <p>Author lists are also getting longer: between 2021 and 2025 the mean number of authors per big-3 paper rose from 4.3 to 5.3, the median from 4 to 5, and the 90th percentile from 7 to 9 — while the 25th percentile held at 3. The growth is in the upper tail, consistent with larger labs adding more co-authors.</p>
 <figure class="l-page">
     <figcaption><b>Figure 7g.</b> Authors per paper at the big-3</figcaption>
-    <p class="sub">Distribution of author-list length per year (NeurIPS · ICML · ICLR, 2021–2025): 25th percentile, median, mean, 75th and 90th percentiles.</p>
+    <p class="sub">Authors per paper at the big-3 (NeurIPS · ICML · ICLR, 2021–2025): mean (dot) with a 25th–75th-percentile candle.</p>
     <div class="plot"><canvas id="f7g"></canvas></div>
   </figure>
 <h2 id="llm-use-is-not-explanatory">LLM Use is Not Explanatory</h2>
@@ -385,16 +385,19 @@ function renderAll(){
   // F7f — first-author papers per person by seniority (mean/median toggle)
   drawF7f();
 
-  // F7g — authors per paper distribution at the big-3
-  if(DATA.f7g){
-    const yrs=DATA.f7g.map(r=>r.year);
-    lineChart('f7g',yrs,()=>[
-      {label:'25th pct',data:DATA.f7g.map(r=>r.p25),borderColor:cat(4),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25},
-      {label:'Median',data:DATA.f7g.map(r=>r.p50),borderColor:cat(0),borderWidth:2.5,pointRadius:2.5,pointHoverRadius:5,tension:.25},
-      {label:'Mean',data:DATA.f7g.map(r=>r.mean),borderColor:cat(1),borderWidth:2,borderDash:[5,4],pointRadius:2.5,pointHoverRadius:5,tension:.25},
-      {label:'75th pct',data:DATA.f7g.map(r=>r.p75),borderColor:cat(2),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25},
-      {label:'90th pct',data:DATA.f7g.map(r=>r.p90),borderColor:cat(3),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25}
-    ],o=>{o.scales.y.min=0;});
+  // F7g — mean with 25–75 candles (floating IQR bar + mean marker)
+  {const el=document.getElementById('f7g');
+   if(el && DATA.f7g){
+     const o=base(); o.scales.y.min=0;
+     const iqr=withA(dark()?ORD_D[2]:'#2a78d6',.30);
+     const c=new Chart(el,{data:{labels:DATA.f7g.map(r=>r.year),datasets:[
+       {type:'bar',label:'IQR (25–75%)',data:DATA.f7g.map(r=>[r.p25,r.p75]),
+        backgroundColor:iqr,borderColor:'transparent',maxBarThickness:14,borderRadius:3,order:2},
+       {type:'line',label:'Mean',data:DATA.f7g.map(r=>r.mean),borderColor:cat(1),
+        backgroundColor:cat(1),borderWidth:2,pointRadius:4,pointHoverRadius:6,tension:.2,order:1}
+     ]},options:o});
+     charts.push({chart:c});
+   }
   }
 
   // F17 — big-3 submissions (left) + unique PhD-student authors (right)
