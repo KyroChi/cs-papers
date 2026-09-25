@@ -114,13 +114,17 @@ d-article figcaption b{font-weight:700;}
 <h2 id="phd-student-growth-by-region">PhD Student Growth by Region</h2>
 <figure class="l-page" id="fworldmap">
     <figcaption><b>Figure 18.</b> Where big-3 authors come from — growth by country</figcaption>
-    <p class="sub">Institution country from author email domains. Colour = growth rate on a log scale (blue = growth, red = decline, grey = no data). Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
-    <div class="bar" id="wm-ctrls"><span class="lbl">Period</span>
-      <button class="toggle" data-wm="range" aria-pressed="true">2021→2025</button>
-      <button class="toggle" data-wm="2022" aria-pressed="false">’22</button>
-      <button class="toggle" data-wm="2023" aria-pressed="false">’23</button>
-      <button class="toggle" data-wm="2024" aria-pressed="false">’24</button>
-      <button class="toggle" data-wm="2025" aria-pressed="false">’25</button>
+    <p class="sub">Institution country from author email domains. Colour = value on a log scale, <b>lightest = lowest, darkest = highest</b> (grey = no data). Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
+    <div class="bar"><span class="lbl">Metric</span>
+      <button class="toggle" data-wmmetric="growth" aria-pressed="true">growth rate</button>
+      <button class="toggle" data-wmmetric="raw" aria-pressed="false">raw count</button>
+    </div>
+    <div class="bar"><span class="lbl">Period</span>
+      <button class="toggle" data-wmperiod="range" aria-pressed="true">2021→2025</button>
+      <button class="toggle" data-wmperiod="2022" aria-pressed="false">’22</button>
+      <button class="toggle" data-wmperiod="2023" aria-pressed="false">’23</button>
+      <button class="toggle" data-wmperiod="2024" aria-pressed="false">’24</button>
+      <button class="toggle" data-wmperiod="2025" aria-pressed="false">’25</button>
     </div>
     <div class="wm-wrap">
       <div class="wm-map"><svg id="wm-svg"></svg></div>
@@ -599,31 +603,37 @@ function initWorldMap(){
   const byC={}; DATA.countries.forEach(r=>{(byC[r.country]=byC[r.country]||{})[r.year]=r.n;});
   const alias={'United States':'United States of America'};
   const g2c={}; Object.keys(byC).forEach(c=>{g2c[alias[c]||c]=c;});
-  let mode='range';
-  function growth(c){const s=byC[c]||{};
-    if(mode==='range'){const a=s[2021],b=s[2025]; return (a>0&&b>0)?b/a:null;}
-    const y=+mode,a=s[y-1],b=s[y]; return (a>0&&b>0)?b/a:null;}
-  function color(v){ if(v==null||!isFinite(v)) return 'rgba(0,0,0,.07)';
-    const t=Math.max(-1,Math.min(1, Math.log(v)/Math.log(4)));
-    return d3.interpolateRdBu((t+1)/2); }
+  let metric='growth', period='range';
+  function value(c){const s=byC[c]||{};
+    if(metric==='raw'){
+      if(period==='range') return [2021,2022,2023,2024,2025].reduce((t,y)=>t+(s[y]||0),0)||null;
+      return s[+period]||null;
+    }
+    if(period==='range'){const a=s[2021],b=s[2025]; return (a>0&&b>0)?b/a:null;}
+    const y=+period,a=s[y-1],b=s[y]; return (a>0&&b>0)?b/a:null;}
+  function fmt(v){return metric==='raw'?Math.round(v).toLocaleString():'×'+v.toFixed(2);}
   const W=660,H=390;
   const proj=d3.geoNaturalEarth1().fitSize([W,H],WORLD);
-  const path=d3.geoPath(proj);
   const gsel=d3.select(svgEl).attr('viewBox','0 0 '+W+' '+H)
-    .append('g').selectAll('path').data(WORLD.features).join('path').attr('d',path);
+    .append('g').selectAll('path').data(WORLD.features).join('path').attr('d',d3.geoPath(proj));
   gsel.append('title');
   function render(){
-    gsel.attr('fill',f=>{const c=g2c[f.properties.name]; return color(c?growth(c):null);});
+    const vals={}; Object.keys(byC).forEach(c=>{const v=value(c); if(v!=null&&isFinite(v)&&v>0) vals[c]=v;});
+    const logs=Object.values(vals).map(Math.log);
+    const lo=Math.min.apply(null,logs), hi=Math.max.apply(null,logs);
+    const col=c=>{const v=vals[c]; if(v==null) return 'rgba(0,0,0,.07)';
+      const t=hi>lo?(Math.log(v)-lo)/(hi-lo):0.5; return d3.interpolateBlues(0.15+0.8*t);};
+    gsel.attr('fill',f=>col(g2c[f.properties.name]));
     gsel.select('title').text(f=>{const c=g2c[f.properties.name];
-      if(!c) return f.properties.name; const v=growth(c);
-      return c+(v!=null?'  ×'+v.toFixed(2):'  (n/a)');});
-    const rows=Object.keys(byC).map(c=>({c,v:growth(c)})).filter(x=>x.v!=null&&isFinite(x.v))
-      .sort((a,b)=>b.v-a.v);
+      if(!c) return f.properties.name; return c+(vals[c]!=null?'  '+fmt(vals[c]):'  (n/a)');});
+    const rows=Object.keys(vals).map(c=>({c,v:vals[c]})).sort((a,b)=>b.v-a.v);
     document.getElementById('wm-list').innerHTML=rows.map(x=>
-      '<div class="wm-row"><span>'+x.c+'</span><span>×'+x.v.toFixed(2)+'</span></div>').join('');
+      '<div class="wm-row"><span>'+x.c+'</span><span>'+fmt(x.v)+'</span></div>').join('');
   }
-  document.querySelectorAll('[data-wm]').forEach(b=>b.onclick=()=>{mode=b.dataset.wm;
-    document.querySelectorAll('[data-wm]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
+  document.querySelectorAll('[data-wmmetric]').forEach(b=>b.onclick=()=>{metric=b.dataset.wmmetric;
+    document.querySelectorAll('[data-wmmetric]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
+  document.querySelectorAll('[data-wmperiod]').forEach(b=>b.onclick=()=>{period=b.dataset.wmperiod;
+    document.querySelectorAll('[data-wmperiod]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
   render();
 }
 function boot(){ renderAll(); initWorldMap(); }
