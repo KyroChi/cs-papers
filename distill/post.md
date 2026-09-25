@@ -43,9 +43,19 @@ We conclude with some brief thoughts on the situation that computer science, and
 - The average papers submitted per-capita has risen. This reflects a trend towards larger author lists and increased collaboration. 
 
 ## An Exponential Growth in PhD Students
-Our primary finding is that the exponential growth in papers (See Figure ) is driven by a concomitant growth in the raw number of PhD students studying computer science (See Figure ).
+Our primary finding is that the exponential growth in papers (See Figure 17, left) is driven by a concomitant growth in the raw number of PhD students studying computer science (See Figure 17, right). In the period of time between 2021 and 2025, our data indicate that submissions to NeurIPS grew by $4.0\times$, from 2,708 to 10,761. ICLR submissions grew by $4.5\times$, from 3,014 in 2021 to 13,697 in 2025. During that same period of time, the number of unique PhD authors submitting to these conferences grew by $4.5\times$, from 3,938 in 2021 to 17,881 in 2025. ICLR submissions in particular have grown at the exact same rate as the growth in the number of PhD students!
 
 {{fig:17}}
+
+This already suggests that LLM assistence may not be a significant contributing factor to the rise in paper submissions. We can provide further evidence in support of this conclusion by tracking the increase in first-author papers per-capita, sub-divided by seniority. Figure 7f shows that the mean first author submissions per-person per-year has risen between 2021 and 2025, but only modestly, from 0.721 to 0.768. 
+
+{{fig:7f}}
+
+When we look at submissions per-person per-year (i.e. not only first authorship), there is a notable increase in in submissions for **both** faculty and PhD students. Perhaps LLM use is increasing research lab's inclusion of lab-mates on the authorship list. However we think it is much more likely that the increase in PhD students is nearly fully explanatory in this case as well, and the fact that the number of CS PhD students began to take off in 2022 is a conincidence, although almost certainly a coincidence spurned by the introduction of chatGPT. 
+
+Author lists are also getting longer: between 2021 and 2025 the mean number of authors per big-3 paper rose from 4.3 to 5.3, the median from 4 to 5, and the 90th percentile from 7 to 9 — while the 25th percentile held at 3. The growth is in the upper tail, consistent with larger labs adding more co-authors.
+
+{{fig:7g}}
 
 ## LLM Use is Not Explanatory
 

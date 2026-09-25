@@ -219,6 +219,19 @@ def main():
             FROM conf_papers WHERE year BETWEEN 2019 AND 2025
             GROUP BY venue, year ORDER BY year""")
 
+        # Figure 7g: authors-per-paper distribution at the big-3, per year.
+        fig["f7g"] = rows("""
+            WITH pc AS (
+              SELECT year, length(string_split(author, ';')) AS na
+              FROM conf_papers
+              WHERE year BETWEEN 2021 AND 2025 AND author IS NOT NULL AND trim(author) <> ''
+            )
+            SELECT year, round(avg(na),3) AS mean,
+              quantile_cont(na,0.25) AS p25, quantile_cont(na,0.5) AS p50,
+              quantile_cont(na,0.75) AS p75, quantile_cont(na,0.9) AS p90,
+              count(*) AS papers
+            FROM pc GROUP BY year ORDER BY year""")
+
         # Figure 7: FIRST-AUTHOR seniority of submissions, finest grain
         # (year x venue x region x seniority) so the page can filter/aggregate.
         # Each paper counts once, by its first author's self-reported position.

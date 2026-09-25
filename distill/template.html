@@ -237,6 +237,12 @@ figcaption b{font-weight:700;}
   </figure>
 
   <figure class="fig-wide">
+    <figcaption><b>Figure 7g.</b> Authors per paper at the big-3</figcaption>
+    <p class="sub">Distribution of author-list length per year (NeurIPS · ICML · ICLR, 2021–2025): 25th percentile, median, mean, 75th and 90th percentiles.</p>
+    <div class="plot"><canvas id="f7g"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide">
     <figcaption><b>Figure 7e.</b> First-author PhD-student submissions — China vs US</figcaption>
     <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
     <div class="plot"><canvas id="f7e"></canvas></div>
@@ -602,6 +608,18 @@ function renderAll(){
 
   // F7f — first-author papers per person by seniority (mean/median toggle)
   drawF7f();
+
+  // F7g — authors per paper distribution at the big-3
+  if(DATA.f7g){
+    const yrs=DATA.f7g.map(r=>r.year);
+    lineChart('f7g',yrs,()=>[
+      {label:'25th pct',data:DATA.f7g.map(r=>r.p25),borderColor:cat(4),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25},
+      {label:'Median',data:DATA.f7g.map(r=>r.p50),borderColor:cat(0),borderWidth:2.5,pointRadius:2.5,pointHoverRadius:5,tension:.25},
+      {label:'Mean',data:DATA.f7g.map(r=>r.mean),borderColor:cat(1),borderWidth:2,borderDash:[5,4],pointRadius:2.5,pointHoverRadius:5,tension:.25},
+      {label:'75th pct',data:DATA.f7g.map(r=>r.p75),borderColor:cat(2),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25},
+      {label:'90th pct',data:DATA.f7g.map(r=>r.p90),borderColor:cat(3),borderWidth:1.5,pointRadius:2,pointHoverRadius:5,tension:.25}
+    ],o=>{o.scales.y.min=0;});
+  }
 
   // F17 — big-3 submissions (left) + unique PhD-student authors (right)
   if(DATA.confpapers){
