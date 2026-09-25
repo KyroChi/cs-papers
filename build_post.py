@@ -53,12 +53,22 @@ d-article figcaption b{font-weight:700;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink);}
 .lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
 .disclaimer{color:var(--muted); font-style:italic; font-size:13px;}
+.wm-wrap{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+.wm-map{flex:1 1 440px; min-width:300px;}
+.wm-map svg{width:100%; height:auto; display:block;}
+.wm-map path{stroke:var(--surface); stroke-width:.3px;}
+.wm-list{flex:0 1 230px; min-width:190px; max-height:390px; overflow-y:auto; border:1px solid var(--ring); border-radius:8px; padding:4px 0;}
+.wm-row{display:flex; justify-content:space-between; gap:10px; font-family:var(--sans); font-size:12.5px; padding:3px 12px; color:var(--ink2);}
+.wm-row:hover{background:var(--grid);}
+.wm-row span:last-child{font-variant-numeric:tabular-nums; color:var(--ink);}
 """
 
 MATHJAX = ('<script>MathJax={tex:{inlineMath:[[\'$\',\'$\']],'
            'displayMath:[[\'$$\',\'$$\']],tags:\'ams\'}};</script>\n'
            '<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>\n')
 DISTILL = '<script src="https://distill.pub/template.v2.js"></script>\n'
+D3 = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
+GEO = os.path.join(HERE, "distill", "world.geo.json")
 
 
 def parse_template(tpl):
@@ -127,6 +137,7 @@ def main():
         urllib.request.urlretrieve(CHARTJS, cache)
     chartjs = open(cache, encoding="utf-8").read()
     runtime = runtime.replace("__FIGDATA__", data)
+    world = open(GEO, encoding="utf-8").read() if os.path.exists(GEO) else "null"
 
     dtitle = f"<d-title>\n<h1>{title}</h1>\n"
     if subtitle:
@@ -141,9 +152,10 @@ def main():
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
-{MATHJAX}{DISTILL}<script>
+{MATHJAX}{DISTILL}{D3}<script>
 {chartjs}
 </script>
+<script>window.WORLD={world};</script>
 <style>{CHART_CSS}</style>
 </head>
 <body>

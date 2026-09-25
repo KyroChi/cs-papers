@@ -47,24 +47,26 @@ Our primary finding is that the exponential growth in papers (See Figure 17, lef
 
 {{fig:17}}
 
+## LLM Use is Not Explanatory
+
 This already suggests that LLM assistence may not be a significant contributing factor to the rise in paper submissions. We can provide further evidence in support of this conclusion by tracking the increase in first-author papers per-capita, sub-divided by seniority. Figure 7f shows that the mean first author submissions per-person per-year has risen between 2021 and 2025, but only modestly, from 0.721 to 0.768. 
 
 {{fig:7f}}
 
-When we look at submissions per-person per-year (i.e. not only first authorship), there is a notable increase in in submissions for **both** faculty and PhD students. Perhaps LLM use is increasing research lab's inclusion of lab-mates on the authorship list. However we think it is much more likely that the increase in PhD students is nearly fully explanatory in this case as well, and the fact that the number of CS PhD students began to take off in 2022 is a conincidence, although almost certainly a coincidence spurned by the introduction of chatGPT. 
-
-Author lists are also getting longer: between 2021 and 2025 the mean number of authors per big-3 paper rose from 4.3 to 5.3, the median from 4 to 5, and the 90th percentile from 7 to 9 — while the 25th percentile held at 3. The growth is in the upper tail, consistent with larger labs adding more co-authors.
+When we look at submissions per-person per-year (i.e. not only first authorship), there is a notable increase in in submissions for **both** faculty and PhD students. Perhaps LLM use is increasing research lab's inclusion of lab-mates on the authorship list. However we think it is much more likely that the increase in PhD students is nearly fully explanatory in this case as well, and the fact that the number of CS PhD students began to take off in 2022 is a conincidence, although almost certainly a coincidence spurned by the introduction of chatGPT. This is clearly reflected in the data (see Figure 7g). Between 2021 and 2025 the mean number of authors per paper has risen from 4.3 to 5.3, a full additional author per paper, on average. 
 
 {{fig:7g}}
 
-## LLM Use is Not Explanatory
-
-## Paper Submissions by Career Seniority 
-
 ## PhD Student Growth by Region
 
+{{fig:worldmap}}
 
-# arXiv Submissions Have Been Increasing Exponentially 
+The rate at which PhD students is being added has a clear geographic bias.
+
+
+# arXiv Submissions Have Been Increasing Exponentially
+We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us. 
+
 
 # The Slop-Cannon: Anecdotal Observations
 

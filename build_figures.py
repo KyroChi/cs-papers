@@ -219,6 +219,13 @@ def main():
             FROM conf_papers WHERE year BETWEEN 2019 AND 2025
             GROUP BY venue, year ORDER BY year""")
 
+        # World map: authorship counts per institution country per year.
+        fig["countries"] = rows("""
+            SELECT country, year, count(*) AS n
+            FROM conf_authors
+            WHERE year BETWEEN 2019 AND 2025 AND country NOT IN ('Unknown','Other/Unknown')
+            GROUP BY country, year ORDER BY country, year""")
+
         # Figure 7g: authors-per-paper distribution at the big-3, per year.
         fig["f7g"] = rows("""
             WITH pc AS (

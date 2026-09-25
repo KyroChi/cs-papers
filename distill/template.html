@@ -3,6 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
 :root{
   --page:#fff; --surface:#fff; --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
@@ -55,6 +56,14 @@ figcaption b{font-weight:700;}
 .plot.tall{height:400px;}
 .subplots{display:flex; gap:16px; flex-wrap:wrap;}
 .subplots>.plot{flex:1 1 320px; min-width:280px;}
+.wm-wrap{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+.wm-map{flex:1 1 440px; min-width:300px;}
+.wm-map svg{width:100%; height:auto; display:block;}
+.wm-map path{stroke:var(--surface); stroke-width:.3px; cursor:default;}
+.wm-list{flex:0 1 230px; min-width:190px; max-height:380px; overflow-y:auto; border:1px solid var(--ring); border-radius:8px; padding:4px 0;}
+.wm-row{display:flex; justify-content:space-between; gap:10px; font-family:var(--sans); font-size:12.5px; padding:3px 12px; color:var(--ink2);}
+.wm-row:hover{background:var(--grid);}
+.wm-row span:last-child{font-variant-numeric:tabular-nums; color:var(--ink);}
 .bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
 .toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent; border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
@@ -254,6 +263,22 @@ figcaption b{font-weight:700;}
     <div class="subplots">
       <div class="plot"><canvas id="f17l"></canvas></div>
       <div class="plot"><canvas id="f17r"></canvas></div>
+    </div>
+  </figure>
+
+  <figure class="fig-wide" id="fworldmap">
+    <figcaption><b>Figure 18.</b> Where big-3 authors come from — growth by country</figcaption>
+    <p class="sub">Institution country from author email domains. Colour = growth rate on a log scale (blue = growth, red = decline, grey = no data). Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
+    <div class="bar" id="wm-ctrls"><span class="lbl">Period</span>
+      <button class="toggle" data-wm="range" aria-pressed="true">2021→2025</button>
+      <button class="toggle" data-wm="2022" aria-pressed="false">’22</button>
+      <button class="toggle" data-wm="2023" aria-pressed="false">’23</button>
+      <button class="toggle" data-wm="2024" aria-pressed="false">’24</button>
+      <button class="toggle" data-wm="2025" aria-pressed="false">’25</button>
+    </div>
+    <div class="wm-wrap">
+      <div class="wm-map"><svg id="wm-svg"></svg></div>
+      <div class="wm-list" id="wm-list"></div>
     </div>
   </figure>
 
@@ -790,7 +815,43 @@ if(_tb) _tb.onclick=()=>{
   document.documentElement.setAttribute('data-theme',next);
   renderAll();
 };
+// ---- Figure 18: world map of author-country growth (D3) ----
+function initWorldMap(){
+  if(typeof d3==='undefined' || typeof WORLD==='undefined') return;
+  const svgEl=document.getElementById('wm-svg');
+  if(!svgEl || svgEl.childNodes.length || !DATA.countries) return;
+  const byC={}; DATA.countries.forEach(r=>{(byC[r.country]=byC[r.country]||{})[r.year]=r.n;});
+  const alias={'United States':'United States of America'};
+  const g2c={}; Object.keys(byC).forEach(c=>{g2c[alias[c]||c]=c;});
+  let mode='range';
+  function growth(c){const s=byC[c]||{};
+    if(mode==='range'){const a=s[2021],b=s[2025]; return (a>0&&b>0)?b/a:null;}
+    const y=+mode,a=s[y-1],b=s[y]; return (a>0&&b>0)?b/a:null;}
+  function color(v){ if(v==null||!isFinite(v)) return 'rgba(0,0,0,.07)';
+    const t=Math.max(-1,Math.min(1, Math.log(v)/Math.log(4)));
+    return d3.interpolateRdBu((t+1)/2); }
+  const W=660,H=390;
+  const proj=d3.geoNaturalEarth1().fitSize([W,H],WORLD);
+  const path=d3.geoPath(proj);
+  const gsel=d3.select(svgEl).attr('viewBox','0 0 '+W+' '+H)
+    .append('g').selectAll('path').data(WORLD.features).join('path').attr('d',path);
+  gsel.append('title');
+  function render(){
+    gsel.attr('fill',f=>{const c=g2c[f.properties.name]; return color(c?growth(c):null);});
+    gsel.select('title').text(f=>{const c=g2c[f.properties.name];
+      if(!c) return f.properties.name; const v=growth(c);
+      return c+(v!=null?'  ×'+v.toFixed(2):'  (n/a)');});
+    const rows=Object.keys(byC).map(c=>({c,v:growth(c)})).filter(x=>x.v!=null&&isFinite(x.v))
+      .sort((a,b)=>b.v-a.v);
+    document.getElementById('wm-list').innerHTML=rows.map(x=>
+      '<div class="wm-row"><span>'+x.c+'</span><span>×'+x.v.toFixed(2)+'</span></div>').join('');
+  }
+  document.querySelectorAll('[data-wm]').forEach(b=>b.onclick=()=>{mode=b.dataset.wm;
+    document.querySelectorAll('[data-wm]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
+  render();
+}
+function boot(){ renderAll(); initWorldMap(); }
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',renderAll);
-if(document.readyState!=='loading') renderAll();
-else addEventListener('DOMContentLoaded',renderAll);
+if(document.readyState!=='loading') boot();
+else addEventListener('DOMContentLoaded',boot);
 </script>
