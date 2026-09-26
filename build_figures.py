@@ -219,11 +219,13 @@ def main():
             FROM conf_papers WHERE year BETWEEN 2019 AND 2025
             GROUP BY venue, year ORDER BY year""")
 
-        # World map: authorship counts per institution country per year.
+        # World map: UNIQUE PhD-student authors per institution country per year
+        # (distinct profiles listing themselves as "PhD student").
         fig["countries"] = rows("""
-            SELECT country, year, count(*) AS n
+            SELECT country, year, count(DISTINCT or_profile) AS n
             FROM conf_authors
             WHERE year BETWEEN 2019 AND 2025 AND country NOT IN ('Unknown','Other/Unknown')
+              AND seniority = 'PhD student' AND or_profile <> ''
             GROUP BY country, year ORDER BY country, year""")
 
         # Figure 7g: authors-per-paper distribution at the big-3, per year.

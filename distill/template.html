@@ -194,6 +194,15 @@ figcaption b{font-weight:700;}
     <div class="plot"><canvas id="f6c"></canvas></div>
   </figure>
 
+  <figure class="fig-wide" id="f6cb">
+    <figcaption><b>Figure 6d.</b> Region growth (indexed) and share, side by side</figcaption>
+    <p class="sub">Left: submissions indexed to 2021 = 100 (steeper = faster growth). Right: share of submissions by region.</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f6cbl"></canvas></div>
+      <div class="plot"><canvas id="f6cbr"></canvas></div>
+    </div>
+  </figure>
+
   <figure class="fig-wide">
     <figcaption><b>Figure 7.</b> Seniority of submissions over time</figcaption>
     <p class="sub"><b>Basis</b> — “first author” counts each paper once by who led it; “all authors” counts every authorship (a PI on many papers is tallied each time). Self-reported OpenReview position. Filter by region and venue.</p>
@@ -267,11 +276,11 @@ figcaption b{font-weight:700;}
   </figure>
 
   <figure class="fig-wide" id="fworldmap">
-    <figcaption><b>Figure 18.</b> Where big-3 authors come from — growth by country</figcaption>
-    <p class="sub">Institution country from author email domains. Colour = value on a log scale, <b>lightest = lowest, darkest = highest</b> (grey = no data). Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
+    <figcaption><b>Figure 18.</b> Unique PhD-student authors by country</figcaption>
+    <p class="sub">Distinct authors listing themselves as “PhD student”, by institution country (from email domains), per year. Colour = value on a log scale, <b>lightest = lowest, darkest = highest</b> (grey = no data). For the range, raw count sums 2021–2025. Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
     <div class="bar"><span class="lbl">Metric</span>
-      <button class="toggle" data-wmmetric="growth" aria-pressed="true">growth rate</button>
-      <button class="toggle" data-wmmetric="raw" aria-pressed="false">raw count</button>
+      <button class="toggle" data-wmmetric="growth" aria-pressed="false">growth rate</button>
+      <button class="toggle" data-wmmetric="raw" aria-pressed="true">raw count</button>
     </div>
     <div class="bar"><span class="lbl">Period</span>
       <button class="toggle" data-wmperiod="range" aria-pressed="true">2021→2025</button>
@@ -622,6 +631,13 @@ function renderAll(){
         borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};});
   });
 
+  // F6d — combined: indexed growth (left) + share (right)
+  {const s=[['China','china'],['United States','us'],['Other','other']];
+   lineChart('f6cbl',years(DATA.f6),()=>s.map(([nm,k],i)=>{const v=DATA.f6.map(r=>r[k]),v0=v[0];
+     return {label:nm,data:v.map(x=>+(100*x/v0).toFixed(0)),borderColor:cat(i),
+       borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};}));
+   stackedBar('f6cbr',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),cat,'pct');}
+
   // F7 — first-author seniority over time (region/venue filtered)
   drawF7();
 
@@ -827,7 +843,7 @@ function initWorldMap(){
   const byC={}; DATA.countries.forEach(r=>{(byC[r.country]=byC[r.country]||{})[r.year]=r.n;});
   const alias={'United States':'United States of America'};
   const g2c={}; Object.keys(byC).forEach(c=>{g2c[alias[c]||c]=c;});
-  let metric='growth', period='range';
+  let metric='raw', period='range';
   function value(c){const s=byC[c]||{};
     if(metric==='raw'){
       if(period==='range') return [2021,2022,2023,2024,2025].reduce((t,y)=>t+(s[y]||0),0)||null;

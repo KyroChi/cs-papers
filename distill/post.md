@@ -59,6 +59,8 @@ When we look at submissions per-person per-year (i.e. not only first authorship)
 
 ## PhD Student Growth by Region
 
+{{fig:6cb}}
+
 {{fig:worldmap}}
 
 The rate at which PhD students is being added has a clear geographic bias.
