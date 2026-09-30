@@ -59,13 +59,28 @@ When we look at submissions per-person per-year (i.e. not only first authorship)
 
 ## PhD Student Growth by Region
 
+{{fig:6cb}}
+
 {{fig:worldmap}}
 
-The rate at which PhD students is being added has a clear geographic bias. By raw numbers, the United 
+The rate at which PhD students is being added has a clear geographic bias. China and the United States are, perhaps unsurprisingly, adding the bulk of the PhD students. Notablye, though, China's rate of increase is nearly double that of the United States'. By raw numbers, the United States has added roughly 20,000 new unique PhD students in the period between 2021 and 2025, while China has added 9,500. The rate is increasing too... dramatically. In 2025 alone China added 4,434 new unique PhD students and the United States added 7,080. 
 
 
 # arXiv Submissions Have Been Increasing Exponentially
-We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us. 
+We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us.
+
+{{fig:1a}}
+
+- The COVID pandemic (2019-2022) saw a flattening of submissions to arXiv
+- Computer science now dominates arXiv submissions
+
+- Computer science continues to grow much faster than math and physics
+{{fig:1c}}
+
+- Colaboration is growing: fewer single author papers, 4+ authors represents the largest share of the growth
+{{fig:2}}
+
+- Mathematics senior authors are actually writing fewer papers, a decline that seems unaffected by the introduction of LLMs.
 
 
 # The Slop-Cannon: Anecdotal Observations

@@ -63,7 +63,7 @@ When we look at submissions per-person per-year (i.e. not only first authorship)
 
 {{fig:worldmap}}
 
-The rate at which PhD students is being added has a clear geographic bias.
+The rate at which PhD students is being added has a clear geographic bias. 
 
 
 # arXiv Submissions Have Been Increasing Exponentially
