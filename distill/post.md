@@ -63,16 +63,26 @@ When we look at submissions per-person per-year (i.e. not only first authorship)
 
 {{fig:worldmap}}
 
-The rate at which PhD students is being added has a clear geographic bias. 
+The rate at which PhD students is being added has a clear geographic bias.
+
+- US and China are dominating the growth of PhD students
+- The rate of Chinese growth is outpacing the United States
 
 
 # arXiv Submissions Have Been Increasing Exponentially
-We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us. 
+We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us.
+
+- Also exponential!
+- Mathematicians have seen a decline in papers submitted by the most senior authors.
+- Computer science specifically is driving the growth
 
 
 # The Slop-Cannon: Anecdotal Observations
+- arXiv just posted their numbers, and they do claim that solo authorship has exploded in 2026. Our data don't capture this yet due to the metadata that we have.
 
 # Where do we go From Here?
+
+Recently arXiv released a blog post instituting a rate limit on paper submissions which cites AI assisted paper writing as a cause of the exponential growth in submissions. Our data does not cover the last 6 months, so it's possible that these trends have been amplified by the rapid rate of LLM assisted writing in the last 6 months. Regardless, the exponential growth in graduate students will surely continue to drive a large portion of the increase in papers. 
 
 # Acknowledgements
 
@@ -80,48 +90,73 @@ We now turn to analyzing trends based on arXiv metadata. The arXiv data is riche
 
 # Appendix: Data Collection & Curation
 
-## All of arXiv
+All of our findings are built from public metadata — we never needed paper
+contents. Aggregates are computed with [DuckDB](https://duckdb.org) over the
+files below and emitted as JSON that the figures read directly. The collection
+scripts, queries, and build pipeline are open source at
+[github.com/KyroChi/cs-papers](https://github.com/KyroChi/cs-papers); external
+data is re-downloaded by those scripts rather than committed.
 
-_How much has arXiv grown, and how has its subject mix shifted?_
+## arXiv metadata
 
-{{fig:1a}}
+The arXiv figures come from the `metadata` configuration of the
+[`secemp9/arxiv-complete`](https://huggingface.co/datasets/secemp9/arxiv-complete)
+dataset on Hugging Face — a single ~1.6 GB Parquet file with one row per paper,
+covering 3.15M papers. (The full dataset bundles PDFs and LaTeX source and runs
+to roughly 16 TiB; we deliberately pulled only the metadata config, since every
+question we ask is answerable from metadata alone.) arXiv metadata is
+distributed by Cornell under CC0.
 
-{{fig:1b}}
+We use a handful of fields: the raw `authors` string, `categories` /
+`primary_category`, and `first_version_date`. A few choices worth stating:
 
-{{fig:1c}}
+- **Submission year.** Each paper is dated by the year of its *first* version
+  (`first_version_date`), i.e. the original submission, not later revisions.
+  1991–2025 are complete years; 2026 is year-to-date through August and is
+  always shown separately.
+- **Author counts.** arXiv stores authors as a single display string, so we
+  count authors by splitting on commas and the word "and" (after stripping
+  parenthetical affiliations such as "(MIT)"). A named collaboration (e.g.
+  "ATLAS Collaboration") counts as one author. This is a standard proxy and is
+  imperfect for unusually formatted lists.
+- **Author identity.** This metadata carries no stable author identifier, so we
+  identify authors by their name string. Common names collide — "Y. Wang"
+  merges thousands of distinct people — so per-author arXiv figures are
+  directional, not exact.
+- **Subjects.** We collapse arXiv's fine-grained categories into coarse groups
+  (Computer Science, Physics, Mathematics, Statistics, Electrical Engineering &
+  Systems Science, …) by primary category; sub-discipline figures use the raw
+  `primary_category`.
+- **No affiliations.** arXiv's public metadata strips submitter emails and has
+  no affiliation field, so the arXiv analyses are necessarily blind to
+  institution and region. For those questions we turn to the conference data.
 
-_Growth is collaborative, not solo — set up Figure 2._
+## Conference metadata (NeurIPS, ICML, ICLR)
 
-{{fig:2}}
+The conference figures come from [Paper Copilot](https://papercopilot.com)'s
+OpenReview archive (see [arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) —
+specifically its per-paper author files for NeurIPS, ICML, and ICLR. Each row
+is one paper, with per-author fields joined by semicolons: author name,
+OpenReview profile id (`or_profile`), institution (`aff`), institutional email
+domain (`aff_domain`), and self-reported `position`.
 
-## Computer Science
-
-_CS is the engine. Prose on the AI/ML subfields and team sizes._
-
-{{fig:2cs}}
-
-{{fig:3}}
-
-## By region — NeurIPS · ICML · ICLR
-
-_China vs US vs Other over time; what the affiliation domains show._
-
-{{fig:6b}}
-
-{{fig:6c}}
-
-_Seniority: who leads the papers._
-
-{{fig:7}}
-
-{{fig:7f}}
-
-## Is the surge just an LLM artifact?
-
-_State the hypothesis, then the bounding argument._
-
-{{fig:16}}
-
-## Methods & data
-
-_Sources, definitions, coverage windows, caveats._
+- **Author identity.** Unlike arXiv, OpenReview assigns a stable profile id, so
+  we de-duplicate people reliably: "unique PhD students" counts distinct
+  `or_profile` values, not authorships.
+- **Seniority.** The `position` field is self-reported ("PhD student", "Full
+  Professor", "Postdoc", …), which we map to tiers. It is *not* inferred from
+  output, so a prolific student is still counted as a PhD student. For
+  paper-level seniority we attribute each paper to its *first author's* position.
+- **Region.** We read each author's country from their institutional email
+  **domain** (OpenReview masks the local part but exposes the domain): `.cn` and
+  the major Chinese firms map to China, `.edu` and US firms to the US, other
+  country-code TLDs to their country, and personal-mail domains (gmail, qq, …)
+  to "unknown". Company domains resolve to a company's *headquarters*, not the
+  author's office — a Google-Beijing author counts as US — so region is
+  approximate, and about 11% of domains are unclassifiable. Paper-level region
+  uses the author-majority country, with ties broken by a deterministic hash.
+- **Coverage.** Affiliation and position data is only populated from roughly
+  2021 onward. ICLR publishes *all* submissions (including rejected) on
+  OpenReview; NeurIPS and ICML expose mostly accepted papers plus opt-in
+  rejections. Pooled conference counts therefore mix submissions and
+  acceptances, and we treat each file as one conference-year.

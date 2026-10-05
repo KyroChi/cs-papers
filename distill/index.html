@@ -139,104 +139,94 @@ d-article figcaption b{font-weight:700;}
       <div class="wm-list" id="wm-list"></div>
     </div>
   </figure>
-<p>The rate at which PhD students is being added has a clear geographic bias. </p>
+<p>The rate at which PhD students is being added has a clear geographic bias.</p>
+<ul>
+<li>US and China are dominating the growth of PhD students</li>
+<li>The rate of Chinese growth is outpacing the United States</li>
+</ul>
 <h1 id="arxiv-submissions-have-been-increasing-exponentially">arXiv Submissions Have Been Increasing Exponentially</h1>
-<p>We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us. </p>
+<p>We now turn to analyzing trends based on arXiv metadata. The arXiv data is richer on the one hand since it spans multiple disciplines and has a larger share of historical data. On the other hand, arXiv does not allow public API calls to extract author email information, so we have less fine-grained metadata accessible to us.</p>
+<ul>
+<li>Also exponential!</li>
+<li>Mathematicians have seen a decline in papers submitted by the most senior authors.</li>
+<li>Computer science specifically is driving the growth</li>
+</ul>
 <h1 id="the-slop-cannon-anecdotal-observations">The Slop-Cannon: Anecdotal Observations</h1>
+<ul>
+<li>arXiv just posted their numbers, and they do claim that solo authorship has exploded in 2026. Our data don't capture this yet due to the metadata that we have.</li>
+</ul>
 <h1 id="where-do-we-go-from-here">Where do we go From Here?</h1>
+<p>Recently arXiv released a blog post instituting a rate limit on paper submissions which cites AI assisted paper writing as a cause of the exponential growth in submissions. Our data does not cover the last 6 months, so it's possible that these trends have been amplified by the rapid rate of LLM assisted writing in the last 6 months. Regardless, the exponential growth in graduate students will surely continue to drive a large portion of the increase in papers. </p>
 <h1 id="acknowledgements">Acknowledgements</h1>
 <h1 id="references">References</h1>
 <h1 id="appendix-data-collection-curation">Appendix: Data Collection &amp; Curation</h1>
-<h2 id="all-of-arxiv">All of arXiv</h2>
-<p><em>How much has arXiv grown, and how has its subject mix shifted?</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 1a.</b> Growth in submissions across all of arXiv</figcaption>
-    <p class="sub">Papers by year of first submission, 1991–2025 (last complete year).</p>
-    <div class="plot"><canvas id="f1a"></canvas></div>
-  </figure>
-<figure class="l-page">
-    <figcaption><b>Figure 1b.</b> Relative distribution of papers across major arXiv subjects</figcaption>
-    <div class="bar"><button class="toggle" data-mode="pct" aria-pressed="true">share %</button><button class="toggle" data-mode="abs" aria-pressed="false">counts</button><span class="sub" style="margin:0">· click legend to toggle series</span></div>
-    <div class="plot tall"><canvas id="f1b"></canvas></div>
-  </figure>
-<figure class="l-page">
-    <figcaption><b>Figure 1c.</b> Year-over-year growth rate — CS, Physics, Mathematics</figcaption>
-    <p class="sub">Annual % change in submissions (from 2005; spikes capped at 60%).</p>
-    <div class="plot tall"><canvas id="f1c"></canvas></div>
-  </figure>
-<p><em>Growth is collaborative, not solo — set up Figure 2.</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 2.</b> Papers by number of authors</figcaption>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f2"></canvas></div>
-  </figure>
-<h2 id="computer-science">Computer Science</h2>
-<p><em>CS is the engine. Prose on the AI/ML subfields and team sizes.</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 2b.</b> Papers by number of authors — CS only</figcaption>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f2cs"></canvas></div>
-  </figure>
-<figure class="l-page">
-    <figcaption><b>Figure 3.</b> Growth of the top-5 CS sub-disciplines</figcaption>
-    <p class="sub">The five largest CS categories in 2025, tracked back over time.</p>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f3"></canvas></div>
-  </figure>
-<h2 id="by-region-neurips-icml-iclr">By region — NeurIPS · ICML · ICLR</h2>
-<p><em>China vs US vs Other over time; what the affiliation domains show.</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 6b.</b> Submissions by institution region — share</figcaption>
-    <div class="plot"><canvas id="f6b"></canvas></div>
-  </figure>
-<figure class="l-page">
-    <figcaption><b>Figure 6c.</b> Growth indexed to 2021 (= 100)</figcaption>
-    <p class="sub">Each region relative to its own 2021 level — steeper is faster growth. Venue coverage shifts year to year (see notes).</p>
-    <div class="plot"><canvas id="f6c"></canvas></div>
-  </figure>
-<p><em>Seniority: who leads the papers.</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 7.</b> Seniority of submissions over time</figcaption>
-    <p class="sub"><b>Basis</b> — “first author” counts each paper once by who led it; “all authors” counts every authorship (a PI on many papers is tallied each time). Self-reported OpenReview position. Filter by region and venue.</p>
-    <div class="bar"><span class="lbl">Basis</span>
-      <button class="toggle" data-f7basis="first" aria-pressed="true">first author</button>
-      <button class="toggle" data-f7basis="all" aria-pressed="false">all authors</button>
-      <span class="lbl" style="margin-left:8px">Scale</span>
-      <button class="toggle" data-f7scale="pct" aria-pressed="true">share %</button>
-      <button class="toggle" data-f7scale="abs" aria-pressed="false">counts</button>
-    </div>
-    <div class="bar"><span class="lbl">Region</span>
-      <button class="toggle" data-f7region="all" aria-pressed="true">all</button>
-      <button class="toggle" data-f7region="China" aria-pressed="false">China</button>
-      <button class="toggle" data-f7region="US" aria-pressed="false">US</button>
-      <button class="toggle" data-f7region="Other" aria-pressed="false">Other</button>
-    </div>
-    <div class="bar"><span class="lbl">Venue</span>
-      <button class="toggle" data-f7venue="all" aria-pressed="true">all</button>
-      <button class="toggle" data-f7venue="nips" aria-pressed="false">NeurIPS</button>
-      <button class="toggle" data-f7venue="icml" aria-pressed="false">ICML</button>
-      <button class="toggle" data-f7venue="iclr" aria-pressed="false">ICLR</button>
-    </div>
-    <div class="plot tall"><canvas id="f7"></canvas></div>
-  </figure>
-<figure class="l-page">
-    <figcaption><b>Figure 7f.</b> Mean submissions per person per year, by seniority</figcaption>
-    <p class="sub">Average papers per person in each self-reported position — toggle between first-authored papers and all authorships. First-authorship concentrates among students; all-authorship rises with seniority.</p>
-    <div class="bar"><span class="lbl">Count</span>
-      <button class="toggle" data-f7fmetric="fa" aria-pressed="true">first-author</button>
-      <button class="toggle" data-f7fmetric="subs" aria-pressed="false">all submissions</button>
-    </div>
-    <div class="plot tall"><canvas id="f7f"></canvas></div>
-  </figure>
-<h2 id="is-the-surge-just-an-llm-artifact">Is the surge just an LLM artifact?</h2>
-<p><em>State the hypothesis, then the bounding argument.</em></p>
-<figure class="l-page">
-    <figcaption><b>Figure 16.</b> First-author papers per person per year</figcaption>
-    <p class="sub">Per-person output, controlling for team size. Flat pre-2023 baseline; a small CS-led rise after ChatGPT.</p>
-    <div class="plot"><canvas id="f16"></canvas></div>
-  </figure>
-<h2 id="methods-data">Methods &amp; data</h2>
-<p><em>Sources, definitions, coverage windows, caveats.</em></p>
+<p>All of our findings are built from public metadata — we never needed paper
+contents. Aggregates are computed with <a href="https://duckdb.org">DuckDB</a> over the
+files below and emitted as JSON that the figures read directly. The collection
+scripts, queries, and build pipeline are open source at
+<a href="https://github.com/KyroChi/cs-papers">github.com/KyroChi/cs-papers</a>; external
+data is re-downloaded by those scripts rather than committed.</p>
+<h2 id="arxiv-metadata">arXiv metadata</h2>
+<p>The arXiv figures come from the <code>metadata</code> configuration of the
+<a href="https://huggingface.co/datasets/secemp9/arxiv-complete"><code>secemp9/arxiv-complete</code></a>
+dataset on Hugging Face — a single ~1.6 GB Parquet file with one row per paper,
+covering 3.15M papers. (The full dataset bundles PDFs and LaTeX source and runs
+to roughly 16 TiB; we deliberately pulled only the metadata config, since every
+question we ask is answerable from metadata alone.) arXiv metadata is
+distributed by Cornell under CC0.</p>
+<p>We use a handful of fields: the raw <code>authors</code> string, <code>categories</code> /
+<code>primary_category</code>, and <code>first_version_date</code>. A few choices worth stating:</p>
+<ul>
+<li><strong>Submission year.</strong> Each paper is dated by the year of its <em>first</em> version
+  (<code>first_version_date</code>), i.e. the original submission, not later revisions.
+  1991–2025 are complete years; 2026 is year-to-date through August and is
+  always shown separately.</li>
+<li><strong>Author counts.</strong> arXiv stores authors as a single display string, so we
+  count authors by splitting on commas and the word "and" (after stripping
+  parenthetical affiliations such as "(MIT)"). A named collaboration (e.g.
+  "ATLAS Collaboration") counts as one author. This is a standard proxy and is
+  imperfect for unusually formatted lists.</li>
+<li><strong>Author identity.</strong> This metadata carries no stable author identifier, so we
+  identify authors by their name string. Common names collide — "Y. Wang"
+  merges thousands of distinct people — so per-author arXiv figures are
+  directional, not exact.</li>
+<li><strong>Subjects.</strong> We collapse arXiv's fine-grained categories into coarse groups
+  (Computer Science, Physics, Mathematics, Statistics, Electrical Engineering &amp;
+  Systems Science, …) by primary category; sub-discipline figures use the raw
+  <code>primary_category</code>.</li>
+<li><strong>No affiliations.</strong> arXiv's public metadata strips submitter emails and has
+  no affiliation field, so the arXiv analyses are necessarily blind to
+  institution and region. For those questions we turn to the conference data.</li>
+</ul>
+<h2 id="conference-metadata-neurips-icml-iclr">Conference metadata (NeurIPS, ICML, ICLR)</h2>
+<p>The conference figures come from <a href="https://papercopilot.com">Paper Copilot</a>'s
+OpenReview archive (see <a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>) —
+specifically its per-paper author files for NeurIPS, ICML, and ICLR. Each row
+is one paper, with per-author fields joined by semicolons: author name,
+OpenReview profile id (<code>or_profile</code>), institution (<code>aff</code>), institutional email
+domain (<code>aff_domain</code>), and self-reported <code>position</code>.</p>
+<ul>
+<li><strong>Author identity.</strong> Unlike arXiv, OpenReview assigns a stable profile id, so
+  we de-duplicate people reliably: "unique PhD students" counts distinct
+  <code>or_profile</code> values, not authorships.</li>
+<li><strong>Seniority.</strong> The <code>position</code> field is self-reported ("PhD student", "Full
+  Professor", "Postdoc", …), which we map to tiers. It is <em>not</em> inferred from
+  output, so a prolific student is still counted as a PhD student. For
+  paper-level seniority we attribute each paper to its <em>first author's</em> position.</li>
+<li><strong>Region.</strong> We read each author's country from their institutional email
+  <strong>domain</strong> (OpenReview masks the local part but exposes the domain): <code>.cn</code> and
+  the major Chinese firms map to China, <code>.edu</code> and US firms to the US, other
+  country-code TLDs to their country, and personal-mail domains (gmail, qq, …)
+  to "unknown". Company domains resolve to a company's <em>headquarters</em>, not the
+  author's office — a Google-Beijing author counts as US — so region is
+  approximate, and about 11% of domains are unclassifiable. Paper-level region
+  uses the author-majority country, with ties broken by a deterministic hash.</li>
+<li><strong>Coverage.</strong> Affiliation and position data is only populated from roughly
+  2021 onward. ICLR publishes <em>all</em> submissions (including rejected) on
+  OpenReview; NeurIPS and ICML expose mostly accepted papers plus opt-in
+  rejections. Pooled conference counts therefore mix submissions and
+  acceptances, and we treat each file as one conference-year.</li>
+</ul>
 </d-article>
 <d-appendix></d-appendix>
 <script>
