@@ -160,12 +160,22 @@ d-article figcaption b{font-weight:700;}
 <h1 id="acknowledgements">Acknowledgements</h1>
 <h1 id="references">References</h1>
 <h1 id="appendix-data-collection-curation">Appendix: Data Collection &amp; Curation</h1>
-<p>All of our findings are built from public metadata — we never needed paper
-contents. Aggregates are computed with <a href="https://duckdb.org">DuckDB</a> over the
-files below and emitted as JSON that the figures read directly. The collection
-scripts, queries, and build pipeline are open source at
-<a href="https://github.com/KyroChi/cs-papers">github.com/KyroChi/cs-papers</a>; external
-data is re-downloaded by those scripts rather than committed.</p>
+<p>Everything here is built from two public <strong>metadata</strong> downloads — we never use
+paper contents:</p>
+<ul>
+<li><strong>arXiv metadata</strong> — the <code>metadata</code> configuration of
+  <a href="https://huggingface.co/datasets/secemp9/arxiv-complete"><code>secemp9/arxiv-complete</code></a>
+  on Hugging Face (~1.6 GB, 3.15M papers, CC0).</li>
+<li><strong>Conference metadata</strong> — <a href="https://papercopilot.com">Paper Copilot</a>'s
+  OpenReview author files for NeurIPS, ICML, and ICLR
+  (<a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>).</li>
+</ul>
+<p>The next two subsections describe each download: what it contains and the
+choices we make when reading it. The final subsection explains how we turn
+these raw files into the numbers the figures plot. All of it is reproducible —
+the download scripts, queries, and build pipeline are open source at
+<a href="https://github.com/KyroChi/cs-papers">github.com/KyroChi/cs-papers</a>, and the
+raw data is re-fetched by those scripts rather than committed.</p>
 <h2 id="arxiv-metadata">arXiv metadata</h2>
 <p>The arXiv figures come from the <code>metadata</code> configuration of the
 <a href="https://huggingface.co/datasets/secemp9/arxiv-complete"><code>secemp9/arxiv-complete</code></a>
@@ -227,6 +237,17 @@ domain (<code>aff_domain</code>), and self-reported <code>position</code>.</p>
   rejections. Pooled conference counts therefore mix submissions and
   acceptances, and we treat each file as one conference-year.</li>
 </ul>
+<h2 id="how-we-compute-the-figures">How we compute the figures</h2>
+<p>The two downloads are large — millions of rows — and the charts never touch
+them directly. Instead a build step runs SQL queries over the raw files with
+<a href="https://duckdb.org">DuckDB</a> and writes one small JSON file of <strong>figure data</strong>:
+the per-year, per-group, per-country summary tables each chart actually plots
+(for example "papers per year", "unique PhD students per country per year", or
+"authors per paper, by quantile"). Every number you see on this page lives in
+that ~100 KB file; the gigabytes of raw metadata exist only long enough to be
+counted. Re-running the queries regenerates the figure data and every chart
+updates in lockstep, so the post stays in sync with the data by construction.
+The queries themselves are in the repository, one per figure.</p>
 </d-article>
 <d-appendix></d-appendix>
 <script>

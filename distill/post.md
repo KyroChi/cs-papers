@@ -90,12 +90,22 @@ Recently arXiv released a blog post instituting a rate limit on paper submission
 
 # Appendix: Data Collection & Curation
 
-All of our findings are built from public metadata — we never needed paper
-contents. Aggregates are computed with [DuckDB](https://duckdb.org) over the
-files below and emitted as JSON that the figures read directly. The collection
-scripts, queries, and build pipeline are open source at
-[github.com/KyroChi/cs-papers](https://github.com/KyroChi/cs-papers); external
-data is re-downloaded by those scripts rather than committed.
+Everything here is built from two public **metadata** downloads — we never use
+paper contents:
+
+- **arXiv metadata** — the `metadata` configuration of
+  [`secemp9/arxiv-complete`](https://huggingface.co/datasets/secemp9/arxiv-complete)
+  on Hugging Face (~1.6 GB, 3.15M papers, CC0).
+- **Conference metadata** — [Paper Copilot](https://papercopilot.com)'s
+  OpenReview author files for NeurIPS, ICML, and ICLR
+  ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)).
+
+The next two subsections describe each download: what it contains and the
+choices we make when reading it. The final subsection explains how we turn
+these raw files into the numbers the figures plot. All of it is reproducible —
+the download scripts, queries, and build pipeline are open source at
+[github.com/KyroChi/cs-papers](https://github.com/KyroChi/cs-papers), and the
+raw data is re-fetched by those scripts rather than committed.
 
 ## arXiv metadata
 
@@ -160,3 +170,16 @@ domain (`aff_domain`), and self-reported `position`.
   OpenReview; NeurIPS and ICML expose mostly accepted papers plus opt-in
   rejections. Pooled conference counts therefore mix submissions and
   acceptances, and we treat each file as one conference-year.
+
+## How we compute the figures
+
+The two downloads are large — millions of rows — and the charts never touch
+them directly. Instead a build step runs SQL queries over the raw files with
+[DuckDB](https://duckdb.org) and writes one small JSON file of **figure data**:
+the per-year, per-group, per-country summary tables each chart actually plots
+(for example "papers per year", "unique PhD students per country per year", or
+"authors per paper, by quantile"). Every number you see on this page lives in
+that ~100 KB file; the gigabytes of raw metadata exist only long enough to be
+counted. Re-running the queries regenerates the figure data and every chart
+updates in lockstep, so the post stays in sync with the data by construction.
+The queries themselves are in the repository, one per figure.
