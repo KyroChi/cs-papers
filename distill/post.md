@@ -35,6 +35,14 @@ The remainder of this blog post walks through our findings with empirical suppor
 
 We conclude with some brief thoughts on the situation that computer science, and research in general, finds itself in.
 
+This work is built on top of two public paper metadata resources:
+- The [`secemp9/arxiv-complete`](https://huggingface.co/datasets/secemp9/arxiv-complete) dataset for arXiv papers.
+- [Paper Copilot](https://papercopilot.com)'s
+  OpenReview author files for NeurIPS, ICML, and ICLR
+  ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)).
+
+All of the code for this blog post, including download scripts and data queries, is open source and avalible at [github.com/KyroChi/cs-papers](https://github.com/KyroChi/cs-papers).
+
 # Who Submits to the Big-3 ML Conferences?
 
 **Main Findings:**
@@ -63,7 +71,7 @@ When we look at submissions per-person per-year (i.e. not only first authorship)
 
 {{fig:worldmap}}
 
-The rate at which PhD students is being added has a clear geographic bias.
+The rate at which PhD students is being added has a clear geographic bias. Both the United States and China are adding massive numbers of PhD students. In the period between 2021 and 2025, the United States added 
 
 - US and China are dominating the growth of PhD students
 - The rate of Chinese growth is outpacing the United States
@@ -88,98 +96,3 @@ Recently arXiv released a blog post instituting a rate limit on paper submission
 
 # References
 
-# Appendix: Data Collection & Curation
-
-Everything here is built from two public **metadata** downloads — we never use
-paper contents:
-
-- **arXiv metadata** — the `metadata` configuration of
-  [`secemp9/arxiv-complete`](https://huggingface.co/datasets/secemp9/arxiv-complete)
-  on Hugging Face (~1.6 GB, 3.15M papers, CC0).
-- **Conference metadata** — [Paper Copilot](https://papercopilot.com)'s
-  OpenReview author files for NeurIPS, ICML, and ICLR
-  ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)).
-
-The next two subsections describe each download: what it contains and the
-choices we make when reading it. The final subsection explains how we turn
-these raw files into the numbers the figures plot. All of it is reproducible —
-the download scripts, queries, and build pipeline are open source at
-[github.com/KyroChi/cs-papers](https://github.com/KyroChi/cs-papers), and the
-raw data is re-fetched by those scripts rather than committed.
-
-## arXiv metadata
-
-The arXiv figures come from the `metadata` configuration of the
-[`secemp9/arxiv-complete`](https://huggingface.co/datasets/secemp9/arxiv-complete)
-dataset on Hugging Face — a single ~1.6 GB Parquet file with one row per paper,
-covering 3.15M papers. (The full dataset bundles PDFs and LaTeX source and runs
-to roughly 16 TiB; we deliberately pulled only the metadata config, since every
-question we ask is answerable from metadata alone.) arXiv metadata is
-distributed by Cornell under CC0.
-
-We use a handful of fields: the raw `authors` string, `categories` /
-`primary_category`, and `first_version_date`. A few choices worth stating:
-
-- **Submission year.** Each paper is dated by the year of its *first* version
-  (`first_version_date`), i.e. the original submission, not later revisions.
-  1991–2025 are complete years; 2026 is year-to-date through August and is
-  always shown separately.
-- **Author counts.** arXiv stores authors as a single display string, so we
-  count authors by splitting on commas and the word "and" (after stripping
-  parenthetical affiliations such as "(MIT)"). A named collaboration (e.g.
-  "ATLAS Collaboration") counts as one author. This is a standard proxy and is
-  imperfect for unusually formatted lists.
-- **Author identity.** This metadata carries no stable author identifier, so we
-  identify authors by their name string. Common names collide — "Y. Wang"
-  merges thousands of distinct people — so per-author arXiv figures are
-  directional, not exact.
-- **Subjects.** We collapse arXiv's fine-grained categories into coarse groups
-  (Computer Science, Physics, Mathematics, Statistics, Electrical Engineering &
-  Systems Science, …) by primary category; sub-discipline figures use the raw
-  `primary_category`.
-- **No affiliations.** arXiv's public metadata strips submitter emails and has
-  no affiliation field, so the arXiv analyses are necessarily blind to
-  institution and region. For those questions we turn to the conference data.
-
-## Conference metadata (NeurIPS, ICML, ICLR)
-
-The conference figures come from [Paper Copilot](https://papercopilot.com)'s
-OpenReview archive (see [arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) —
-specifically its per-paper author files for NeurIPS, ICML, and ICLR. Each row
-is one paper, with per-author fields joined by semicolons: author name,
-OpenReview profile id (`or_profile`), institution (`aff`), institutional email
-domain (`aff_domain`), and self-reported `position`.
-
-- **Author identity.** Unlike arXiv, OpenReview assigns a stable profile id, so
-  we de-duplicate people reliably: "unique PhD students" counts distinct
-  `or_profile` values, not authorships.
-- **Seniority.** The `position` field is self-reported ("PhD student", "Full
-  Professor", "Postdoc", …), which we map to tiers. It is *not* inferred from
-  output, so a prolific student is still counted as a PhD student. For
-  paper-level seniority we attribute each paper to its *first author's* position.
-- **Region.** We read each author's country from their institutional email
-  **domain** (OpenReview masks the local part but exposes the domain): `.cn` and
-  the major Chinese firms map to China, `.edu` and US firms to the US, other
-  country-code TLDs to their country, and personal-mail domains (gmail, qq, …)
-  to "unknown". Company domains resolve to a company's *headquarters*, not the
-  author's office — a Google-Beijing author counts as US — so region is
-  approximate, and about 11% of domains are unclassifiable. Paper-level region
-  uses the author-majority country, with ties broken by a deterministic hash.
-- **Coverage.** Affiliation and position data is only populated from roughly
-  2021 onward. ICLR publishes *all* submissions (including rejected) on
-  OpenReview; NeurIPS and ICML expose mostly accepted papers plus opt-in
-  rejections. Pooled conference counts therefore mix submissions and
-  acceptances, and we treat each file as one conference-year.
-
-## How we compute the figures
-
-The two downloads are large — millions of rows — and the charts never touch
-them directly. Instead a build step runs SQL queries over the raw files with
-[DuckDB](https://duckdb.org) and writes one small JSON file of **figure data**:
-the per-year, per-group, per-country summary tables each chart actually plots
-(for example "papers per year", "unique PhD students per country per year", or
-"authors per paper, by quantile"). Every number you see on this page lives in
-that ~100 KB file; the gigabytes of raw metadata exist only long enough to be
-counted. Re-running the queries regenerates the figure data and every chart
-updates in lockstep, so the post stays in sync with the data by construction.
-The queries themselves are in the repository, one per figure.

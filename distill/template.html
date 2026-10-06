@@ -615,13 +615,9 @@ function renderAll(){
       backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}));
   });
 
-  // F6b — region share
+  // F6b — region share (stackedBar in 'pct' mode already renders 0–100%)
   {const s=[['China','china'],['United States','us'],['Other','other']];
-   stackedBar('f6b',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),cat,'pct');
-   // default this one to pct with no toggle buttons present -> force pct
-   const c=charts[charts.length-1].chart; c.options.scales.y.max=100; c.options.scales.y.ticks.callback=v=>v+'%';
-   const raw=s.map(([,k])=>DATA.f6.map(r=>r[k])),p=toPct(raw);
-   c.data.datasets.forEach((d,i)=>d.data=p[i]); c.update('none');}
+   stackedBar('f6b',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),cat,'pct');}
 
   // F6c — growth indexed to 2021 = 100
   lineChart('f6c',years(DATA.f6),()=>{
