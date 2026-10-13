@@ -12,8 +12,10 @@
 
 CREATE OR REPLACE TEMP MACRO author_list(s) AS
     list_filter(
-        regexp_split_to_array(regexp_replace(s, '\([^)]*\)', '', 'g'), ',|\s+and\s+'),
-        x -> trim(x) <> ''
+        regexp_split_to_array(
+            regexp_replace(regexp_replace(s, '\s*\(\(.*$', ''), '\([^)]*\)', '', 'g'),
+            ',|\s+and\s+'),
+        x -> trim(x) <> '' AND NOT regexp_matches(lower(trim(x)), '^et\.? ?al\.?$')
     );
 
 -- one row per (author, paper-year) across ALL of arXiv, for debut + output

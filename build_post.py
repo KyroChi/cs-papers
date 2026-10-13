@@ -38,21 +38,46 @@ CHART_CSS = """
   --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
   --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --surface:#fff; --ring:rgba(0,0,0,.12);
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --measure:780px;   /* one width for text and figures (≈ distill body +20%) */
 }
-d-article figure{margin:1.6em auto;}
+/* One centered column: prose, tables, and figures all share --measure. */
+d-article{grid-template-columns:[full-start] minmax(16px,1fr) [col-start] minmax(0,var(--measure)) [col-end] minmax(16px,1fr) [full-end] !important;}
+d-article>*{grid-column:col-start / col-end !important;}
+d-title{display:block !important; max-width:var(--measure); margin-left:auto; margin-right:auto;}
+d-title>*{max-width:100% !important; white-space:normal !important; overflow-wrap:break-word;}
+d-byline{max-width:var(--measure); margin-left:auto; margin-right:auto;}
+d-article figure{margin:1.8em 0;}
 d-article figcaption{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
 d-article figcaption b{font-weight:700;}
 .sub{font-family:var(--sans); font-size:13px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
-.plot{position:relative; width:100%; height:360px;}
+.plot{position:relative; width:100%; height:400px;}
 .plot.tall{height:400px;}
 .subplots{display:flex; gap:16px; flex-wrap:wrap;}
-.subplots>.plot{flex:1 1 320px; min-width:280px;}
+.subplots>.plot{flex:1 1 320px; min-width:280px; height:320px;}
 .bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
 .toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent;
   border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink);}
 .lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
 .disclaimer{color:var(--muted); font-style:italic; font-size:13px;}
+d-article table{display:block; overflow-x:auto; border-collapse:separate; border-spacing:0; width:fit-content;
+  max-width:100%; margin:24px auto; font-family:var(--sans); font-size:13px;
+  border:1px solid var(--ring); border-radius:10px; -webkit-overflow-scrolling:touch;}
+d-article thead th{font-weight:600; color:var(--ink); text-align:right; white-space:nowrap;
+  padding:9px 15px; background:rgba(0,0,0,.035); border-bottom:1.5px solid var(--axis); font-size:11.5px;
+  letter-spacing:.02em;}
+d-article th:first-child,d-article td:first-child{text-align:left;}
+d-article tbody td{text-align:right; white-space:nowrap; padding:7px 15px;
+  color:var(--ink2); font-variant-numeric:tabular-nums;}
+d-article tbody tr:nth-child(even) td{background:rgba(0,0,0,.022);}
+d-article tbody td:first-child{color:var(--ink); font-weight:500;}
+/* boxed warning / caveat callout */
+d-article .warn{border:1px solid var(--ring); border-left:3px solid var(--axis);
+  background:rgba(0,0,0,.028); border-radius:8px; padding:12px 16px; margin:20px auto;
+  font-size:15px; line-height:1.55; color:var(--ink2);}
+/* exception: the wide appendix (last) table may exceed --measure and stay wide/scrollable */
+d-article>table:last-of-type{grid-column:full-start / full-end !important;
+  max-width:min(1080px,calc(100vw - 32px)) !important; margin:22px auto !important;}
 .wm-wrap{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
 .wm-map{flex:1 1 440px; min-width:300px;}
 .wm-map svg{width:100%; height:auto; display:block;}

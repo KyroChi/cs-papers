@@ -19,9 +19,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # is preserved.
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "results", "figures.json")
 
-# author-list expression (strip parenthetical affiliations, split on comma/"and")
-AUTH = (r"list_filter(regexp_split_to_array(regexp_replace(authors,'\([^)]*\)','','g'),"
-        r"',|\s+and\s+'), x -> trim(x) <> '')")
+# author-list expression. Parsing the raw `authors` display string:
+#   1. drop the trailing "((1) affil, (2) affil, ...)" affiliation block (nested
+#      parens the inner strip can't reach — the source of "Italy"/"Department of
+#      Physics"/country tokens);
+#   2. strip remaining inline "(affiliation)" parentheticals;
+#   3. split on commas and the standalone word "and";
+#   4. drop empties and "et al" / "et al." variants.
+AUTH = (r"list_filter(regexp_split_to_array("
+        r"regexp_replace(regexp_replace(authors,'\s*\(\(.*$',''),'\([^)]*\)','','g'),"
+        r"',|\s+and\s+'), x -> trim(x) <> '' "
+        r"AND NOT regexp_matches(lower(trim(x)),'^et\.? ?al\.?$'))")
 
 
 def main():

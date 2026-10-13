@@ -25,10 +25,13 @@ SELECT
     n_versions,
     comments,
     CAST(year(first_version_date) AS INTEGER) AS year,
-    -- author count proxy: split on commas or the standalone word "and"
+    -- author count proxy: drop the trailing "((1) affil ...)" block, strip inline
+    -- "(affiliation)" parens, split on commas / the word "and", drop "et al".
     length(list_filter(
-        regexp_split_to_array(authors, ',|\s+and\s+'),
-        x -> trim(x) <> ''
+        regexp_split_to_array(
+            regexp_replace(regexp_replace(authors, '\s*\(\(.*$', ''), '\([^)]*\)', '', 'g'),
+            ',|\s+and\s+'),
+        x -> trim(x) <> '' AND NOT regexp_matches(lower(trim(x)), '^et\.? ?al\.?$')
     )) AS author_count,
     -- coarse arXiv "group" from the primary category
     CASE
