@@ -1,14 +1,3 @@
--- conf_setup.sql — views over the Paper Copilot author files (NeurIPS/ICML/ICLR).
--- Loaded automatically by run.py when data/conf/ is present. Builds:
---   conf_papers  : one row per paper (venue, year, id, raw author/aff strings)
---   conf_authors : one row per (paper, author) with primary domain, country,
---                  sector (academia/industry), and seniority tier.
---
--- CAVEATS: (1) company domains map to HQ country, NOT office location — a
--- Google-Beijing author counts as US here; academic domains (.edu, .edu.cn,
--- .ac.*) are unambiguous, so an academia-only cut is the cleanest China/US
--- signal. (2) Affiliation coverage varies by venue-year. (3) Within one author,
--- multiple concurrent affiliations are '+'-joined; we keep the FIRST (primary).
 
 CREATE OR REPLACE VIEW conf_papers AS
 SELECT
@@ -44,7 +33,6 @@ tagged AS (
 )
 SELECT
     venue, year, id, author_no, author, or_profile, aff, domain, position,
-    -- sector: academia vs industry vs other
     CASE
         WHEN domain LIKE '%.edu' OR domain LIKE '%.edu.%' OR domain LIKE '%.ac.%'
              OR domain LIKE '%.edu.cn' OR domain LIKE 'uni%' OR aff ILIKE '%universit%'
@@ -58,7 +46,6 @@ SELECT
         WHEN domain = '' THEN 'Unknown'
         ELSE 'Other'
     END AS sector,
-    -- country from domain (company => HQ; academic ccTLD => unambiguous)
     CASE
         WHEN domain = '' THEN 'Unknown'
         WHEN domain LIKE '%.cn' THEN 'China'
@@ -88,14 +75,12 @@ SELECT
         WHEN tld = 'ie' THEN 'Ireland'      WHEN tld = 'nz' THEN 'New Zealand'
         ELSE 'Other/Unknown'
     END AS country,
-    -- region: the three buckets we track (Unknown = no domain given)
     CASE
         WHEN domain = '' THEN 'Unknown'
         WHEN country = 'China' THEN 'China'
         WHEN country = 'United States' THEN 'US'
         ELSE 'Other'
     END AS region,
-    -- seniority tier from position text
     CASE
         WHEN position LIKE '%phd%' OR position LIKE '%ph.d%' OR position LIKE '%doctoral%'
              OR position LIKE '%dphil%' THEN 'PhD student'
@@ -115,10 +100,6 @@ SELECT
     END AS seniority
 FROM tagged;
 
--- Paper-level region attribution. For each submission we count authors by
--- region (among those with a known domain) and assign a dominant region by
--- plurality (ties: China, then US, then Other). Also exposes first-author
--- region and any-author flags for collaboration views.
 CREATE OR REPLACE VIEW conf_paper_region AS
 WITH pa AS (
     SELECT venue, year, id,
@@ -134,10 +115,6 @@ WITH pa AS (
 SELECT *,
     (n_cn > 0)  AS any_china,
     (n_us > 0)  AS any_us,
-    -- Attribute the paper to the region with the MOST authors. On a tie for
-    -- the top count, pick fairly among the tied regions — a "coin flip" made
-    -- deterministic by hashing the paper id, so it's uniform in aggregate but
-    -- reproducible across runs. Handles 2- and 3-way ties.
     CASE WHEN n_known = 0 THEN 'Unknown' ELSE
         list_transform(
             list_filter(

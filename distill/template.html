@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Who Fills arXiv</title>
+<title>Figure library — Who is Writing all Those Papers?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
@@ -10,7 +10,6 @@
   --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --ring:rgba(0,0,0,.1);
   --display:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --mono:Consolas,Monaco,"Andale Mono","Ubuntu Mono",monospace;
 }
 :root:not([data-theme="light"]){ @media (prefers-color-scheme:dark){
   --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
@@ -22,32 +21,7 @@
 }
 body{background:var(--page); color:var(--ink2); font-family:var(--sans); margin:0;
   font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
-.wrap{max-width:1080px; margin:0 auto; padding:64px 24px 96px;}
-/* narrow text column, wide figures — distill-style */
-.wrap>h1,.wrap>h2,.wrap>h3,.wrap>h4,.wrap>p,.wrap>ul,.wrap>ol,.wrap>blockquote,.wrap>hr,
-.wrap>.authors,.wrap>.byline,.wrap>.disclaimer,.wrap>.cite,.wrap>.lead,.wrap>.find,
-.wrap>.notes,.wrap>.methods,.wrap>pre{max-width:660px; margin-left:auto; margin-right:auto;}
-h1{font-family:var(--display); font-weight:700; font-size:44px; line-height:1.12; letter-spacing:-.02em; color:var(--ink); margin:0 0 10px;}
-h2{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
-h3{font-family:var(--display); font-weight:700; font-size:20px; line-height:1.4; color:var(--ink); margin:1.8em 0 .3em;}
-h4{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:1.6em 0 .3em;}
-p{margin:0 0 1.1em;}
-a{color:inherit; text-decoration:none; border-bottom:1px solid var(--axis);}
-a:hover{border-bottom-color:var(--ink);}
-ul,ol{padding-left:1.3em; margin:0 0 1.1em;}
-li{margin:.25em 0;}
-strong,b{color:var(--ink); font-weight:600;}
-blockquote{border-left:3px solid var(--grid); margin:1.5em auto; padding:.3em 0 .3em 1.3em; color:var(--ink2); font-size:18px; line-height:1.6;}
-code{font-family:var(--mono); font-size:.88em; background:var(--grid); padding:.1em .35em; border-radius:3px;}
-pre{overflow-x:auto; background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:14px; font-size:13px;}
-pre code{background:none; padding:0;}
-hr{border:none; border-top:1px solid var(--grid); margin:2.4em auto;}
-.byline{font-family:var(--sans); color:var(--muted); font-size:14px; margin:0 0 2px;}
-.authors{font-family:var(--display); font-weight:600; font-size:16px; color:var(--ink); margin:.3em 0 .1em;}
-.disclaimer{font-family:var(--sans); font-style:italic; font-size:12.5px; color:var(--muted); margin:12px 0 0;}
-.cite{color:var(--muted); font-size:13px; line-height:1.6; border-left:2px solid var(--grid); padding:8px 0 8px 14px; margin:20px auto 8px;}
-.cite a{color:var(--ink2);}
-.sec{font-family:var(--display); font-weight:600; font-size:30px; line-height:1.25; color:var(--ink); margin:1.9em 0 .4em;}
+.wrap{max-width:1080px; margin:0 auto; padding:48px 24px 96px;}
 figure{max-width:984px; margin:34px auto; background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:18px 18px 14px;}
 figcaption{font-family:var(--display); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
 figcaption b{font-weight:700;}
@@ -69,45 +43,10 @@ figcaption b{font-weight:700;}
 .toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
 .lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
 .controls{position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); right:16px; z-index:9;}
-.find{list-style:none; padding:0; margin:14px 0 4px;}
-.find li{position:relative; padding-left:20px; margin:0 0 9px; font-size:14.5px; line-height:1.55; color:var(--ink2);}
-.find li:before{content:""; position:absolute; left:2px; top:9px; width:6px; height:6px; border-radius:50%; background:var(--muted);}
-.find b{color:var(--ink); font-weight:600;}
-.ref{color:var(--muted); font-size:11.5px; font-family:var(--sans); white-space:nowrap; border:1px solid var(--grid); border-radius:4px; padding:1px 5px; margin-left:4px;}
-.lead{font-family:var(--sans); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:30px 0 0;}
-.notes{color:var(--muted); font-size:12px; line-height:1.7; margin-top:44px; border-top:1px solid var(--grid); padding-top:16px;}
-.notes b{color:var(--ink2);}
-.methods{margin:14px 0 0;}
-.methods dt{font-family:var(--sans); font-weight:600; font-size:12.5px; color:var(--ink); margin-top:14px;}
-.methods dd{margin:3px 0 0; font-size:12.5px; line-height:1.6; color:var(--ink2);}
-.methods code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; background:var(--grid); padding:0 4px; border-radius:3px;}
-.methods a{color:var(--ink2);}
 </style>
 
 <div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>
 <div class="wrap">
-  <h1>Who Fills arXiv</h1>
-  <p class="byline">An interactive look at the growth of arXiv and the machine-learning conferences.</p>
-  <div class="cite">
-    Data — arXiv metadata (3.15M papers): <a href="https://huggingface.co/datasets/secemp9/arxiv-complete">secemp9/arxiv-complete</a>
-    (Hugging Face; metadata config, Cornell/CC0). Conference affiliations (NeurIPS·ICML·ICLR):
-    Paper Copilot OpenReview archive (<a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>).
-  </div>
-
-  <p class="lead">Key findings</p>
-  <ul class="find">
-    <li>arXiv submissions have grown <b>~9× since 2000</b> (≈31k → ≈284k in 2025) and are still accelerating.<span class="ref">Fig 1a</span></li>
-    <li>The rise is driven by <b>Computer Science</b> — specifically the AI/ML subfields — and by <b>teams, not solo authors</b>.<span class="ref">Fig 1b</span><span class="ref">Fig 2</span><span class="ref">Fig 3</span></li>
-    <li>At the top ML venues, <b>China's submission share rose steeply</b> (~13% → ~23% by 2025; level with the US only in the partial-2026 ICLR-only cycle), driven mainly by a <b>~9× rise in PhD-student first authors</b> — not students each writing more.<span class="ref">Fig 6</span><span class="ref">Fig 7</span></li>
-  </ul>
-
-  <p class="sec">All of arXiv</p>
-  <ul class="find">
-    <li>Submissions grew <b>~9×</b> from 2000 (≈31k) to 2025 (≈284k), fastest in the most recent years (≈+16%/yr in 2024–25).<span class="ref">Fig 1a</span></li>
-    <li><b>Computer Science overtook physics</b> to become the largest area; its share of arXiv climbed steeply as physics and math shares shrank.<span class="ref">Fig 1b</span></li>
-    <li>Growth is <b>collaborative</b>: solo-authored papers fell from <b>~44% (1991) to ~11% (2025)</b>; the median author count rose from 2 to 4.<span class="ref">Fig 2</span></li>
-  </ul>
-
   <figure class="fig-wide" data-fig="arxiv-growth">
     <figcaption>Growth in submissions across all of arXiv</figcaption>
     <p class="sub">Papers by year of first submission, 1991–2025 (last complete year).</p>
@@ -120,78 +59,10 @@ figcaption b{font-weight:700;}
     <div class="plot tall"><canvas id="f1b"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption>Year-over-year growth rate — CS, Physics, Mathematics</figcaption>
-    <p class="sub">Annual % change in submissions (from 2005; spikes capped at 60%).</p>
-    <div class="plot tall"><canvas id="f1c"></canvas></div>
-  </figure>
-
   <figure class="fig-wide" data-fig="author-list-sizes">
     <figcaption>Papers by number of authors</figcaption>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f2"></canvas></div>
-  </figure>
-
-  <p class="sec">Computer Science</p>
-  <ul class="find">
-    <li>CS is the single biggest driver of arXiv's rise — from <b>27 papers (1995) to ~129k (2025)</b>, now the largest area.<span class="ref">Fig 1b</span></li>
-    <li>CS is even more team-heavy than arXiv overall; solo work is a small and shrinking sliver.<span class="ref">Fig 2b</span></li>
-    <li>Growth concentrates in the <b>AI/ML subfields</b> — the top-5 in 2025 are cs.CV, cs.LG, cs.CL, cs.AI, cs.RO.<span class="ref">Fig 3</span></li>
-    <li>Mean papers per CS author per year is rising (<b>≈2.0→2.5</b>, 2021–25) with a growing right tail (s.d. up), while the median stays 1.<span class="ref">Fig 4</span></li>
-    <li><b>Prolific authors are getting more prolific</b>: those with 21+ career papers went from ~8 to ~11 papers/yr; occasional authors are flat.<span class="ref">Fig 5</span></li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>Papers by number of authors — CS only</figcaption>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f2cs"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Growth of the top-5 CS sub-disciplines</figcaption>
-    <p class="sub">The five largest CS categories in 2025, tracked back over time.</p>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f3"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Papers submitted per CS author each year</figcaption>
-    <p class="sub">Mean (band = ±1 s.d.) and median annual output among authors active that year.</p>
-    <div class="plot"><canvas id="f4"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Annual output by career total</figcaption>
-    <p class="sub">Mean papers/year, with authors bucketed by cumulative CS papers to date (an author moves up a bucket as they accumulate papers).</p>
-    <div class="plot"><canvas id="f5"></canvas></div>
-  </figure>
-
-  <p class="sec">By region — NeurIPS · ICML · ICLR</p>
-  <ul class="find">
-    <li><b>China's share rose sharply</b>: China-majority submissions went <b>~13% → ~23%</b> (2021→2025) as the US fell <b>~49% → ~37%</b>, "Other" near 40% — the gap narrowed (they cross only in the partial-2026 ICLR-only data; see the 2026 section).<span class="ref">Fig 6a</span><span class="ref">Fig 6b</span></li>
-    <li>Indexed to 2021, China's submissions grew <b>~10×</b> vs <b>~4×</b> for the US (through 2025).<span class="ref">Fig 6c</span></li>
-    <li>At the <b>first-author</b> level (who led the paper), <b>PhD students dominate in every region</b>; switching to "all authors" pulls faculty/PIs up — the two bases tell different stories.<span class="ref">Fig 7</span></li>
-    <li>China's PhD-led surge is <b>headcount, not output</b>: ~9× more distinct PhD first-authors, with papers-per-student flat (~1.2) and a stable seniority ratio. The US shows a mild per-student rise (1.2→1.45).<span class="ref">Fig 7</span></li>
-    <li>The inflow of <b>new PhD-student first-authors grows fastest for China</b> (~5× over 2022–25 vs ~2.6× for the US), though the US still added more per year through 2025.<span class="ref">Fig 7c</span></li>
-    <li>First-author PhD submissions grew <b>~9.9×</b> for China (285→2,821) vs <b>~4.1×</b> for the US (1,413→5,853) over 2021–25 — China's first-author PhD output is growing ~2.4× faster, though the US base is larger.<span class="ref">Fig 7e</span></li>
-    <li>Faculty are on the most papers per year (mean ≈3 in 2025) vs PhD students ≈1.9, but the <b>median is 1 for every tier</b> — the gap is a prolific minority, not typical behavior.<span class="ref">Fig 7d</span></li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>Submissions by institution region — absolute</figcaption>
-    <p class="sub">Each paper attributed to its author-majority region. Coverage 2021–2025.</p>
-    <div class="plot"><canvas id="f6a"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Submissions by institution region — share</figcaption>
-    <div class="plot"><canvas id="f6b"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Growth indexed to 2021 (= 100)</figcaption>
-    <p class="sub">Each region relative to its own 2021 level — steeper is faster growth. Venue coverage shifts year to year (see notes).</p>
-    <div class="plot"><canvas id="f6c"></canvas></div>
   </figure>
 
   <figure class="fig-wide" id="f6cb" data-fig="region-growth">
@@ -203,45 +74,10 @@ figcaption b{font-weight:700;}
     </div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption>Seniority of submissions over time</figcaption>
-    <p class="sub"><b>Basis</b> — “first author” counts each paper once by who led it; “all authors” counts every authorship (a PI on many papers is tallied each time). Self-reported OpenReview position. Filter by region and venue.</p>
-    <div class="bar"><span class="lbl">Basis</span>
-      <button class="toggle" data-f7basis="first" aria-pressed="true">first author</button>
-      <button class="toggle" data-f7basis="all" aria-pressed="false">all authors</button>
-      <span class="lbl" style="margin-left:8px">Scale</span>
-      <button class="toggle" data-f7scale="pct" aria-pressed="true">share %</button>
-      <button class="toggle" data-f7scale="abs" aria-pressed="false">counts</button>
-    </div>
-    <div class="bar"><span class="lbl">Region</span>
-      <button class="toggle" data-f7region="all" aria-pressed="true">all</button>
-      <button class="toggle" data-f7region="China" aria-pressed="false">China</button>
-      <button class="toggle" data-f7region="US" aria-pressed="false">US</button>
-      <button class="toggle" data-f7region="Other" aria-pressed="false">Other</button>
-    </div>
-    <div class="bar"><span class="lbl">Venue</span>
-      <button class="toggle" data-f7venue="all" aria-pressed="true">all</button>
-      <button class="toggle" data-f7venue="nips" aria-pressed="false">NeurIPS</button>
-      <button class="toggle" data-f7venue="icml" aria-pressed="false">ICML</button>
-      <button class="toggle" data-f7venue="iclr" aria-pressed="false">ICLR</button>
-    </div>
-    <div class="plot tall"><canvas id="f7"></canvas></div>
-  </figure>
-
   <figure class="fig-wide" data-fig="new-phds-by-region">
     <figcaption>New PhD-student first-authors per year, by region</figcaption>
     <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then).</p>
     <div class="plot"><canvas id="f7c"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Submissions per person per year, by seniority</figcaption>
-    <p class="sub">Distinct papers a person is an author on each year, averaged within their self-reported position. Median is ~1 for every tier — most people are on one paper a year; the mean spreads them by seniority.</p>
-    <div class="bar"><span class="lbl">Stat</span>
-      <button class="toggle" data-f7dstat="mean" aria-pressed="true">mean</button>
-      <button class="toggle" data-f7dstat="median" aria-pressed="false">median</button>
-    </div>
-    <div class="plot tall"><canvas id="f7d"></canvas></div>
   </figure>
 
   <figure class="fig-wide" data-fig="subs-per-person">
@@ -258,12 +94,6 @@ figcaption b{font-weight:700;}
     <figcaption>Authors per paper at the big-3</figcaption>
     <p class="sub">Authors per paper at the big-3 (NeurIPS · ICML · ICLR, 2021–2025): mean (dot) with a 25th–75th-percentile candle.</p>
     <div class="plot"><canvas id="f7g"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>First-author PhD-student submissions — China vs US</figcaption>
-    <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
-    <div class="plot"><canvas id="f7e"></canvas></div>
   </figure>
 
   <figure class="fig-wide" id="f17" data-fig="conferences-and-phds">
@@ -295,115 +125,6 @@ figcaption b{font-weight:700;}
     </div>
   </figure>
 
-  <p class="sec">Mathematics</p>
-  <ul class="find">
-    <li><b>Even math is going collaborative</b>: solo papers fell <b>52% → 29%</b> (2000→2025) while 3+-author papers rose <b>15% → 38%</b> — the growth is multi-author, not solo.<span class="ref">Fig 8</span></li>
-    <li>Top-5 2026 subfields: combinatorics (math.CO), analysis of PDEs (math.AP), optimization &amp; control (math.OC), numerical analysis (math.NA), number theory (math.NT).<span class="ref">Fig 9</span></li>
-    <li>Per-author output is <b>roughly flat</b> (mean ≈1.6→1.7, median 1) — far below CS.<span class="ref">Fig 10</span></li>
-    <li>Unlike CS, math's <b>most prolific authors are not speeding up</b> — the 21+ bucket's output drifted <b>down</b> (~4.6 → 3.1 papers/yr).<span class="ref">Fig 11</span></li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>Papers by number of authors — Math only</figcaption>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f8"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Growth of the top-5 Math sub-disciplines</figcaption>
-    <p class="sub">The five largest Math categories in 2025, tracked back over time.</p>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f9"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Papers submitted per Math author each year</figcaption>
-    <p class="sub">Mean (band = ±1 s.d.) and median annual output among authors active that year.</p>
-    <div class="plot"><canvas id="f10"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Annual output by career total — Math</figcaption>
-    <p class="sub">Mean papers/year, authors bucketed by cumulative Math papers to date.</p>
-    <div class="plot"><canvas id="f11"></canvas></div>
-  </figure>
-
-  <p class="sec">Peer review — ICLR (submissions incl. rejected)</p>
-  <ul class="find">
-    <li><b>Acceptance kept pace with submissions.</b> ICLR submissions grew <b>~24×</b> (489 in 2017 → 11,663 in 2025), but the acceptance <b>rate held ~30–32%</b> since 2019 — so accepted papers scaled up too (~200 → <b>~3,700, ~19×</b>), rather than staying fixed.<span class="ref">Fig 12</span><span class="ref">Fig 13</span></li>
-    <li>The total-submissions bar explodes while the accepted slice stays a roughly constant share — the conference raised its accepted count, not its selectivity.<span class="ref">Fig 12</span></li>
-    <li>ICLR 2026 decisions aren't released yet, so acceptance is shown through 2025.</li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>ICLR outcomes over time — accepted / rejected / withdrawn</figcaption>
-    <p class="sub">Bar height = total submissions. Toggle to share % to read the accepted fraction directly.</p>
-    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
-    <div class="plot tall"><canvas id="f12"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>ICLR acceptance rate over time</figcaption>
-    <p class="sub">Accepted ÷ all submissions. Roughly flat near 30–32% since 2019 despite the submission explosion.</p>
-    <div class="plot"><canvas id="f13"></canvas></div>
-  </figure>
-
-  <p class="sec">Preliminary notes — is it more students, or students writing more?</p>
-  <ul class="find">
-    <li><b>Mostly more students.</b> PhD-student submissions (all authorships) grew <b>~6.1×</b> (2021→2025), decomposing into <b>~4.5× more distinct students</b> × <b>~1.34× more papers per student</b> — headcount is the dominant term.<span class="ref">Fig 14a</span></li>
-    <li>Per-student output rose ~34% for all authorship (1.40 → 1.88) but only <b>~16% for first-authorship</b> (1.18 → 1.37) — so the extra is mostly <b>co-authorship</b>, not students each <b>leading</b> more papers. First-author PhD growth is ~4.2× headcount. (A per-student productivity effect — e.g. AI-assisted writing — would surface here; the modest first-author rise is where to watch, but it's too early and confounded to attribute.)<span class="ref">Fig 14b</span></li>
-    <li>The <b>median is 1 paper/year</b> for students throughout — the typical PhD student still submits one paper a year; the mean rises from a growing tail.<span class="ref">Fig 7d</span></li>
-    <li><b>Caveats (why this is preliminary):</b> OpenReview coverage itself grew over 2021–25, inflating headcount; ML-venues only; positions are self-reported; the window is short and starts at 2021. Directional, not causal.</li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>Distinct PhD-student authors per year</figcaption>
-    <p class="sub">Headcount — the dominant driver, up ~4.5× (2021→2025).</p>
-    <div class="plot"><canvas id="f14a"></canvas></div>
-  </figure>
-
-  <figure class="fig-wide">
-    <figcaption>Papers per PhD student per year</figcaption>
-    <p class="sub">Same unit, so comparable: all-authorship rose ~34% while first-author-only rose just ~16% — students aren't each leading many more papers.</p>
-    <div class="plot"><canvas id="f14b"></canvas></div>
-  </figure>
-
-  <p class="sec">Controlling for LLMs — per-person output, deep history</p>
-  <ul class="find">
-    <li>Counting <b>first-authorships only</b> (which controls for growing team size), output per person was <b>flat-to-declining through 2022</b> — CS held ~1.35 for 18 years. There was <b>no secular productivity trend before LLMs</b>.<span class="ref">Fig 16</span></li>
-    <li>A <b>modest uptick begins in 2023</b> — strongest in CS (~1.35 → ~1.45, +7%), weak across all fields, negligible in math. It's concentrated in the <b>heaviest-LLM-use field</b> and timed to <b>ChatGPT (late 2022), not GPT-3 (2020)</b>.<span class="ref">Fig 16</span></li>
-    <li><b>Suggestive, not conclusive.</b> The bump is small and confounded (paper-splitting, LLMs-as-research-topic inflating CS, workshop tracks). First-author-per-person removes team-size effects but not these. Deep arXiv history (from 1991) gives the pre-LLM control that the 2021+ conference data cannot.</li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>First-author papers per person per year</figcaption>
-    <p class="sub">Per-person output, controlling for team size. Flat pre-2023 baseline; a small CS-led rise after ChatGPT.</p>
-    <div class="plot"><canvas id="f16"></canvas></div>
-  </figure>
-
-  <p class="sec">Is the surge just an LLM artifact?</p>
-  <ul class="find">
-    <li><b>The steelman, taken at face value.</b> For the sake of argument, assume the entire post-2022 per-person uptick (Fig 16) is <b>100% caused by LLMs</b> — every extra fraction of a paper per author is AI-enabled.</li>
-    <li><b>Even then, it's a minor term.</b> CS papers grew <b>~2×</b> (64.7k → 128.9k, 2022→2025). Of that, the number of first authors rose <b>×1.87</b> while output per person rose only <b>×1.067</b>. Strip the per-person rise entirely and CS still grows to ~121k — so LLM productivity could explain <b>at most ~10–13%</b> of the increase; <b>~87–90% is simply more people</b>.<span class="ref">Fig 16</span><span class="ref">Fig 14a</span></li>
-    <li><b>Timing rules out the earlier growth.</b> Per-person output was flat through 2022, yet arXiv had already grown <b>~9× since 2000</b>. LLMs cannot account for a surge that predates them by two decades.<span class="ref">Fig 1a</span><span class="ref">Fig 16</span></li>
-    <li><b>Not just an LLM spam flood.</b> If the extra papers were mostly low-quality AI filler, acceptance rates should have collapsed. Instead ICLR's rate held ~30–32% and accepted counts scaled with submissions — the added volume clears review at the same bar.<span class="ref">Fig 13</span></li>
-    <li><b>Bottom line.</b> The increase is primarily a <b>people phenomenon</b> — more researchers, especially PhD students in ML, on larger teams. LLMs are at most a small, recent multiplier on top, not the primary cause; the headcount, China-growth, and team-size findings hold regardless.</li>
-  </ul>
-
-  <p class="sec">2026 so far (through August, year-to-date)</p>
-  <ul class="find">
-    <li>Through <b>August 2026</b>, arXiv already logged <b>225,912</b> submissions — <b>~24% ahead</b> of the same Jan–Aug window in 2025 (181,969). On pace for another record year.<span class="ref">Fig 15</span></li>
-    <li>Computer Science is now <b>~48%</b> of Jan–Aug submissions (2026), up from 46% (2025) and 34% (2021) — nearly half of all new arXiv papers.<span class="ref">Fig 15</span></li>
-    <li><b>Conferences (preliminary, ICLR-only — NeurIPS/ICML 2026 not yet released):</b> ICLR 2026 drew ~22.8k submissions (vs 13.7k in 2025); by author-majority region <b>China (~31%) edged past the US (~30%)</b> for the first time — one venue, decisions still pending.</li>
-    <li>2026 is partial and excluded from the figures above; treat it as a leading indicator.</li>
-  </ul>
-
-  <figure class="fig-wide">
-    <figcaption>2026 pace — arXiv submissions year-to-date (Jan–Aug)</figcaption>
-    <p class="sub">Same Jan–Aug window each year, so 2026 is comparable rather than penalized for being partial.</p>
-    <div class="plot"><canvas id="f15"></canvas></div>
-  </figure>
-
   <figure class="fig-wide" id="fsen">
     <figcaption>Annual output by career total — CS (left) vs Mathematics (right)</figcaption>
     <p class="sub">Mean papers/year, with authors bucketed by cumulative papers to date (an author moves up a bucket as they accumulate papers).</p>
@@ -424,89 +145,20 @@ figcaption b{font-weight:700;}
     <p class="sub">Each row is a career-total bucket; the curve is the distribution of <b>years active on arXiv</b> for that bucket's solo-2026 authors, peak-normalized per row. Computer Science and Mathematics are shown in the legend.</p>
     <div id="ridge" style="width:100%"></div>
   </figure>
-
-  <p class="sec">Methods &amp; data</p>
-  <dl class="methods">
-    <dt>Data sources</dt>
-    <dd>arXiv metadata for 3.15M papers from the <code>metadata</code> config of
-      <a href="https://huggingface.co/datasets/secemp9/arxiv-complete">secemp9/arxiv-complete</a>
-      (Hugging Face; a 1.6 GB parquet, not the full 16 TiB corpus). arXiv metadata is distributed by Cornell under CC0.
-      Conference author affiliations (NeurIPS, ICML, ICLR) from the Paper Copilot OpenReview archive
-      (<a href="https://arxiv.org/abs/2510.13201">arXiv:2510.13201</a>). ICLR accept/reject decisions from the
-      berenslab/iclr-dataset. All data is fetched by scripts; none is redistributed here.</dd>
-    <dt>Author counting</dt>
-    <dd>The raw author string is cleaned before splitting: we drop the trailing numbered-affiliation
-      block (e.g. “((1) INAF, Italy, (2) …)”), strip remaining inline “(affiliation)” parentheticals,
-      then split on commas and the word “and” and discard “et al”. Without this, affiliation and country
-      fragments leak in as false authors. A named collaboration (e.g. “ATLAS Collaboration”) counts as
-      one author. This is a proxy, imperfect for unusual formatting.</dd>
-    <dt>Author identity &amp; de-duplication</dt>
-    <dd>On arXiv, authors are identified by name string, so common names collide (“Y. Wang” merges many
-      people) — per-author figures are directional. Conference figures de-duplicate by OpenReview profile id
-      (<code>or_profile</code>), which is reliable.</dd>
-    <dt>Subject groups</dt>
-    <dd>arXiv archives are collapsed into coarse groups (Computer Science, Physics, Mathematics, Statistics,
-      EESS, …) by primary category; the smallest groups fold into “Other”. Sub-discipline figures use the raw
-      <code>primary_category</code>.</dd>
-    <dt>Institution region</dt>
-    <dd>From the author's OpenReview institutional email <b>domain</b> (the local part is masked). <code>.cn</code>
-      and major Chinese firms → China; <code>.edu</code>/US firms → US; other ccTLDs → their country; the rest
-      → Other. Company domains map to <b>HQ country, not office location</b> (a Google-Beijing author counts as
-      US), so an academia-only cut is cleaner. Personal-email domains (gmail, qq, …) are treated as
-      unknown-institution, not a company. ~11% of domains are unclassifiable and excluded from region shares.</dd>
-    <dt>Paper-level region attribution</dt>
-    <dd>Each paper is assigned to the region holding the <b>most</b> of its authors' institutions; ties are
-      broken by a deterministic hash of the paper id (a “fair coin” that is uniform in aggregate but
-      reproducible). ~6–7% of papers are ties.</dd>
-    <dt>Seniority</dt>
-    <dd>Self-reported OpenReview <code>position</code> (“PhD student”, “Full Professor”, …) mapped to tiers —
-      <b>not</b> inferred from paper counts. Figures distinguish a <b>first-author</b> basis (each paper counted
-      once, by who led it) from an <b>all-authors</b> basis (every authorship; a PI on many papers is tallied
-      each time).</dd>
-    <dt>Coverage &amp; time windows</dt>
-    <dd>arXiv spans 1991–2025 (main figures end at 2025, the last complete year; 2026 is year-to-date through
-      August, shown separately). Conference affiliation/position data populates from ~2021. ICLR includes
-      <b>all submissions incl. rejected</b>; NeurIPS/ICML are largely accepted + opt-in, so pooled conference
-      numbers mix submissions and acceptances. ICLR 2026 decisions are not yet released.</dd>
-    <dt>Bucket definitions</dt>
-    <dd>Author-count and career-total buckets are made non-overlapping where the requested edges overlapped
-      (e.g. author counts {1, 2–3, 4–5, 6–8, 9+}; CS career totals {1, 2–3, 4–8, 9–20, 21+}; Math author counts
-      {1, 2, 3, 4, 5, 6+}).</dd>
-    <dt>LLM-control metric</dt>
-    <dd>To separate productivity from team growth, per-person output is measured as <b>first-author papers per
-      person per year</b> (each paper counted once). arXiv's deep history provides a pre-LLM baseline; the
-      conference data (2021+) does not.</dd>
-    <dt>Reproducibility</dt>
-    <dd>Open-source: <code>download_*.py</code> fetch the data, <code>build_figures.py</code> computes the
-      aggregates via DuckDB, and <code>build_html.py</code> assembles this self-contained page. Raw data is
-      git-ignored.</dd>
-    <dt>Caveats</dt>
-    <dd>All findings are <b>directional, not causal</b>: name/position self-reporting, domain-to-country
-      heuristics, ML-venue-only conference coverage, OpenReview coverage that itself grows over time, and short
-      post-2021 windows all introduce noise. Treat magnitudes as approximate and trends as the signal.</dd>
-  </dl>
 </div>
 
 <script>
 const DATA = __FIGDATA__;
-// Single colormap for every figure: the first 80% of plasma (drops the pale
-// yellow tail), matching the world map. t in [0,1] -> plasma(0.8*t).
 const BL=t=>(typeof d3!=='undefined'&&d3.color?d3.color(d3.interpolatePlasma(0.8*t)).formatHex():'#cc4778');
-// seq(n): n colors, smooth light -> dark (ordered buckets, stacks).
 function seq(n){return n<=1?[BL(0.72)]:Array.from({length:n},(_,i)=>BL(0.22+0.70*(i/(n-1))));}
 function seqf(n){const r=seq(n);return i=>r[i%r.length];}
-// CATB: blues spaced for mutual contrast (overlapping line/point series).
 const CATB=[0.92,0.42,0.68,0.30,0.80,0.54,0.22,0.60].map(BL);
 const charts=[];
 
-// ---- 2026 solo-authorship analysis (precomputed; YTD Jan 1–Aug 27) ----
-// Career-total buckets (row labels for the tenure ridgeline).
 const RIDGE_BK=['1','2–3','4–5','6–8','9–11','12–15','16–20','21–30','31+'];
-// Tenure histogram of the 31+-career solo authors (% of that group).
 const TEN_BK=['≤3 yr','4–5','6–10','11–15','16–20','21+'];
 const TEN_CS=[1.0,1.9,25.4,30.1,22.1,19.4];
 const TEN_MA=[0.5,0.8,12.8,25.1,25.4,35.4];
-// Ridgeline: bucket × tenure-year counts for solo-2026 authors.
 const RIDGE_TMAX=37;
 const RIDGE_CS=[[1575,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[696,358,165,88,50,44,41,33,20,12,23,8,8,9,9,3,5,2,0,1,0,0,1,3,1,0,0,0,2,0,0,1,0,0,0,0,0,0],[120,158,107,75,55,38,44,27,27,23,18,10,5,14,10,12,7,4,1,1,6,3,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[49,100,106,84,62,69,51,39,52,23,10,20,14,11,14,10,9,6,2,2,4,1,0,2,0,0,1,2,0,0,0,0,1,0,1,0,0,0],[14,25,31,44,41,46,43,37,32,31,14,14,18,7,8,5,3,7,0,3,1,5,0,1,2,2,0,0,0,0,0,2,0,0,0,0,0,0],[4,15,21,26,31,35,38,27,48,32,24,11,11,11,11,9,7,4,9,3,8,4,0,1,2,0,1,1,1,0,0,0,0,1,0,0,0,0],[1,2,7,18,23,19,34,33,25,27,24,22,19,10,12,11,8,3,4,5,1,3,2,0,5,0,1,1,1,0,1,0,0,0,0,0,0,0],[2,3,8,9,14,23,32,43,34,36,20,19,16,20,14,19,11,12,6,12,9,5,5,2,0,0,7,3,2,1,0,1,0,0,0,0,0,0],[0,0,4,6,8,10,24,40,56,52,63,56,56,52,55,59,44,41,36,44,39,33,17,21,19,18,8,11,13,8,6,11,8,4,2,0,0,0]];
 const RIDGE_MA=[[947,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[326,399,228,124,67,53,45,45,27,16,7,12,6,10,6,4,5,3,4,3,0,4,2,2,0,0,3,0,1,1,1,0,0,0,0,0,0,0],[43,112,147,136,106,74,53,48,34,25,16,17,12,7,14,8,11,3,4,4,4,1,0,3,1,2,1,1,1,0,1,2,1,0,0,0,0,0],[13,52,104,96,118,89,90,57,49,40,35,27,27,15,20,17,8,8,10,10,6,2,3,4,2,2,3,2,2,0,0,2,0,0,1,0,0,0],[4,9,28,54,67,61,64,61,47,43,36,25,26,35,21,16,8,9,6,7,10,9,4,3,3,3,6,0,1,0,0,1,0,0,0,0,0,0],[3,4,6,16,23,46,62,60,71,51,44,40,25,34,23,27,15,15,17,6,17,9,5,6,3,5,6,1,5,1,1,4,1,0,1,0,0,0],[1,4,5,15,25,35,34,38,47,43,41,32,31,33,26,20,32,26,15,22,17,15,13,6,5,5,3,3,4,4,2,3,1,1,2,0,0,0],[0,1,2,6,8,15,36,40,41,54,47,41,44,49,46,42,41,38,36,29,30,22,18,20,9,7,13,5,9,4,1,5,4,3,3,1,0,0],[0,3,3,1,5,8,19,28,51,55,54,65,92,80,96,71,77,92,77,93,70,80,69,62,53,42,46,45,40,28,17,32,20,18,13,2,3,1]];
@@ -518,7 +170,6 @@ function dark(){const t=document.documentElement.getAttribute('data-theme');
 function cat(i){return CATB[i%CATB.length];}
 function ord(i){return seq(6)[i%6];}
 function withA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
-
 function base(){
   const ink=css('--ink'),ink2=css('--ink2'),muted=css('--muted'),grid=css('--grid'),axis=css('--axis');
   Chart.defaults.font.family=css('--sans')||'system-ui';
@@ -537,22 +188,19 @@ function base(){
   };
 }
 const years=a=>a.map(r=>r.year);
-
-// pivot long [{year,key,val}] -> {labels, map:{k:[..]}}
 function pivot(rows,keyf,valf,keys){
   const yrs=[...new Set(rows.map(r=>r.year))].sort((a,b)=>a-b);
   const map={}; keys.forEach(k=>map[k]=yrs.map(()=>0));
   rows.forEach(r=>{const k=keyf(r); if(map[k]) map[k][yrs.indexOf(r.year)]+=valf(r);});
   return {yrs,map};
 }
-function toPct(cols){ // cols: array of series arrays -> percentage per column index
+function toPct(cols){
   const n=cols[0].length, tot=Array(n).fill(0);
   cols.forEach(s=>s.forEach((v,i)=>tot[i]+=v));
   return cols.map(s=>s.map((v,i)=>tot[i]?+(100*v/tot[i]).toFixed(2):0));
 }
-
 function stackedBar(id,labels,names,series,colorf,mode0){
-  if(!document.getElementById(id))return;   // figure not on this page — skip
+  if(!document.getElementById(id))return;
   const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
   let mode=mode0||'abs';
   const build=()=>{
@@ -568,7 +216,7 @@ function stackedBar(id,labels,names,series,colorf,mode0){
   charts.push({chart:c,rebuild:()=>{const oo=base();oo.scales.x.stacked=true;oo.scales.y.stacked=true;
     if(mode==='pct'){oo.scales.y.max=100;oo.scales.y.ticks.callback=v=>v+'%';}else{oo.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
     c.options=oo;c.data.datasets=build();c.update('none');}});
-  // hook toggles that share this figure
+
   const fig=document.getElementById(id).closest('figure');
   fig.querySelectorAll('.toggle[data-mode]').forEach(btn=>btn.onclick=()=>{
     mode=btn.dataset.mode;
@@ -579,9 +227,8 @@ function stackedBar(id,labels,names,series,colorf,mode0){
   });
   return c;
 }
-
 function lineChart(id,labels,datasets,tweak){
-  if(!document.getElementById(id))return;   // figure not on this page — skip
+  if(!document.getElementById(id))return;
   const mk=()=>{const o=base(); if(tweak)tweak(o); return o;};
   const c=new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:datasets()},options:mk()});
   charts.push({chart:c,rebuild:()=>{c.options=mk();c.data.datasets=datasets();c.update('none');}});
@@ -590,106 +237,42 @@ function lineChart(id,labels,datasets,tweak){
 
 function renderAll(){
   charts.splice(0).forEach(c=>c.chart.destroy());
-  if(f7chart){f7chart.destroy();f7chart=null;}
-  if(f7dchart){f7dchart.destroy();f7dchart=null;}
   if(f7fchart){f7fchart.destroy();f7fchart=null;}
 
-  // F1a — area line
   lineChart('f1a',years(DATA.f1a),()=>[{label:'Submissions',data:DATA.f1a.map(r=>r.papers),
     borderColor:cat(0),backgroundColor:withA(cat(0),.14),borderWidth:2,
     fill:true,tension:.25,pointRadius:0,pointHoverRadius:4}]);
 
-  // F1b — subjects, folded to 6
   {const keep=['Computer Science','Physics','Mathematics','Statistics','Elec Eng & Systems'];
    const names=[...keep,'Other'];
    const rows=DATA.f1b.map(r=>({year:r.year,k:keep.includes(r.subject_group)?r.subject_group:'Other',v:r.papers}));
    const {yrs,map}=pivot(rows,r=>r.k,r=>r.v,names);
-   stackedBar('f1b',yrs,names,names.map(n=>map[n]),seqf(names.length),'pct');
-   // F1c — year-over-year growth rate per group (derived), from 2005
-   const start=yrs.indexOf(2005), yy=yrs.slice(start);
-   const g1c=['Computer Science','Physics','Mathematics'];
-   lineChart('f1c',yy,()=>g1c.map(nm=>{
-     const s=map[nm];
-     return {label:nm,data:yy.map(y=>{const j=yrs.indexOf(y),prev=s[j-1];
-       return prev>0?Math.min(60,+(100*(s[j]-prev)/prev).toFixed(1)):null;}),
-       borderColor:cat(names.indexOf(nm)),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25,spanGaps:true};
-   }),o=>{o.scales.y.max=60; o.scales.y.ticks.callback=v=>v+'%';});}
+   stackedBar('f1b',yrs,names,names.map(n=>map[n]),seqf(names.length),'pct');}
 
-  // F2 — author buckets, ordinal
   {const b=DATA.f2_buckets;
    stackedBar('f2',years(DATA.f2),b,b.map(k=>DATA.f2.map(r=>r[k])),ord,'abs');}
 
-  // F2b — CS author buckets, ordinal
-  {const b=DATA.f2cs_buckets;
-   stackedBar('f2cs',years(DATA.f2cs),b,b.map(k=>DATA.f2cs.map(r=>r[k])),ord,'abs');}
-
-  // F3 — CS subdisciplines
-  {const cats=DATA.f3_cats;
-   const {yrs,map}=pivot(DATA.f3,r=>r.primary_category,r=>r.papers,cats);
-   stackedBar('f3',yrs,cats,cats.map(k=>map[k]),seqf(cats.length),'abs');}
-
-  // F4 — mean/median with ±sd band
-  lineChart('f4',years(DATA.f4),()=>{
-    const mean=DATA.f4.map(r=>r.mean),sd=DATA.f4.map(r=>r.std),med=DATA.f4.map(r=>r.median);
-    const up=mean.map((m,i)=>+(m+sd[i]).toFixed(2)),lo=mean.map((m,i)=>Math.max(0,+(m-sd[i]).toFixed(2)));
-    const band=withA(cat(0),.13);
-    return [
-      {label:'+1 s.d.',data:up,borderColor:'transparent',backgroundColor:band,fill:'+1',pointRadius:0,tension:.25},
-      {label:'−1 s.d.',data:lo,borderColor:'transparent',backgroundColor:band,fill:false,pointRadius:0,tension:.25},
-      {label:'Mean',data:mean,borderColor:cat(0),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25},
-      {label:'Median',data:med,borderColor:cat(1),borderWidth:2,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,tension:.25}
-    ];
-  });
-
-  // F5 — annual output by career bucket
-  {const {yrs,map}=pivot(DATA.f5,r=>r.bucket,r=>r.mean_output,DATA.f5_buckets);
-   // mean_output is an average, not additive — rebuild as plain lines
-   lineChart('f5',yrs,()=>DATA.f5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
-     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
-
-  // F6a — region absolute
-  lineChart('f6a',years(DATA.f6),()=>{
-    const s=[['China','china'],['United States','us'],['Other','other']];
-    return s.map(([nm,k],i)=>({label:nm,data:DATA.f6.map(r=>r[k]),borderColor:cat(i),
-      backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}));
-  });
-
-  // F6b — region share (stackedBar in 'pct' mode already renders 0–100%)
-  {const s=[['China','china'],['United States','us'],['Other','other']];
-   stackedBar('f6b',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),seqf(s.length),'pct');}
-
-  // F6c — growth indexed to 2021 = 100
-  lineChart('f6c',years(DATA.f6),()=>{
-    const s=[['China','china'],['United States','us'],['Other','other']];
-    return s.map(([nm,k],i)=>{const v=DATA.f6.map(r=>r[k]),v0=v[0];
-      return {label:nm,data:v.map(x=>+(100*x/v0).toFixed(0)),borderColor:cat(i),
-        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};});
-  });
-
-  // F6d — combined: indexed growth (left) + share (right)
   {const s=[['China','china'],['United States','us'],['Other','other']];
    lineChart('f6cbl',years(DATA.f6),()=>s.map(([nm,k],i)=>{const v=DATA.f6.map(r=>r[k]),v0=v[0];
      return {label:nm,data:v.map(x=>+(100*x/v0).toFixed(0)),borderColor:cat(i),
        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};}));
    stackedBar('f6cbr',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),seqf(s.length),'pct');}
 
-  // F7 — first-author seniority over time (region/venue filtered)
-  drawF7();
-
-  // F7c — new PhD-student first-authors per year by region (drop censored 2021)
   {const regs=[['China','China'],['United States','US'],['Other','Other']];
    const rows=DATA.newphd.filter(r=>r.year>=2022 && r.year<=2025);
    const {yrs,map}=pivot(rows,r=>r.region,r=>r.n,['China','US','Other']);
    lineChart('f7c',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
      backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));}
 
-  // F7d — submissions per person by seniority (mean/median toggle)
-  drawF7d();
-
-  // F7f — first-author papers per person by seniority (mean/median toggle)
   drawF7f();
 
-  // F7g — mean with 25–75 candles (floating IQR bar + mean marker)
+  {const {yrs,map}=pivot(DATA.f5,r=>r.bucket,r=>r.mean_output,DATA.f5_buckets);
+   lineChart('f5',yrs,()=>DATA.f5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
+     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
+  {const {yrs,map}=pivot(DATA.m5,r=>r.bucket,r=>r.mean_output,DATA.m5_buckets);
+   lineChart('f11',yrs,()=>DATA.m5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
+     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
+
   {const el=document.getElementById('f7g');
    if(el && DATA.f7g){
      const o=base(); o.scales.y.min=0;
@@ -704,7 +287,6 @@ function renderAll(){
    }
   }
 
-  // F17 — big-3 submissions (left) + unique PhD-student authors (right)
   if(DATA.confpapers){
     const yrs=[...new Set(DATA.confpapers.map(r=>r.year))].sort((a,b)=>a-b);
     const V=[['NeurIPS','nips'],['ICML','icml'],['ICLR','iclr']];
@@ -721,82 +303,6 @@ function renderAll(){
       o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
   }
 
-  // F7e — first-author PhD-student submissions, China vs US (from DATA.fa)
-  {const yrs=[...new Set(DATA.fa.map(r=>r.year))].sort((a,b)=>a-b);
-   const mk=reg=>yrs.map(y=>DATA.fa.filter(r=>r.year===y&&r.region===reg&&r.seniority==='PhD student').reduce((s,r)=>s+r.n,0));
-   lineChart('f7e',yrs,()=>[
-     {label:'China',data:mk('China'),borderColor:cat(0),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
-     {label:'United States',data:mk('US'),borderColor:cat(1),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}
-   ]);}
-
-  // Mathematics — Figures 8-11 (mirror of CS)
-  {const b=DATA.m2_buckets;
-   stackedBar('f8',years(DATA.m2),b,b.map(k=>DATA.m2.map(r=>r[k])),ord,'abs');}
-  {const cats=DATA.m3_cats;
-   const {yrs,map}=pivot(DATA.m3,r=>r.primary_category,r=>r.papers,cats);
-   stackedBar('f9',yrs,cats,cats.map(k=>map[k]),seqf(cats.length),'abs');}
-  lineChart('f10',years(DATA.m4),()=>{
-    const mean=DATA.m4.map(r=>r.mean),sd=DATA.m4.map(r=>r.std),med=DATA.m4.map(r=>r.median);
-    const up=mean.map((m,i)=>+(m+sd[i]).toFixed(2)),lo=mean.map((m,i)=>Math.max(0,+(m-sd[i]).toFixed(2)));
-    const band=withA(cat(0),.13);
-    return [
-      {label:'+1 s.d.',data:up,borderColor:'transparent',backgroundColor:band,fill:'+1',pointRadius:0,tension:.25},
-      {label:'−1 s.d.',data:lo,borderColor:'transparent',backgroundColor:band,fill:false,pointRadius:0,tension:.25},
-      {label:'Mean',data:mean,borderColor:cat(0),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25},
-      {label:'Median',data:med,borderColor:cat(1),borderWidth:2,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,tension:.25}
-    ];});
-  {const {yrs,map}=pivot(DATA.m5,r=>r.bucket,r=>r.mean_output,DATA.m5_buckets);
-   lineChart('f11',yrs,()=>DATA.m5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
-     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
-
-  // F12/F13 — ICLR acceptance over time
-  if(DATA.acc){
-    const yrs=DATA.acc.map(r=>r.year);
-    stackedBar('f12',yrs,['Accepted','Rejected','Withdrawn / other'],
-      [DATA.acc.map(r=>r.accepted),DATA.acc.map(r=>r.rejected),DATA.acc.map(r=>r.withdrawn_other)],
-      i=>seq(3)[2-i],'abs');   // accepted = darkest
-    lineChart('f13',yrs,()=>[{label:'Acceptance rate',
-      data:DATA.acc.map(r=>+(100*r.accepted/r.submissions).toFixed(1)),
-      borderColor:cat(0),backgroundColor:withA(cat(0),.13),
-      borderWidth:2,fill:true,tension:.25,pointRadius:2.5,pointHoverRadius:5}],
-      o=>{o.scales.y.min=0; o.scales.y.max=50; o.scales.y.ticks.callback=v=>v+'%';});
-  }
-
-  // F14a — PhD headcount (a count); F14b — papers per student (a rate)
-  if(DATA.phddec){
-    const yrs=DATA.phddec.map(r=>r.year);
-    stackedBar('f14a',yrs,['Distinct PhD students'],[DATA.phddec.map(r=>r.students)],cat,'abs');
-    lineChart('f14b',yrs,()=>[
-      {label:'All authorship',data:DATA.phddec.map(r=>r.papers_per_student),
-        borderColor:cat(1),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
-      {label:'First-author only',data:DATA.phddec.map(r=>r.fa_per_student),
-        borderColor:cat(2),borderWidth:2,borderDash:[5,4],pointRadius:2.5,pointHoverRadius:5,tension:.2}
-    ],o=>{o.scales.y.min=0; o.scales.y.suggestedMax=2;});
-  }
-
-  // F16 — first-author papers per person (LLM control)
-  if(DATA.faperson){
-    const yrs=DATA.faperson.map(r=>r.year);
-    lineChart('f16',yrs,()=>[
-      {label:'All arXiv',data:DATA.faperson.map(r=>r.all_fields),borderColor:cat(0),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25},
-      {label:'Computer Science',data:DATA.faperson.map(r=>r.cs),borderColor:cat(1),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25},
-      {label:'Mathematics',data:DATA.faperson.map(r=>r.math),borderColor:cat(2),borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}
-    ],o=>{o.scales.y.suggestedMin=1; o.scales.y.suggestedMax=1.6;});
-  }
-
-  // F15 — 2026 pace: arXiv YTD (Jan–cutoff) by year, all + CS
-  if(DATA.ytd){
-    const yrs=DATA.ytd.map(r=>r.year);
-    const mn=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][DATA.ytd_month]||'';
-    lineChart('f15',yrs,()=>[
-      {label:'All arXiv (Jan–'+mn+')',data:DATA.ytd.map(r=>r.ytd_papers),borderColor:cat(0),
-        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2},
-      {label:'Computer Science',data:DATA.ytd.map(r=>r.ytd_cs),borderColor:cat(1),
-        borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2}
-    ],o=>{o.scales.y.min=0; o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
-  }
-
-  // Ftenure — tenure histogram of the 31+ solo authors (% of group)
   {const el=document.getElementById('ftenure');
    if(el){const o=base(); o.scales.y.ticks.callback=v=>v+'%';
      const c=new Chart(el,{type:'bar',data:{labels:TEN_BK,datasets:[
@@ -807,7 +313,6 @@ function renderAll(){
   drawRidge();
 }
 
-// ---- Figure 22: tenure ridgeline (custom SVG) ----
 function drawRidge(){
   const host=document.getElementById('ridge'); if(!host) return;
   const ink2=css('--ink2'),muted=css('--muted'),grid=css('--grid'),axis=css('--axis');
@@ -854,69 +359,20 @@ function drawRidge(){
   host.appendChild(leg);
 }
 
-// ---- Figure 7: first-author seniority, filtered by region & venue ----
-let f7region='all', f7venue='all', f7basis='first', f7scale='pct', f7chart=null;
-function f7data(){
-  const src=f7basis==='first'?DATA.fa:DATA.fa_all;
-  const yrs=[...new Set(src.map(r=>r.year))].sort((a,b)=>a-b);
-  const order=DATA.f7_order;
-  const series=order.map(()=>yrs.map(()=>0));
-  src.forEach(r=>{
-    if(f7region!=='all'&&r.region!==f7region)return;
-    if(f7venue!=='all'&&r.venue!==f7venue)return;
-    const si=order.indexOf(r.seniority); if(si<0)return;
-    series[si][yrs.indexOf(r.year)]+=r.n;
-  });
-  return {yrs,order,series};
-}
-function drawF7(){
-  if(!document.getElementById('f7'))return;
-  if(f7chart)f7chart.destroy();
-  const {yrs,order,series}=f7data();
-  const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
-  const vals=f7scale==='pct'?toPct(series):series;
-  if(f7scale==='pct'){o.scales.y.max=100; o.scales.y.ticks.callback=v=>v+'%';}
-  else{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
-  f7chart=new Chart(document.getElementById('f7'),{type:'bar',data:{labels:yrs,
-    datasets:order.map((nm,i)=>({label:nm,data:vals[i],backgroundColor:seq(order.length)[i],
-      borderColor:css('--surface'),borderWidth:{top:2,right:0,bottom:0,left:0},
-      borderRadius:3,maxBarThickness:34,stack:'s'}))},options:o});
-}
-function wireF7(attr,set,redraw){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
-  set(b.dataset[attr.replace('data-','').replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]);
-  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));(redraw||drawF7)();});}
-wireF7('data-f7region',v=>f7region=v);
-wireF7('data-f7venue',v=>f7venue=v);
-wireF7('data-f7basis',v=>f7basis=v);
-wireF7('data-f7scale',v=>f7scale=v);
-
-// ---- Figure 7d: submissions per person by seniority (mean/median) ----
-let f7dstat='mean', f7dchart=null;
-function drawF7d(){
-  if(!document.getElementById('f7d'))return;
-  if(f7dchart)f7dchart.destroy();
-  const order=DATA.f7_order;
-  const {yrs,map}=pivot(DATA.f7d.map(r=>({year:r.year,k:r.seniority,v:r[f7dstat]})),
-                        r=>r.k,r=>r.v,order);
-  const o=base();
-  f7dchart=new Chart(document.getElementById('f7d'),{type:'line',data:{labels:yrs,
-    datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
-      borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
-}
-wireF7('data-f7dstat',v=>f7dstat=v,drawF7d);
-
-// ---- Figure 7f: first-author papers per person by seniority (mean/median) ----
 let f7fmetric='fa', f7fchart=null;
 function drawF7f(){
   if(!document.getElementById('f7f'))return;
   if(f7fchart)f7fchart.destroy();
   const order=DATA.f7_order, o=base();
-  const src=f7fmetric==='fa'?DATA.f7f:DATA.f7d;   // mean first-author vs mean all submissions
+  const src=f7fmetric==='fa'?DATA.f7f:DATA.f7d;
   const {yrs,map}=pivot(src.map(r=>({year:r.year,k:r.seniority,v:r.mean})),r=>r.k,r=>r.v,order);
   f7fchart=new Chart(document.getElementById('f7f'),{type:'line',data:{labels:yrs,
     datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
       borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
 }
+function wireF7(attr,set,redraw){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
+  set(b.dataset[attr.replace('data-','').replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]);
+  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));redraw();});}
 wireF7('data-f7fmetric',v=>f7fmetric=v,drawF7f);
 
 const _tb=document.getElementById('themeBtn');
@@ -926,7 +382,7 @@ if(_tb) _tb.onclick=()=>{
   document.documentElement.setAttribute('data-theme',next);
   renderAll();
 };
-// ---- Figure 18: world map of author-country growth (D3) ----
+
 function initWorldMap(){
   if(typeof d3==='undefined' || typeof WORLD==='undefined') return;
   const svgEl=document.getElementById('wm-svg');
@@ -966,7 +422,7 @@ function initWorldMap(){
   document.querySelectorAll('[data-wmperiod]').forEach(b=>b.onclick=()=>{period=b.dataset.wmperiod;
     document.querySelectorAll('[data-wmperiod]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
   render();
-  // crop the country list to the rendered map height
+
   const syncH=()=>{const h=svgEl.getBoundingClientRect().height;
     if(h>40) document.getElementById('wm-list').style.maxHeight=Math.round(h)+'px';};
   requestAnimationFrame(syncH);

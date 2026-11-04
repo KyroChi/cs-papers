@@ -104,18 +104,14 @@ DISTILL = '<script src="https://distill.pub/template.v2.js"></script>\n'
 D3 = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
 GEO = os.path.join(HERE, "distill", "world.geo.json")
 
-
 def parse_template(tpl):
-    runtime = re.findall(r"<script>.*?</script>", tpl, re.S)[-1]  # render code
+    runtime = re.findall(r"<script>.*?</script>", tpl, re.S)[-1]
     figs = {}
     for block in re.findall(r"<figure\b.*?</figure>", tpl, re.S):
-        # Prefer an explicit data-fig slug; fall back to the first canvas id.
         m = re.search(r'data-fig="([\w-]+)"', block) or re.search(r'id="f([\w-]+)"', block)
         if m:
-            # distill: wide figures span the page column
             figs[m.group(1)] = block.replace('class="fig-wide"', 'class="l-page"')
     return runtime, figs
-
 
 def parse_captions(path):
     """distill/figures.md -> {fid: (heading, caption_html)}.
@@ -146,7 +142,6 @@ def parse_captions(path):
     flush()
     return caps
 
-
 def build_figcaption(block, number, heading):
     """Replace the figure's <figcaption> with `Figure N. <heading>`.
 
@@ -163,7 +158,6 @@ def build_figcaption(block, number, heading):
         return block[:m.start()] + newcap + block[m.end():]
     return block
 
-
 def apply_sub(block, caption):
     """Set the figure's grey sub-caption from figures.md (empty -> remove it)."""
     if re.search(r'<p class="sub"', block):
@@ -172,19 +166,17 @@ def apply_sub(block, caption):
                           lambda mm: f"{mm.group(1)}{caption}{mm.group(2)}",
                           block, count=1, flags=re.S)
         return re.sub(r'\s*<p class="sub"[^>]*>.*?</p>', "", block, count=1, flags=re.S)
-    if caption:  # no sub line existed -> add one right after the caption
+    if caption:
         return re.sub(r'(</figcaption>)',
                       lambda mm: f'{mm.group(1)}\n    <p class="sub">{caption}</p>',
                       block, count=1)
     return block
-
 
 def front_matter(md):
     m = re.match(r"^---\n(.*?)\n---\n(.*)$", md, re.S)
     if m:
         return yaml.safe_load(m.group(1)) or {}, m.group(2)
     return {}, md
-
 
 def main():
     tpl = open(TEMPLATE, encoding="utf-8").read()
@@ -194,18 +186,15 @@ def main():
 
     raw = open(POST, encoding="utf-8").read()
     fm, md = front_matter(raw)
-    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)         # drop authoring notes
+    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
     body = markdown.markdown(md, extensions=["extra", "sane_lists", "toc"])
 
-    # Number figures by order of first appearance in the post (so the distill
-    # post is self-consistent regardless of the template library's own numbers).
     order = []
     for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
         if fid in figs and fid not in order:
             order.append(fid)
     fignum = {fid: i + 1 for i, fid in enumerate(order)}
 
-    # inject figures
     missing, counts = [], {}
     for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
         counts[fid] = counts.get(fid, 0) + 1
@@ -221,17 +210,14 @@ def main():
             return f"<!-- unknown figure: {fid} -->"
         block = figs[fid]
         heading, caption = caps.get(fid, (None, None))
-        # The number is assigned from post order; the heading comes from
-        # figures.md (falling back to the template's own figcaption text).
         block = build_figcaption(block, fignum.get(fid), heading)
-        if caption is not None:   # caption given in figures.md (may be empty)
+        if caption is not None:
             block = apply_sub(block, caption)
         return block
 
     body = re.sub(r"<p>\s*\{\{\s*fig:([\w-]+)\s*\}\}\s*</p>", repl, body)
     body = re.sub(r"\{\{\s*fig:([\w-]+)\s*\}\}", repl, body)
 
-    # Resolve {{figref:ID}} prose references to the figure's assigned number.
     bad_refs = sorted({f for f in re.findall(r"\{\{\s*figref:([\w-]+)\s*\}\}", body)
                        if f not in fignum})
     body = re.sub(r"\{\{\s*figref:([\w-]+)\s*\}\}",
@@ -294,7 +280,6 @@ def main():
     open(OUT, "w", encoding="utf-8").write(out)
     used = len(re.findall(r"<figure\b", body))
     print(f"Wrote {OUT} ({len(out)} bytes, {used} figures)")
-
 
 if __name__ == "__main__":
     main()

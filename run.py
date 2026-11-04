@@ -18,12 +18,10 @@ import duckdb
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data", "arxiv_metadata.parquet")
 
-
 def connect():
     if not os.path.exists(DATA):
         sys.exit("Data not found. Run: python download_data.py")
     con = duckdb.connect()
-    # Cap memory (4 GiB) and spill to disk — bounded well below machine RAM.
     con.execute("SET memory_limit='4GB'")
     con.execute("SET threads=2")
     con.execute("SET preserve_insertion_order=false")
@@ -31,13 +29,11 @@ def connect():
     con.execute(f"SET file_search_path = '{HERE}'")
     with open(os.path.join(HERE, "setup.sql")) as fh:
         con.execute(fh.read())
-    # Conference views (NeurIPS/ICML/ICLR) — only if that data is present.
     import glob
     if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
         with open(os.path.join(HERE, "conf_setup.sql")) as fh:
             con.execute(fh.read())
     return con
-
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
@@ -53,7 +49,6 @@ def main():
     elif args.sql:
         sql = args.sql
     else:
-        # interactive shell
         print("arXiv DuckDB shell. Views: papers, papers_enriched. Ctrl-D to exit.")
         while True:
             try:
@@ -63,20 +58,16 @@ def main():
             if line.strip():
                 try:
                     con.sql(line).show(max_rows=100)
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
                     print("ERROR:", e)
         return
 
-    # Support multi-statement .sql files: show each SELECT's result.
-    # Strip line comments first so a ';' inside a comment doesn't split a
-    # statement (our SQL has no '--' inside string literals).
     no_comments = "\n".join(line.split("--", 1)[0] for line in sql.splitlines())
     statements = [s.strip() for s in no_comments.split(";") if s.strip()]
     for stmt in statements:
         rel = con.sql(stmt)
         if rel is not None:
             rel.show(max_rows=200)
-
 
 if __name__ == "__main__":
     main()

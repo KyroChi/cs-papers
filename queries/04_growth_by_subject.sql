@@ -1,5 +1,3 @@
--- Q4a. Which subjects are driving the increase? Papers per coarse group per year.
--- Pivot-style: one row per year, one column per major arXiv group.
 SELECT
     year,
     count(*) FILTER (WHERE subject_group = 'Computer Science')     AS cs,
@@ -15,8 +13,6 @@ WHERE year IS NOT NULL AND year <= year(current_date)
 GROUP BY year
 ORDER BY year;
 
--- Q4b. Which single categories grew most in the last decade (absolute add)?
--- Compares a recent full year to one 10 years earlier.
 WITH by_cat AS (
     SELECT primary_category,
            count(*) FILTER (WHERE year = year(current_date) - 1) AS recent,

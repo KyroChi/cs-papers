@@ -15,11 +15,10 @@ import json
 import os
 import urllib.request
 
-VENUES = ("nips", "icml", "iclr")  # nips == NeurIPS in this archive
+VENUES = ("nips", "icml", "iclr")
 TREE_API = "https://api.github.com/repos/papercopilot/openreview/git/trees/main?recursive=1"
 RAW = "https://raw.githubusercontent.com/papercopilot/openreview/main/"
 DEST = os.path.join(os.path.dirname(__file__), "data", "conf")
-
 
 def list_author_files():
     with urllib.request.urlopen(TREE_API) as r:
@@ -30,7 +29,6 @@ def list_author_files():
         and any(x["path"].startswith(f"authors/{v}/") for v in VENUES)
         and x["path"].endswith(".jsonl")
     ]
-
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
@@ -47,7 +45,6 @@ def main():
         urllib.request.urlretrieve(RAW + p, out)
         print(f"  {os.path.getsize(out) / 1e6:6.2f} MB  {os.path.basename(out)}")
     print(f"Done -> {DEST}")
-
 
 if __name__ == "__main__":
     main()

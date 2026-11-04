@@ -18,7 +18,6 @@ TREE = "https://api.github.com/repos/berenslab/iclr-dataset/git/trees/main?recur
 RAW = "https://raw.githubusercontent.com/berenslab/iclr-dataset/main/"
 DEST = os.path.join(os.path.dirname(__file__), "data", "iclr_decisions")
 
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--force", action="store_true")
@@ -37,7 +36,6 @@ def main():
         urllib.request.urlretrieve(RAW + p, out)
         print(f"  {os.path.getsize(out)/1e6:6.2f} MB  {os.path.basename(out)}")
     print(f"Done -> {DEST}")
-
 
 if __name__ == "__main__":
     main()

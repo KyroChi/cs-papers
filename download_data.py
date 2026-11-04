@@ -21,7 +21,6 @@ URL = (
 )
 DEST = os.path.join(os.path.dirname(__file__), "data", "arxiv_metadata.parquet")
 
-
 def _progress(block_num, block_size, total_size):
     done = block_num * block_size
     if total_size > 0:
@@ -30,7 +29,6 @@ def _progress(block_num, block_size, total_size):
             f"\r  {pct:3d}%  {done / 1e9:5.2f} / {total_size / 1e9:5.2f} GB"
         )
         sys.stdout.flush()
-
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
@@ -46,7 +44,6 @@ def main():
     print(f"Downloading arXiv metadata (~1.6 GB) ->\n  {DEST}")
     urllib.request.urlretrieve(URL, DEST, _progress)
     print(f"\nDone: {os.path.getsize(DEST) / 1e9:.2f} GB")
-
 
 if __name__ == "__main__":
     main()

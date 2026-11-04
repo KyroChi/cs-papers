@@ -1,12 +1,3 @@
--- Q5. The "PhD students?" proxy. Metadata has no seniority field, so we
--- approximate early-career researchers by FIRST APPEARANCE of an author name.
---
--- Method: explode each paper into (author, year), find each author's first
--- year on arXiv, then count how many authors debut each year and how many
--- papers are written entirely by first-year authors.
---
--- BIG CAVEAT: name collisions. "Y. Wang" is thousands of people; initials
--- merge distinct authors. Treat these numbers as directional, not exact.
 WITH exploded AS (
     SELECT
         trim(a) AS author,

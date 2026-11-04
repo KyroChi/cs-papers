@@ -1,6 +1,3 @@
--- Q11. [needs data/conf] Who are the authors, by seniority, over time.
--- Share of author-instances by seniority tier, per venue per year. This is the
--- direct (self-reported) answer to "is it PhD students?" for top-ML venues.
 SELECT
     venue, year,
     count(*) FILTER (WHERE seniority <> 'Unknown')  AS known_positions,

@@ -1,5 +1,3 @@
--- Q3. Are teams getting bigger? Mean/median authors per paper per year.
--- Median is robust to huge-collaboration outliers (e.g. 1000-author physics).
 SELECT
     year,
     count(*)                             AS papers,

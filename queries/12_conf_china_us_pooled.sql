@@ -1,7 +1,3 @@
--- Q12. [needs data/conf] The headline China-vs-US trend, pooled across all
--- three venues, with an ACADEMIA-ONLY cut (unambiguous domains: .edu/.edu.cn/
--- .ac.*) alongside the all-sectors cut. Academia-only removes the multinational-
--- company HQ ambiguity, so it is the cleanest read.
 SELECT
     year,
     count(*) FILTER (WHERE domain <> '')                                        AS authorships_all,

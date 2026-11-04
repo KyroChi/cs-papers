@@ -1,8 +1,3 @@
--- Q6. Decompose the surge. Between a baseline year and a recent year, how
--- much of the TOTAL added volume came from each subject group, and from each
--- author-count bucket? This directly answers "who/what is responsible."
---
--- Edit :baseline / :recent below (defaults: 10 years apart).
 WITH bounds AS (
     SELECT year(current_date) - 11 AS baseline, year(current_date) - 1 AS recent
 ),
@@ -20,7 +15,6 @@ tagged AS (
     FROM papers_enriched, bounds
     WHERE year IN (bounds.baseline, bounds.recent) AND author_count > 0
 )
--- contribution to growth by subject group
 SELECT
     'subject_group' AS dimension, subject_group AS value,
     count(*) FILTER (WHERE year = (SELECT baseline FROM bounds)) AS baseline_papers,

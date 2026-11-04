@@ -1,14 +1,3 @@
--- Q7. Last-author seniority in CS. In CS the last author is conventionally the
--- senior/PI. We measure the last author's:
---   * career age = paper year - the year that name first appeared on arXiv
---   * career output = total arXiv papers that name is on (any position)
--- and track it over time and against team size.
---
--- CAVEATS: (1) name collisions inflate output and understate career age for
--- common names ("Y. Wang"); (2) last-author-as-senior is a CS convention, not
--- a rule (many subfields use alphabetical or contribution order). Directional.
---
--- Author string is cleaned of parenthetical affiliations, e.g. "Smith (MIT)".
 
 CREATE OR REPLACE TEMP MACRO author_list(s) AS
     list_filter(
@@ -18,7 +7,6 @@ CREATE OR REPLACE TEMP MACRO author_list(s) AS
         x -> trim(x) <> '' AND NOT regexp_matches(lower(trim(x)), '^et\.? ?al\.?$')
     );
 
--- one row per (author, paper-year) across ALL of arXiv, for debut + output
 CREATE OR REPLACE TEMP TABLE author_stats AS
 WITH exploded AS (
     SELECT trim(a) AS author, CAST(year(first_version_date) AS INTEGER) AS year
@@ -28,7 +16,6 @@ WITH exploded AS (
 SELECT author, min(year) AS debut_year, count(*) AS career_papers
 FROM exploded GROUP BY author;
 
--- CS papers with their last author resolved
 CREATE OR REPLACE TEMP TABLE cs_last AS
 SELECT
     p.paper_id,
@@ -38,7 +25,6 @@ SELECT
 FROM papers p
 WHERE p.primary_category LIKE 'cs.%' AND p.first_version_date IS NOT NULL;
 
--- A) by year: is the typical CS senior author getting older / more prolific?
 SELECT
     c.year,
     count(*)                                         AS cs_papers,
@@ -50,7 +36,6 @@ FROM cs_last c JOIN author_stats s ON c.last_author = s.author
 WHERE c.year BETWEEN 2000 AND year(current_date)
 GROUP BY c.year ORDER BY c.year;
 
--- B) recent CS (2020+): does a bigger team come with a more senior last author?
 SELECT
     CASE
         WHEN c.author_count = 1            THEN '1 (solo)'

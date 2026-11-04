@@ -1,6 +1,3 @@
--- Q2. Solo authors vs groups over time.
--- Buckets each paper by author count and shows the share per bucket per year.
--- Answers: "is the growth solo authors, or teams?"
 SELECT
     year,
     count(*) AS papers,

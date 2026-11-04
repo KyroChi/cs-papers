@@ -1,5 +1,3 @@
--- Q1. The baseline: how many papers per year, and year-over-year growth.
--- Establishes the "dramatic increase" everything else decomposes.
 SELECT
     year,
     count(*)                                            AS papers,

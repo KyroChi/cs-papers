@@ -12,12 +12,15 @@ GitHub Pages is enabled for this repo, it is served at
 
 **Writing it:** [`distill/post.md`](distill/post.md) has a YAML front-matter
 block (title, subtitle, authors, published, disclaimer) followed by plain
-Markdown. Drop any figure with a token on its own line, e.g. `{{fig:7f}}`.
-Rebuild with `make post`. `build_post.py` emits a genuine
-[distill.pub](https://distill.pub) article (`<d-title>`/`<d-byline>`/`<d-article>`,
-`template.v2.js` + MathJax), injects the referenced figures (interactive
-Chart.js from `distill/template.html`), and inlines the latest data + Chart.js.
-Figures you don't reference aren't shown.
+Markdown. Place a figure with a token on its own line, e.g.
+`{{fig:subs-per-person}}`, and reference one in prose with
+`{{figref:subs-per-person}}`. Figure headings and captions live in
+[`distill/figures.md`](distill/figures.md). Rebuild with `make post`.
+`build_post.py` emits a genuine [distill.pub](https://distill.pub) article
+(`<d-title>`/`<d-byline>`/`<d-article>`, `template.v2.js` + MathJax), injects the
+referenced figures (interactive Chart.js from `distill/template.html`), numbers
+them by order of appearance, and inlines the latest data + Chart.js. Figures you
+don't reference aren't shown. Agents: see [`AGENTS.md`](AGENTS.md).
 
 **Viewing:** open `distill/index.html` in a browser (`open distill/index.html`)
 or publish via GitHub Pages — both load the distill framework. Needs network
@@ -80,18 +83,20 @@ post` after editing prose, or `make all` for both.
 ## Layout
 
 ```
-distill/post.md      the prose (Markdown; edit this) with {{fig:ID}} tokens
-distill/template.html figure library + render code (interactive Chart.js blocks)
+distill/post.md      the prose (Markdown; edit this) with {{fig:SLUG}} tokens
+distill/figures.md   figure headings + captions (edit this; no numbers)
+distill/template.html figure library: one <figure> per chart + the render script
 distill/index.html   built, self-contained page (do not hand-edit)
 results/             figures.json (latest findings) + archive/ (per-run history)
 queries/             standalone DuckDB SQL for the arXiv metadata questions
 setup.sql            DuckDB views over the arXiv parquet
 conf_setup.sql       DuckDB views over the conference author files
 build_figures.py     compute all figure aggregates (memory-capped)
-build_post.py        Markdown prose + figures -> distill/index.html
-build_html.py        render template.html directly (all figures, for previewing)
+build_post.py        post.md + figures.md + figures -> distill/index.html
+build_html.py        render the figure library standalone (preview)
 run.py               ad-hoc SQL runner / shell
 download_*.py        fetch the external datasets
+AGENTS.md            orientation for coding agents
 ```
 
 ## Requirements

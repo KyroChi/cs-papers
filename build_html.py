@@ -19,7 +19,6 @@ CHARTJS = "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
 CDN_TAG = ('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/'
            '4.4.4/chart.umd.min.js"></script>')
 
-
 def main():
     a = sys.argv[1:]
     template = a[0] if len(a) > 0 else os.path.join(HERE, "distill", "template.html")
@@ -38,7 +37,6 @@ def main():
     html = html.replace(CDN_TAG, "<script>\n" + chartjs + "\n</script>")
     open(out, "w").write(html)
     print(f"Wrote {out} ({len(html)} bytes, cdnjs refs left: {html.count('cdnjs')})")
-
 
 if __name__ == "__main__":
     main()

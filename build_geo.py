@@ -13,12 +13,10 @@ URL = ("https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/"
        "geojson/ne_110m_admin_0_countries.geojson")
 OUT = os.path.join(os.path.dirname(__file__), "distill", "world.geo.json")
 
-
 def round_coords(x, nd=2):
     if isinstance(x, (int, float)):
         return round(x, nd)
     return [round_coords(v, nd) for v in x]
-
 
 def main():
     print("downloading Natural Earth 110m…")
@@ -39,7 +37,6 @@ def main():
     with open(OUT, "w") as fh:
         json.dump(out, fh, separators=(",", ":"))
     print(f"wrote {OUT} ({os.path.getsize(OUT)/1e3:.0f} KB, {len(feats)} countries)")
-
 
 if __name__ == "__main__":
     main()

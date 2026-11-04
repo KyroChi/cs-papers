@@ -1,6 +1,3 @@
--- Q10. [needs data/conf] China vs US vs rest at NeurIPS/ICML/ICLR over time.
--- Share of author-instances (each authorship counted) by institution country,
--- per venue per year. Company domains = HQ country (see conf_setup caveats).
 SELECT
     venue, year,
     count(*) FILTER (WHERE domain <> '')                    AS authorships,

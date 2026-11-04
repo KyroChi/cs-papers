@@ -14,27 +14,15 @@ import sys
 import duckdb
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# Findings are written to results/figures.json (the "latest", read by the
-# distill build) and archived per-run under results/archive/ so every re-run
-# is preserved.
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "results", "figures.json")
 
-# author-list expression. Parsing the raw `authors` display string:
-#   1. drop the trailing "((1) affil, (2) affil, ...)" affiliation block (nested
-#      parens the inner strip can't reach — the source of "Italy"/"Department of
-#      Physics"/country tokens);
-#   2. strip remaining inline "(affiliation)" parentheticals;
-#   3. split on commas and the standalone word "and";
-#   4. drop empties and "et al" / "et al." variants.
 AUTH = (r"list_filter(regexp_split_to_array("
         r"regexp_replace(regexp_replace(authors,'\s*\(\(.*$',''),'\([^)]*\)','','g'),"
         r"',|\s+and\s+'), x -> trim(x) <> '' "
         r"AND NOT regexp_matches(lower(trim(x)),'^et\.? ?al\.?$'))")
 
-
 def main():
     con = duckdb.connect()
-    # Cap memory (4 GiB) and spill to disk — bounded well below machine RAM.
     con.execute("SET memory_limit='4GB'")
     con.execute("SET threads=2")
     con.execute("SET preserve_insertion_order=false")
@@ -51,13 +39,11 @@ def main():
 
     fig = {}
 
-    # ---- Figure 1a: raw growth in submissions across all of arXiv ----
     fig["f1a"] = rows("""
         SELECT year, count(*) AS papers
         FROM papers_enriched WHERE year BETWEEN 1991 AND 2025
         GROUP BY year ORDER BY year""")
 
-    # ---- Figure 1b: relative distribution across major subjects (stacked) ----
     fig["f1b_groups"] = ['Computer Science','Physics','Mathematics','Statistics',
         'Elec Eng & Systems','Quantitative Biology','Economics','Quantitative Finance',
         'Other/Physics-misc']
@@ -66,8 +52,6 @@ def main():
         FROM papers_enriched WHERE year BETWEEN 1991 AND 2025
         GROUP BY year, subject_group ORDER BY year""")
 
-    # ---- Figure 2: author-count buckets {1, 2-3, 4-5, 6-8, 9+} ----
-    # (last bucket is >8; the given "8+"/"6-8" overlap is resolved non-overlapping)
     fig["f2_buckets"] = ['1','2-3','4-5','6-8','9+']
     fig["f2"] = rows("""
         SELECT year,
@@ -79,7 +63,6 @@ def main():
         FROM papers_enriched WHERE year BETWEEN 1991 AND 2025 AND author_count>0
         GROUP BY year ORDER BY year""")
 
-    # ---- Figure 2b: papers by number of authors, CS only ----
     fig["f2cs_buckets"] = ['1','2-3','4-5','6-8','9+']
     fig["f2cs"] = rows("""
         SELECT year,
@@ -92,7 +75,6 @@ def main():
         WHERE year BETWEEN 2000 AND 2025 AND author_count>0 AND primary_category LIKE 'cs.%'
         GROUP BY year ORDER BY year""")
 
-    # ---- Figure 3: top-5 CS sub-disciplines in 2026, tracked over time ----
     top5 = [r["primary_category"] for r in rows("""
         SELECT primary_category, count(*) c FROM papers_enriched
         WHERE primary_category LIKE 'cs.%' AND year=2025
@@ -105,7 +87,6 @@ def main():
         WHERE primary_category IN ({inlist}) AND year BETWEEN 2010 AND 2025
         GROUP BY year, primary_category ORDER BY year""")
 
-    # ---- Figures 4 & 5: CS per-author annual output ----
     con.execute(f"""
         CREATE TEMP TABLE cs_annual AS
         WITH ev AS (
@@ -116,15 +97,12 @@ def main():
         )
         SELECT author, year, count(*) AS n FROM ev GROUP BY author, year""")
 
-    # Fig 4: mean / std / median of annual output, per year
     fig["f4"] = rows("""
         SELECT year, round(avg(n),3) AS mean, round(stddev_samp(n),3) AS std,
                median(n) AS median, count(*) AS active_authors
         FROM cs_annual WHERE year BETWEEN 2005 AND 2025
         GROUP BY year ORDER BY year""")
 
-    # Fig 5: same annual output, split by cumulative career-total bucket
-    # buckets {1, 2-3, 4-8, 9-20, 21+} (non-overlapping resolution of 8-20/20+)
     fig["f5_buckets"] = ['1','2-3','4-8','9-20','21+']
     fig["f5"] = rows("""
         WITH cum AS (
@@ -144,7 +122,6 @@ def main():
         FROM b WHERE year BETWEEN 2005 AND 2025
         GROUP BY year, bucket ORDER BY year""")
 
-    # ==== Mathematics — mirror of the CS figures (8-11) ====
     fig["m2_buckets"] = ['1','2','3','4','5','6+']
     fig["m2"] = rows("""
         SELECT year,
@@ -194,9 +171,6 @@ def main():
         SELECT year, bucket, round(avg(n),3) AS mean_output, count(*) AS author_years
         FROM b WHERE year BETWEEN 2005 AND 2025 GROUP BY year, bucket ORDER BY year""")
 
-    # ---- Figure 16: first-author papers per person (LLM control, deep history) ----
-    # Controls for team-size growth by counting only first-authorships. Flat
-    # pre-2023 baseline; watch for a post-ChatGPT uptick.
     fig["faperson"] = rows(f"""
         WITH base AS (
           SELECT lower(trim(list_extract({AUTH}, 1))) AS fa, year, primary_category
@@ -211,7 +185,6 @@ def main():
           (SELECT round(avg(n),3) FROM m WHERE m.year=y.year) AS math
         FROM (SELECT DISTINCT year FROM base) y ORDER BY y.year""")
 
-    # ---- Figure 6: region (China / US / Other), conference submissions ----
     if "conf_paper_region" in [r["name"] for r in rows("SHOW TABLES")]:
         fig["f6"] = rows("""
             SELECT year,
@@ -221,14 +194,11 @@ def main():
             FROM conf_paper_region WHERE year BETWEEN 2021 AND 2025
             GROUP BY year ORDER BY year""")
 
-        # Figure 17 (left): raw papers submitted to each big-3 venue per year.
         fig["confpapers"] = rows("""
             SELECT venue, year, count(DISTINCT id) AS papers
             FROM conf_papers WHERE year BETWEEN 2019 AND 2025
             GROUP BY venue, year ORDER BY year""")
 
-        # World map: UNIQUE PhD-student authors per institution country per year
-        # (distinct profiles listing themselves as "PhD student").
         fig["countries"] = rows("""
             SELECT country, year, count(DISTINCT or_profile) AS n
             FROM conf_authors
@@ -236,7 +206,6 @@ def main():
               AND seniority = 'PhD student' AND or_profile <> ''
             GROUP BY country, year ORDER BY country, year""")
 
-        # Figure 7g: authors-per-paper distribution at the big-3, per year.
         fig["f7g"] = rows("""
             WITH pc AS (
               SELECT year, length(string_split(author, ';')) AS na
@@ -249,9 +218,6 @@ def main():
               count(*) AS papers
             FROM pc GROUP BY year ORDER BY year""")
 
-        # Figure 7: FIRST-AUTHOR seniority of submissions, finest grain
-        # (year x venue x region x seniority) so the page can filter/aggregate.
-        # Each paper counts once, by its first author's self-reported position.
         fig["f7_order"] = ['PhD student','Junior student (MS/UG)','Postdoc','Faculty',
             'Researcher (unspecified)','Industry/research staff','Other']
         fig["fa"] = rows("""
@@ -259,17 +225,12 @@ def main():
             FROM conf_authors
             WHERE author_no = 1 AND seniority <> 'Unknown' AND year BETWEEN 2021 AND 2025
             GROUP BY year, venue, region, seniority ORDER BY year""")
-        # all-author-instances basis (every authorship counted, incl. PIs on
-        # many papers) — the earlier metric; kept alongside first-author.
         fig["fa_all"] = rows("""
             SELECT year, venue, region, seniority, count(*) AS n
             FROM conf_authors
             WHERE seniority <> 'Unknown' AND year BETWEEN 2021 AND 2025
             GROUP BY year, venue, region, seniority ORDER BY year""")
 
-        # Figure 7c: NEW PhD-student first-authors per year, by region.
-        # debut = first year a profile appears as a PhD-student first author
-        # (proxy for new publishing PhD students). 2021 is left-censored.
         fig["newphd"] = rows("""
             WITH p AS (
               SELECT or_profile, year, region FROM conf_authors
@@ -282,8 +243,6 @@ def main():
             SELECT debut AS year, region, count(*) AS n
             FROM deb GROUP BY debut, region ORDER BY year""")
 
-        # Figure 7d: mean/median submissions per person per year, by seniority.
-        # subs = distinct papers a profile is an author on that year.
         fig["f7d"] = rows("""
             WITH pp AS (
               SELECT year, seniority, or_profile, count(DISTINCT id) AS subs
@@ -295,8 +254,6 @@ def main():
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
-        # Figure 7f: mean/median FIRST-AUTHOR papers per person per year, by
-        # seniority (how first-authorship concentrates by career stage).
         fig["f7f"] = rows("""
             WITH pp AS (
               SELECT year, seniority, or_profile,
@@ -309,8 +266,6 @@ def main():
                    count(*) AS people
             FROM pp GROUP BY year, seniority ORDER BY year""")
 
-        # Figure 14: PhD-student output decomposed — headcount, all-authorship
-        # per student, and FIRST-AUTHOR-only papers per student.
         fig["phddec"] = rows("""
             WITH s AS (
               SELECT year, or_profile, count(DISTINCT id) AS subs
@@ -327,7 +282,6 @@ def main():
             FROM sg JOIN fag USING(year)
             WHERE sg.year BETWEEN 2021 AND 2025 ORDER BY sg.year""")
 
-    # ---- Figures 12/13: ICLR acceptance over time (berenslab decisions) ----
     dec = glob.glob(os.path.join(HERE, "data", "iclr_decisions", "*.parquet"))
     if dec:
         best = max(dec, key=lambda p: con.sql(
@@ -344,7 +298,6 @@ def main():
             WHERE year BETWEEN 2017 AND 2025
             GROUP BY year ORDER BY year""")
 
-    # ---- 2026 so far: year-to-date pace vs prior years (same Jan–cutoff window) ----
     cutoff = con.sql("SELECT max(month(first_version_date)) FROM papers "
                      "WHERE year(first_version_date)=2026").fetchone()[0]
     fig["ytd_month"] = cutoff
@@ -359,7 +312,6 @@ def main():
     os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(fig, f, default=float)
-    # archive a timestamped copy so every re-run is preserved
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     archive_dir = os.path.join(os.path.dirname(OUT) or ".", "archive")
     os.makedirs(archive_dir, exist_ok=True)
@@ -369,7 +321,6 @@ def main():
     print(f"Wrote {OUT} ({os.path.getsize(OUT)} bytes); archived -> {archive}")
     for k, v in fig.items():
         print(f"  {k}: {len(v) if isinstance(v, list) else v}")
-
 
 if __name__ == "__main__":
     main()
