@@ -27,3 +27,7 @@ distill/*.bak.*
 
 # editor tilde backups
 *~
+
+# Generated artifacts — rebuilt by `make` (build_figures.py -> results/, build_post.py -> index.html)
+distill/index.html
+results/

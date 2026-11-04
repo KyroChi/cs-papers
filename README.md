@@ -5,10 +5,11 @@ conferences (NeurIPS · ICML · ICLR)? This repo builds an interactive
 [distill](https://distill.pub)-style document from public metadata — **without
 downloading arXiv's 16 TiB corpus** (we use only the ~1.6 GB metadata config).
 
-**→ The document lives in [`distill/index.html`](distill/index.html)** — a
-self-contained interactive page (open it in any browser, works offline). If
-GitHub Pages is enabled for this repo, it is served at
-`https://kyrochi.github.io/cs-papers/distill/`.
+**→ Build the document with `make`**, which writes `distill/index.html` — a
+self-contained interactive page (open it in any browser, works offline). The
+rendered page and the computed `results/` are **generated, not committed** —
+run `make` to produce them (see [Reproduce](#reproduce)). Publishing to GitHub
+Pages therefore needs a build step (e.g. a CI workflow), not a raw checkout.
 
 **Writing it:** [`distill/post.md`](distill/post.md) has a YAML front-matter
 block (title, subtitle, authors, published, disclaimer) followed by plain
@@ -86,8 +87,9 @@ post` after editing prose, or `make all` for both.
 distill/post.md      the prose (Markdown; edit this) with {{fig:SLUG}} tokens
 distill/figures.md   figure headings + captions (edit this; no numbers)
 distill/template.html figure library: one <figure> per chart + the render script
-distill/index.html   built, self-contained page (do not hand-edit)
-results/             figures.json (latest findings) + archive/ (per-run history)
+distill/index.html   built page (generated, git-ignored; run `make`)
+distill/world.geo.json static basemap for the world figure (committed input)
+results/             figures.json + archive/ (generated, git-ignored)
 queries/             standalone DuckDB SQL for the arXiv metadata questions
 setup.sql            DuckDB views over the arXiv parquet
 conf_setup.sql       DuckDB views over the conference author files

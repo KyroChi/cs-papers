@@ -15,7 +15,9 @@ The published artifact is `distill/index.html` (self-contained, interactive).
 - **Never download arXiv's full-text corpus (~16 TiB).** Use only the ~1.6 GB
   metadata config (`secemp9/arxiv-complete`). All analysis is metadata-only.
 - **Never hand-edit `distill/index.html`** — it is generated. Edit the sources
-  and rebuild.
+  and rebuild. The rendered page and `results/` (figures.json + archive) are
+  **git-ignored, not committed**; `make` regenerates them. `distill/world.geo.json`
+  is the exception: a committed static basemap (a build *input*, not output).
 - DuckDB runs memory-capped (`memory_limit`, `threads=2`,
   `preserve_insertion_order=false`, `temp_directory='.duckdb_tmp'`); keep it
   capped — the machine has limited RAM.
