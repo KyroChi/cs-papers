@@ -1,0 +1,33 @@
+# External data — fetched with the download_*.py scripts, never committed.
+# (arXiv metadata, Paper Copilot conference files, berenslab ICLR decisions)
+data/
+
+# Python / environment
+.venv/
+__pycache__/
+*.pyc
+
+# Local DuckDB / build caches
+*.duckdb
+*.duckdb.wal
+.duckdb_tmp/
+*chartjs.cache
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Local scratch (never commit)
+scratch/
+
+# editor/session backups
+distill/*.bak.*
+*.bak
+
+# editor tilde backups
+*~
+
+# Generated artifacts — rebuilt by `make` (build_figures.py -> results/, build_post.py -> index.html)
+distill/index.html
+results/

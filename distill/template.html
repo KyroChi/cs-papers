@@ -1,0 +1,436 @@
+<meta charset="utf-8">
+<title>Figure library — Who is Writing all Those Papers?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root{
+  --page:#fff; --surface:#fff; --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
+  --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --ring:rgba(0,0,0,.1);
+  --display:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+:root:not([data-theme="light"]){ @media (prefers-color-scheme:dark){
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
+}}
+:root[data-theme="dark"]{
+  --page:#0e0e0e; --surface:#181818; --ink:#f4f4f4; --ink2:rgba(255,255,255,.72); --muted:rgba(255,255,255,.5);
+  --grid:rgba(255,255,255,.12); --axis:rgba(255,255,255,.28); --ring:rgba(255,255,255,.13);
+}
+body{background:var(--page); color:var(--ink2); font-family:var(--sans); margin:0;
+  font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:1080px; margin:0 auto; padding:48px 24px 96px;}
+figure{max-width:984px; margin:34px auto; background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:18px 18px 14px;}
+figcaption{font-family:var(--display); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
+figcaption b{font-weight:700;}
+.sub{font-family:var(--sans); font-size:13px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
+.plot{position:relative; width:100%; height:360px;}
+.plot.tall{height:400px;}
+.subplots{display:flex; gap:16px; flex-wrap:wrap;}
+.subplots>.plot{flex:1 1 320px; min-width:280px;}
+.wm-wrap{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+.wm-map{flex:1 1 440px; min-width:300px;}
+.wm-map svg{width:100%; height:auto; display:block;}
+.wm-map path{stroke:var(--surface); stroke-width:.3px; cursor:default;}
+.wm-list{flex:0 1 230px; min-width:190px; max-height:380px; overflow-y:auto; border:1px solid var(--ring); border-radius:8px; padding:4px 0;}
+.wm-row{display:flex; justify-content:space-between; gap:10px; font-family:var(--sans); font-size:12.5px; padding:3px 12px; color:var(--ink2);}
+.wm-row:hover{background:var(--grid);}
+.wm-row span:last-child{font-variant-numeric:tabular-nums; color:var(--ink);}
+.bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
+.toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent; border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
+.toggle[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink);}
+.lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
+.controls{position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); right:16px; z-index:9;}
+</style>
+
+<div class="controls"><button class="toggle" id="themeBtn">◐ theme</button></div>
+<div class="wrap">
+  <figure class="fig-wide" data-fig="arxiv-growth">
+    <figcaption>Growth in submissions across all of arXiv</figcaption>
+    <p class="sub">Papers by year of first submission, 1991–2025 (last complete year).</p>
+    <div class="plot"><canvas id="f1a"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" data-fig="subject-shares">
+    <figcaption>Relative distribution of papers across major arXiv subjects</figcaption>
+    <div class="bar"><button class="toggle" data-mode="pct" aria-pressed="true">share %</button><button class="toggle" data-mode="abs" aria-pressed="false">counts</button><span class="sub" style="margin:0">· click legend to toggle series</span></div>
+    <div class="plot tall"><canvas id="f1b"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" data-fig="author-list-sizes">
+    <figcaption>Papers by number of authors</figcaption>
+    <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
+    <div class="plot tall"><canvas id="f2"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" id="f6cb" data-fig="region-growth">
+    <figcaption>Region growth (indexed) and share, side by side</figcaption>
+    <p class="sub">Left: submissions indexed to 2021 = 100 (steeper = faster growth). Right: share of submissions by region.</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f6cbl"></canvas></div>
+      <div class="plot"><canvas id="f6cbr"></canvas></div>
+    </div>
+  </figure>
+
+  <figure class="fig-wide" data-fig="new-phds-by-region">
+    <figcaption>New PhD-student first-authors per year, by region</figcaption>
+    <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then).</p>
+    <div class="plot"><canvas id="f7c"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" data-fig="subs-per-person">
+    <figcaption>Mean submissions per person per year, by seniority</figcaption>
+    <p class="sub">Average papers per person in each self-reported position — toggle between first-authored papers and all authorships. First-authorship concentrates among students; all-authorship rises with seniority.</p>
+    <div class="bar"><span class="lbl">Count</span>
+      <button class="toggle" data-f7fmetric="fa" aria-pressed="true">first-author</button>
+      <button class="toggle" data-f7fmetric="subs" aria-pressed="false">all submissions</button>
+    </div>
+    <div class="plot tall"><canvas id="f7f"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" data-fig="authors-per-conf-paper">
+    <figcaption>Authors per paper at the big-3</figcaption>
+    <p class="sub">Authors per paper at the big-3 (NeurIPS · ICML · ICLR, 2021–2025): mean (dot) with a 25th–75th-percentile candle.</p>
+    <div class="plot"><canvas id="f7g"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" id="f17" data-fig="conferences-and-phds">
+    <figcaption>Big-3 submissions and the PhD-student author base</figcaption>
+    <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f17l"></canvas></div>
+      <div class="plot"><canvas id="f17r"></canvas></div>
+    </div>
+  </figure>
+
+  <figure class="fig-wide" id="fworldmap">
+    <figcaption>Unique PhD-student authors by country</figcaption>
+    <p class="sub">Distinct authors listing themselves as “PhD student”, by institution country (from email domains), per year. Colour = value on a log scale, <b>dark purple = lowest, bright orange = highest</b> (grey = no data). For the range, raw count sums 2021–2025. Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
+    <div class="bar"><span class="lbl">Metric</span>
+      <button class="toggle" data-wmmetric="growth" aria-pressed="false">growth rate</button>
+      <button class="toggle" data-wmmetric="raw" aria-pressed="true">raw count</button>
+    </div>
+    <div class="bar"><span class="lbl">Period</span>
+      <button class="toggle" data-wmperiod="range" aria-pressed="true">2021→2025</button>
+      <button class="toggle" data-wmperiod="2022" aria-pressed="false">’22</button>
+      <button class="toggle" data-wmperiod="2023" aria-pressed="false">’23</button>
+      <button class="toggle" data-wmperiod="2024" aria-pressed="false">’24</button>
+      <button class="toggle" data-wmperiod="2025" aria-pressed="false">’25</button>
+    </div>
+    <div class="wm-wrap">
+      <div class="wm-map"><svg id="wm-svg"></svg></div>
+      <div class="wm-list" id="wm-list"></div>
+    </div>
+  </figure>
+
+  <figure class="fig-wide" id="fsen">
+    <figcaption>Annual output by career total — CS (left) vs Mathematics (right)</figcaption>
+    <p class="sub">Mean papers/year, with authors bucketed by cumulative papers to date (an author moves up a bucket as they accumulate papers).</p>
+    <div class="subplots">
+      <div class="plot"><canvas id="f5"></canvas></div>
+      <div class="plot"><canvas id="f11"></canvas></div>
+    </div>
+  </figure>
+
+  <figure class="fig-wide">
+    <figcaption>Are the 31+ solo authors veterans or newcomers?</figcaption>
+    <p class="sub">For the solo-2026 authors with 31+ career papers, years since their first-ever arXiv submission. Computer Science and Mathematics are shown in the legend.</p>
+    <div class="plot"><canvas id="ftenure"></canvas></div>
+  </figure>
+
+  <figure class="fig-wide" id="fridge">
+    <figcaption>Tenure by career-output bucket — solo 2026 authors</figcaption>
+    <p class="sub">Each row is a career-total bucket; the curve is the distribution of <b>years active on arXiv</b> for that bucket's solo-2026 authors, peak-normalized per row. Computer Science and Mathematics are shown in the legend.</p>
+    <div id="ridge" style="width:100%"></div>
+  </figure>
+</div>
+
+<script>
+const DATA = __FIGDATA__;
+const BL=t=>(typeof d3!=='undefined'&&d3.color?d3.color(d3.interpolatePlasma(0.8*t)).formatHex():'#cc4778');
+function seq(n){return n<=1?[BL(0.72)]:Array.from({length:n},(_,i)=>BL(0.22+0.70*(i/(n-1))));}
+function seqf(n){const r=seq(n);return i=>r[i%r.length];}
+const CATB=[0.92,0.42,0.68,0.30,0.80,0.54,0.22,0.60].map(BL);
+const charts=[];
+
+const RIDGE_BK=['1','2–3','4–5','6–8','9–11','12–15','16–20','21–30','31+'];
+const TEN_BK=['≤3 yr','4–5','6–10','11–15','16–20','21+'];
+const TEN_CS=[1.0,1.9,25.4,30.1,22.1,19.4];
+const TEN_MA=[0.5,0.8,12.8,25.1,25.4,35.4];
+const RIDGE_TMAX=37;
+const RIDGE_CS=[[1575,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[696,358,165,88,50,44,41,33,20,12,23,8,8,9,9,3,5,2,0,1,0,0,1,3,1,0,0,0,2,0,0,1,0,0,0,0,0,0],[120,158,107,75,55,38,44,27,27,23,18,10,5,14,10,12,7,4,1,1,6,3,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[49,100,106,84,62,69,51,39,52,23,10,20,14,11,14,10,9,6,2,2,4,1,0,2,0,0,1,2,0,0,0,0,1,0,1,0,0,0],[14,25,31,44,41,46,43,37,32,31,14,14,18,7,8,5,3,7,0,3,1,5,0,1,2,2,0,0,0,0,0,2,0,0,0,0,0,0],[4,15,21,26,31,35,38,27,48,32,24,11,11,11,11,9,7,4,9,3,8,4,0,1,2,0,1,1,1,0,0,0,0,1,0,0,0,0],[1,2,7,18,23,19,34,33,25,27,24,22,19,10,12,11,8,3,4,5,1,3,2,0,5,0,1,1,1,0,1,0,0,0,0,0,0,0],[2,3,8,9,14,23,32,43,34,36,20,19,16,20,14,19,11,12,6,12,9,5,5,2,0,0,7,3,2,1,0,1,0,0,0,0,0,0],[0,0,4,6,8,10,24,40,56,52,63,56,56,52,55,59,44,41,36,44,39,33,17,21,19,18,8,11,13,8,6,11,8,4,2,0,0,0]];
+const RIDGE_MA=[[947,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[326,399,228,124,67,53,45,45,27,16,7,12,6,10,6,4,5,3,4,3,0,4,2,2,0,0,3,0,1,1,1,0,0,0,0,0,0,0],[43,112,147,136,106,74,53,48,34,25,16,17,12,7,14,8,11,3,4,4,4,1,0,3,1,2,1,1,1,0,1,2,1,0,0,0,0,0],[13,52,104,96,118,89,90,57,49,40,35,27,27,15,20,17,8,8,10,10,6,2,3,4,2,2,3,2,2,0,0,2,0,0,1,0,0,0],[4,9,28,54,67,61,64,61,47,43,36,25,26,35,21,16,8,9,6,7,10,9,4,3,3,3,6,0,1,0,0,1,0,0,0,0,0,0],[3,4,6,16,23,46,62,60,71,51,44,40,25,34,23,27,15,15,17,6,17,9,5,6,3,5,6,1,5,1,1,4,1,0,1,0,0,0],[1,4,5,15,25,35,34,38,47,43,41,32,31,33,26,20,32,26,15,22,17,15,13,6,5,5,3,3,4,4,2,3,1,1,2,0,0,0],[0,1,2,6,8,15,36,40,41,54,47,41,44,49,46,42,41,38,36,29,30,22,18,20,9,7,13,5,9,4,1,5,4,3,3,1,0,0],[0,3,3,1,5,8,19,28,51,55,54,65,92,80,96,71,77,92,77,93,70,80,69,62,53,42,46,45,40,28,17,32,20,18,13,2,3,1]];
+
+function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
+function dark(){const t=document.documentElement.getAttribute('data-theme');
+  if(t==='dark')return true; if(t==='light')return false;
+  return matchMedia('(prefers-color-scheme:dark)').matches;}
+function cat(i){return CATB[i%CATB.length];}
+function ord(i){return seq(6)[i%6];}
+function withA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function base(){
+  const ink=css('--ink'),ink2=css('--ink2'),muted=css('--muted'),grid=css('--grid'),axis=css('--axis');
+  Chart.defaults.font.family=css('--sans')||'system-ui';
+  Chart.defaults.font.size=12; Chart.defaults.color=ink2;
+  return {
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:ink2,usePointStyle:true,pointStyleWidth:10,boxHeight:7,padding:14}},
+      tooltip:{backgroundColor:css('--surface'),titleColor:ink,bodyColor:ink2,borderColor:css('--ring'),borderWidth:1,padding:10,usePointStyle:true,boxPadding:4}
+    },
+    scales:{
+      x:{grid:{display:false},border:{color:axis},ticks:{color:muted,maxRotation:0,autoSkipPadding:12}},
+      y:{grid:{color:grid,drawBorder:false},border:{display:false},ticks:{color:muted}}
+    }
+  };
+}
+const years=a=>a.map(r=>r.year);
+function pivot(rows,keyf,valf,keys){
+  const yrs=[...new Set(rows.map(r=>r.year))].sort((a,b)=>a-b);
+  const map={}; keys.forEach(k=>map[k]=yrs.map(()=>0));
+  rows.forEach(r=>{const k=keyf(r); if(map[k]) map[k][yrs.indexOf(r.year)]+=valf(r);});
+  return {yrs,map};
+}
+function toPct(cols){
+  const n=cols[0].length, tot=Array(n).fill(0);
+  cols.forEach(s=>s.forEach((v,i)=>tot[i]+=v));
+  return cols.map(s=>s.map((v,i)=>tot[i]?+(100*v/tot[i]).toFixed(2):0));
+}
+function stackedBar(id,labels,names,series,colorf,mode0){
+  if(!document.getElementById(id))return;
+  const o=base(); o.scales.x.stacked=true; o.scales.y.stacked=true;
+  let mode=mode0||'abs';
+  const build=()=>{
+    const raw=series.map(s=>s.slice());
+    const vals=mode==='pct'?toPct(raw):raw;
+    if(mode==='pct'){o.scales.y.max=100; o.scales.y.ticks.callback=v=>v+'%';}
+    else{o.scales.y.max=undefined; o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
+    return names.map((nm,i)=>({label:nm,data:vals[i],backgroundColor:colorf(i),
+      borderColor:css('--surface'),borderWidth:{top:2,right:0,bottom:0,left:0},borderRadius:3,
+      maxBarThickness:34,stack:'s'}));
+  };
+  const c=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:build()},options:o});
+  charts.push({chart:c,rebuild:()=>{const oo=base();oo.scales.x.stacked=true;oo.scales.y.stacked=true;
+    if(mode==='pct'){oo.scales.y.max=100;oo.scales.y.ticks.callback=v=>v+'%';}else{oo.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
+    c.options=oo;c.data.datasets=build();c.update('none');}});
+
+  const fig=document.getElementById(id).closest('figure');
+  fig.querySelectorAll('.toggle[data-mode]').forEach(btn=>btn.onclick=()=>{
+    mode=btn.dataset.mode;
+    fig.querySelectorAll('.toggle[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b===btn));
+    const oo=base();oo.scales.x.stacked=true;oo.scales.y.stacked=true;
+    if(mode==='pct'){oo.scales.y.max=100;oo.scales.y.ticks.callback=v=>v+'%';}else{oo.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;}
+    c.options=oo;c.data.datasets=build();c.update();
+  });
+  return c;
+}
+function lineChart(id,labels,datasets,tweak){
+  if(!document.getElementById(id))return;
+  const mk=()=>{const o=base(); if(tweak)tweak(o); return o;};
+  const c=new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:datasets()},options:mk()});
+  charts.push({chart:c,rebuild:()=>{c.options=mk();c.data.datasets=datasets();c.update('none');}});
+  return c;
+}
+
+function renderAll(){
+  charts.splice(0).forEach(c=>c.chart.destroy());
+  if(f7fchart){f7fchart.destroy();f7fchart=null;}
+
+  lineChart('f1a',years(DATA.f1a),()=>[{label:'Submissions',data:DATA.f1a.map(r=>r.papers),
+    borderColor:cat(0),backgroundColor:withA(cat(0),.14),borderWidth:2,
+    fill:true,tension:.25,pointRadius:0,pointHoverRadius:4}]);
+
+  {const keep=['Computer Science','Physics','Mathematics','Statistics','Elec Eng & Systems'];
+   const names=[...keep,'Other'];
+   const rows=DATA.f1b.map(r=>({year:r.year,k:keep.includes(r.subject_group)?r.subject_group:'Other',v:r.papers}));
+   const {yrs,map}=pivot(rows,r=>r.k,r=>r.v,names);
+   stackedBar('f1b',yrs,names,names.map(n=>map[n]),seqf(names.length),'pct');}
+
+  {const b=DATA.f2_buckets;
+   stackedBar('f2',years(DATA.f2),b,b.map(k=>DATA.f2.map(r=>r[k])),ord,'abs');}
+
+  {const s=[['China','china'],['United States','us'],['Other','other']];
+   lineChart('f6cbl',years(DATA.f6),()=>s.map(([nm,k],i)=>{const v=DATA.f6.map(r=>r[k]),v0=v[0];
+     return {label:nm,data:v.map(x=>+(100*x/v0).toFixed(0)),borderColor:cat(i),
+       borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2};}));
+   stackedBar('f6cbr',years(DATA.f6),s.map(x=>x[0]),s.map(([,k])=>DATA.f6.map(r=>r[k])),seqf(s.length),'pct');}
+
+  {const regs=[['China','China'],['United States','US'],['Other','Other']];
+   const rows=DATA.newphd.filter(r=>r.year>=2022 && r.year<=2025);
+   const {yrs,map}=pivot(rows,r=>r.region,r=>r.n,['China','US','Other']);
+   lineChart('f7c',yrs,()=>regs.map(([nm,k],i)=>({label:nm,data:map[k],borderColor:cat(i),
+     backgroundColor:cat(i),borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2})));}
+
+  drawF7f();
+
+  {const {yrs,map}=pivot(DATA.f5,r=>r.bucket,r=>r.mean_output,DATA.f5_buckets);
+   lineChart('f5',yrs,()=>DATA.f5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
+     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
+  {const {yrs,map}=pivot(DATA.m5,r=>r.bucket,r=>r.mean_output,DATA.m5_buckets);
+   lineChart('f11',yrs,()=>DATA.m5_buckets.map((k,i)=>({label:k+' papers',data:map[k],
+     borderColor:ord(i),borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25})));}
+
+  {const el=document.getElementById('f7g');
+   if(el && DATA.f7g){
+     const o=base(); o.scales.y.min=0;
+     const iqr=withA(cat(0),.30);
+     const c=new Chart(el,{data:{labels:DATA.f7g.map(r=>r.year),datasets:[
+       {type:'bar',label:'IQR (25–75%)',data:DATA.f7g.map(r=>[r.p25,r.p75]),
+        backgroundColor:iqr,borderColor:'transparent',maxBarThickness:14,borderRadius:3,order:2},
+       {type:'line',label:'Mean',data:DATA.f7g.map(r=>r.mean),borderColor:cat(1),
+        backgroundColor:cat(1),borderWidth:2,pointRadius:4,pointHoverRadius:6,tension:.2,order:1}
+     ]},options:o});
+     charts.push({chart:c});
+   }
+  }
+
+  if(DATA.confpapers){
+    const yrs=[...new Set(DATA.confpapers.map(r=>r.year))].sort((a,b)=>a-b);
+    const V=[['NeurIPS','nips'],['ICML','icml'],['ICLR','iclr']];
+    const pick=v=>yrs.map(y=>{const r=DATA.confpapers.find(x=>x.year===y&&x.venue===v);return r?r.papers:null;});
+    lineChart('f17l',yrs,()=>V.map(([nm,v],i)=>({label:nm,data:pick(v),borderColor:cat(i),
+      borderWidth:2,pointRadius:2.5,pointHoverRadius:5,tension:.2,spanGaps:true})),
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
+  if(DATA.phddec){
+    const yrs=DATA.phddec.map(r=>r.year);
+    lineChart('f17r',yrs,()=>[{label:'PhD-student authors',data:DATA.phddec.map(r=>r.students),
+      borderColor:cat(0),backgroundColor:withA(cat(0),.14),borderWidth:2,
+      fill:true,tension:.2,pointRadius:2.5,pointHoverRadius:5}],
+      o=>{o.scales.y.ticks.callback=v=>v>=1000?(v/1000)+'k':v;});
+  }
+
+  {const el=document.getElementById('ftenure');
+   if(el){const o=base(); o.scales.y.ticks.callback=v=>v+'%';
+     const c=new Chart(el,{type:'bar',data:{labels:TEN_BK,datasets:[
+       {label:'Computer Science',data:TEN_CS,backgroundColor:cat(0),borderRadius:3,maxBarThickness:42},
+       {label:'Mathematics',data:TEN_MA,backgroundColor:cat(1),borderRadius:3,maxBarThickness:42}
+     ]},options:o}); charts.push({chart:c});}}
+
+  drawRidge();
+}
+
+function drawRidge(){
+  const host=document.getElementById('ridge'); if(!host) return;
+  const ink2=css('--ink2'),muted=css('--muted'),grid=css('--grid'),axis=css('--axis');
+  const csC=cat(0), maC=cat(1);
+  const W=Math.max(320,host.clientWidth||760), ML=52, MR=12, MT=8, MB=28;
+  const rows=RIDGE_BK.length, rowStep=40, band=72;
+  const H=MT+MB+rowStep*(rows-1)+band, plotW=W-ML-MR, T=RIDGE_TMAX;
+  const xp=t=>ML+plotW*t/T, ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 '+W+' '+H); svg.setAttribute('width','100%'); svg.setAttribute('height',H);
+  for(let t=0;t<=T;t+=5){const x=xp(t);
+    const ln=document.createElementNS(ns,'line');
+    ln.setAttribute('x1',x);ln.setAttribute('x2',x);ln.setAttribute('y1',MT);ln.setAttribute('y2',H-MB);
+    ln.setAttribute('stroke',grid);svg.appendChild(ln);
+    const tx=document.createElementNS(ns,'text');
+    tx.setAttribute('x',x);tx.setAttribute('y',H-MB+15);tx.setAttribute('fill',muted);
+    tx.setAttribute('font-size','11');tx.setAttribute('text-anchor','middle');tx.textContent=t;svg.appendChild(tx);}
+  const xl=document.createElementNS(ns,'text');
+  xl.setAttribute('x',ML+plotW/2);xl.setAttribute('y',H-1);xl.setAttribute('fill',muted);
+  xl.setAttribute('font-size','11');xl.setAttribute('text-anchor','middle');
+  xl.textContent='years active on arXiv (since first submission)';svg.appendChild(xl);
+  const smooth=a=>a.map((_,i)=>(a[Math.max(0,i-1)]+a[i]+a[Math.min(a.length-1,i+1)])/3);
+  const area=(data,baseY,color)=>{const s=smooth(data),sm=Math.max.apply(null,s)||1;
+    let d='M '+xp(0)+' '+baseY;
+    s.forEach((val,t)=>{d+=' L '+xp(t).toFixed(1)+' '+(baseY-band*val/sm).toFixed(1);});
+    d+=' L '+xp(T)+' '+baseY+' Z';
+    const p=document.createElementNS(ns,'path');
+    p.setAttribute('d',d);p.setAttribute('fill',color);p.setAttribute('fill-opacity','0.5');
+    p.setAttribute('stroke',color);p.setAttribute('stroke-width','1.3');svg.appendChild(p);};
+  for(let i=0;i<rows;i++){const baseY=MT+band+rowStep*i;
+    const bl=document.createElementNS(ns,'line');
+    bl.setAttribute('x1',ML);bl.setAttribute('x2',W-MR);bl.setAttribute('y1',baseY);bl.setAttribute('y2',baseY);
+    bl.setAttribute('stroke',axis);bl.setAttribute('stroke-opacity','.5');svg.appendChild(bl);
+    const lb=document.createElementNS(ns,'text');
+    lb.setAttribute('x',ML-7);lb.setAttribute('y',baseY-2);lb.setAttribute('fill',ink2);
+    lb.setAttribute('font-size','11.5');lb.setAttribute('font-weight','600');lb.setAttribute('text-anchor','end');
+    lb.textContent=RIDGE_BK[i];svg.appendChild(lb);
+    area(RIDGE_MA[i],baseY,maC); area(RIDGE_CS[i],baseY,csC);}
+  host.innerHTML=''; host.appendChild(svg);
+  const sw=c=>'<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:2px;background:'+c+';opacity:.72;display:inline-block"></span>';
+  const leg=document.createElement('div');
+  leg.style.cssText='display:flex;gap:18px;justify-content:center;margin:6px 0 2px;font-family:var(--sans);font-size:12px;color:'+ink2+';';
+  leg.innerHTML=sw(csC)+'Computer Science</span>'+sw(maC)+'Mathematics</span>';
+  host.appendChild(leg);
+}
+
+let f7fmetric='fa', f7fchart=null;
+function drawF7f(){
+  if(!document.getElementById('f7f'))return;
+  if(f7fchart)f7fchart.destroy();
+  const order=DATA.f7_order, o=base();
+  const src=f7fmetric==='fa'?DATA.f7f:DATA.f7d;
+  const {yrs,map}=pivot(src.map(r=>({year:r.year,k:r.seniority,v:r.mean})),r=>r.k,r=>r.v,order);
+  f7fchart=new Chart(document.getElementById('f7f'),{type:'line',data:{labels:yrs,
+    datasets:order.map((nm,i)=>({label:nm,data:map[nm],borderColor:cat(i),
+      borderWidth:2,pointRadius:2,pointHoverRadius:5,tension:.25}))},options:o});
+}
+function wireF7(attr,set,redraw){document.querySelectorAll('['+attr+']').forEach(b=>b.onclick=()=>{
+  set(b.dataset[attr.replace('data-','').replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]);
+  document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b));redraw();});}
+wireF7('data-f7fmetric',v=>f7fmetric=v,drawF7f);
+
+const _tb=document.getElementById('themeBtn');
+if(_tb) _tb.onclick=()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':(cur==='light'?'dark':(dark()?'light':'dark'));
+  document.documentElement.setAttribute('data-theme',next);
+  renderAll();
+};
+
+function initWorldMap(){
+  if(typeof d3==='undefined' || typeof WORLD==='undefined') return;
+  const svgEl=document.getElementById('wm-svg');
+  if(!svgEl || svgEl.childNodes.length || !DATA.countries) return;
+  const byC={}; DATA.countries.forEach(r=>{(byC[r.country]=byC[r.country]||{})[r.year]=r.n;});
+  const alias={'United States':'United States of America'};
+  const g2c={}; Object.keys(byC).forEach(c=>{g2c[alias[c]||c]=c;});
+  let metric='raw', period='range';
+  function value(c){const s=byC[c]||{};
+    if(metric==='raw'){
+      if(period==='range') return [2021,2022,2023,2024,2025].reduce((t,y)=>t+(s[y]||0),0)||null;
+      return s[+period]||null;
+    }
+    if(period==='range'){const a=s[2021],b=s[2025]; return (a>0&&b>0)?b/a:null;}
+    const y=+period,a=s[y-1],b=s[y]; return (a>0&&b>0)?b/a:null;}
+  function fmt(v){return metric==='raw'?Math.round(v).toLocaleString():'×'+v.toFixed(2);}
+  const W=660,H=390;
+  const proj=d3.geoNaturalEarth1().fitSize([W,H],WORLD);
+  const gsel=d3.select(svgEl).attr('viewBox','0 0 '+W+' '+H)
+    .append('g').selectAll('path').data(WORLD.features).join('path').attr('d',d3.geoPath(proj));
+  gsel.append('title');
+  function render(){
+    const vals={}; Object.keys(byC).forEach(c=>{const v=value(c); if(v!=null&&isFinite(v)&&v>0) vals[c]=v;});
+    const logs=Object.values(vals).map(Math.log);
+    const lo=Math.min.apply(null,logs), hi=Math.max.apply(null,logs);
+    const col=c=>{const v=vals[c]; if(v==null) return 'rgba(0,0,0,.07)';
+      const t=hi>lo?(Math.log(v)-lo)/(hi-lo):0.5; return d3.interpolatePlasma(0.8*t);};
+    gsel.attr('fill',f=>col(g2c[f.properties.name]));
+    gsel.select('title').text(f=>{const c=g2c[f.properties.name];
+      if(!c) return f.properties.name; return c+(vals[c]!=null?'  '+fmt(vals[c]):'  (n/a)');});
+    const rows=Object.keys(vals).map(c=>({c,v:vals[c]})).sort((a,b)=>b.v-a.v);
+    document.getElementById('wm-list').innerHTML=rows.map(x=>
+      '<div class="wm-row"><span>'+x.c+'</span><span>'+fmt(x.v)+'</span></div>').join('');
+  }
+  document.querySelectorAll('[data-wmmetric]').forEach(b=>b.onclick=()=>{metric=b.dataset.wmmetric;
+    document.querySelectorAll('[data-wmmetric]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
+  document.querySelectorAll('[data-wmperiod]').forEach(b=>b.onclick=()=>{period=b.dataset.wmperiod;
+    document.querySelectorAll('[data-wmperiod]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();});
+  render();
+
+  const syncH=()=>{const h=svgEl.getBoundingClientRect().height;
+    if(h>40) document.getElementById('wm-list').style.maxHeight=Math.round(h)+'px';};
+  requestAnimationFrame(syncH);
+  addEventListener('resize',()=>requestAnimationFrame(syncH));
+}
+function boot(){ renderAll(); initWorldMap(); }
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',renderAll);
+addEventListener('resize',()=>{clearTimeout(window.__rt);window.__rt=setTimeout(drawRidge,160);});
+if(document.readyState!=='loading') boot();
+else addEventListener('DOMContentLoaded',boot);
+</script>

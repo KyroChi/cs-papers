@@ -1,0 +1,7 @@
+# Data we collect ourselves (e.g. our own scrapes) is versioned with Git LFS.
+# External data is NOT committed at all (see .gitignore) — it is re-downloaded
+# with the download_*.py scripts. These patterns only apply to files that are
+# actually committed (i.e. placed outside the git-ignored data/ directory).
+*.parquet filter=lfs diff=lfs merge=lfs -text
+*.jsonl filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text

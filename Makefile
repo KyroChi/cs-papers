@@ -1,0 +1,27 @@
+# Reproduce the analysis and the distill document.
+# First time:  make setup && make data && make
+# Rebuild:     make            (compute figures, then build the post)
+PY := .venv/bin/python
+
+.DEFAULT_GOAL := all
+.PHONY: setup data figures post all clean
+
+setup:                 ## create venv and install deps
+	python3 -m venv .venv
+	$(PY) -m pip install -q --upgrade pip -r requirements.txt
+
+data:                  ## download all external data (~1.7 GB, not committed)
+	$(PY) scripts/download_data.py            # arXiv metadata (1.6 GB)
+	$(PY) scripts/download_conf_data.py       # NeurIPS/ICML/ICLR author files (~70 MB)
+	$(PY) scripts/download_iclr_decisions.py  # ICLR accept/reject decisions
+
+figures:               ## compute aggregates -> results/figures.json (+ archive)
+	$(PY) scripts/build_figures.py
+
+post:                  ## build distill/index.html from distill/post.md + figures
+	$(PY) scripts/build_post.py
+
+all: figures post      ## rebuild findings and the distill document
+
+clean:                 ## remove build caches (keeps data and results)
+	rm -f .chartjs.cache

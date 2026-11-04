@@ -1,0 +1,285 @@
+#!/usr/bin/env python3
+"""Build a distill.pub article from Markdown prose + the figure library.
+
+Write prose in `distill/post.md`: a YAML front-matter block (title, subtitle,
+authors, published, disclaimer) followed by Markdown. Drop a figure anywhere
+with a token on its own line, e.g. `{{fig:7f}}`.
+
+This emits a genuine distill.pub page — `<d-front-matter>`, `<d-title>`,
+`<d-byline>`, `<d-article>`, loading distill's `template.v2.js` and MathJax —
+so it matches the kyrochi.github.io distill posts. The interactive figures
+(Chart.js) and their render code are pulled from `distill/template.html`; the
+latest findings (results/figures.json) and Chart.js are inlined.
+
+Note: distill's framework loads from distill.pub, so the page needs network
+for styling (like the real blog). It renders correctly locally and on GitHub
+Pages; the claude.ai artifact sandbox blocks distill.pub, so use a browser.
+
+Usage: python build_post.py            # distill/post.md -> distill/index.html
+"""
+import json as jsonlib
+import os
+import re
+import sys
+import urllib.request
+
+import markdown
+import yaml
+
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE = os.path.join(HERE, "distill", "template.html")
+POST = os.path.join(HERE, "distill", "post.md")
+CAPTIONS = os.path.join(HERE, "distill", "figures.md")
+FIGURES = os.path.join(HERE, "results", "figures.json")
+OUT = os.path.join(HERE, "distill", "index.html")
+CHARTJS = "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
+
+CHART_CSS = """
+:root{
+  --ink:#000; --ink2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.5);
+  --grid:rgba(0,0,0,.1); --axis:rgba(0,0,0,.25); --surface:#fff; --ring:rgba(0,0,0,.12);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --measure:780px;   /* one width for text and figures (≈ distill body +20%) */
+}
+/* One centered column: prose, tables, and figures all share --measure. */
+d-article{grid-template-columns:[full-start] minmax(16px,1fr) [col-start] minmax(0,var(--measure)) [col-end] minmax(16px,1fr) [full-end] !important;}
+d-article>*{grid-column:col-start / col-end !important;}
+d-title{display:block !important; max-width:var(--measure); margin-left:auto; margin-right:auto;}
+d-title>*{max-width:100% !important; white-space:normal !important; overflow-wrap:break-word;}
+/* distill auto-builds <d-byline> on its full-width grid, which overflows our
+   narrower centered column. Keep it in the text column, left-aligned, and drop
+   the empty Affiliations sub-column and the clipped "No DOI yet." column. */
+d-byline{display:block !important; max-width:var(--measure); margin-left:auto; margin-right:auto;}
+d-byline .byline.grid{display:flex !important; gap:48px; justify-content:flex-start; grid-column:unset !important;}
+d-byline .authors-affiliations.grid{display:block !important;}
+d-byline .authors-affiliations h3:nth-of-type(2){display:none;}  /* "Affiliations" */
+d-byline .affiliation{display:none;}
+d-byline .byline.grid>div:last-child{display:none;}              /* "DOI" column */
+d-article figure{margin:1.8em 0;}
+d-article figcaption{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
+d-article figcaption b{font-weight:700;}
+.sub{font-family:var(--sans); font-size:13px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
+.plot{position:relative; width:100%; height:400px;}
+.plot.tall{height:400px;}
+.subplots{display:flex; gap:16px; flex-wrap:wrap;}
+.subplots>.plot{flex:1 1 320px; min-width:280px; height:320px;}
+.bar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 10px;}
+.toggle{font-family:var(--sans); font-size:12px; color:var(--ink2); background:transparent;
+  border:1px solid var(--ring); border-radius:999px; padding:4px 11px; cursor:pointer;}
+.toggle[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink);}
+.lbl{font-family:var(--sans); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px;}
+.disclaimer{color:var(--muted); font-style:italic; font-size:13px;}
+d-article table{display:block; overflow-x:auto; border-collapse:separate; border-spacing:0; width:fit-content;
+  max-width:100%; margin:24px auto; font-family:var(--sans); font-size:13px;
+  border:1px solid var(--ring); border-radius:10px; -webkit-overflow-scrolling:touch;}
+d-article thead th{font-weight:600; color:var(--ink); text-align:right; white-space:nowrap;
+  padding:9px 15px; background:rgba(0,0,0,.035); border-bottom:1.5px solid var(--axis); font-size:11.5px;
+  letter-spacing:.02em;}
+d-article th:first-child,d-article td:first-child{text-align:left;}
+d-article tbody td{text-align:right; white-space:nowrap; padding:7px 15px;
+  color:var(--ink2); font-variant-numeric:tabular-nums;}
+d-article tbody tr:nth-child(even) td{background:rgba(0,0,0,.022);}
+d-article tbody td:first-child{color:var(--ink); font-weight:500;}
+/* boxed warning / caveat callout */
+d-article .warn{border:1px solid var(--ring); border-left:3px solid var(--axis);
+  background:rgba(0,0,0,.028); border-radius:8px; padding:12px 16px; margin:20px auto;
+  font-size:15px; line-height:1.55; color:var(--ink2);}
+/* exception: the wide appendix (last) table may exceed --measure and stay wide/scrollable */
+d-article>table:last-of-type{grid-column:full-start / full-end !important;
+  max-width:min(1080px,calc(100vw - 32px)) !important; margin:22px auto !important;}
+.wm-wrap{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+.wm-map{flex:1 1 440px; min-width:300px;}
+.wm-map svg{width:100%; height:auto; display:block;}
+.wm-map path{stroke:var(--surface); stroke-width:.3px;}
+.wm-list{flex:0 1 230px; min-width:190px; max-height:390px; overflow-y:auto; border:1px solid var(--ring); border-radius:8px; padding:4px 0;}
+.wm-row{display:flex; justify-content:space-between; gap:10px; font-family:var(--sans); font-size:12.5px; padding:3px 12px; color:var(--ink2);}
+.wm-row:hover{background:var(--grid);}
+.wm-row span:last-child{font-variant-numeric:tabular-nums; color:var(--ink);}
+"""
+
+MATHJAX = ('<script>MathJax={tex:{inlineMath:[[\'$\',\'$\']],'
+           'displayMath:[[\'$$\',\'$$\']],tags:\'ams\'}};</script>\n'
+           '<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>\n')
+DISTILL = '<script src="https://distill.pub/template.v2.js"></script>\n'
+D3 = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
+GEO = os.path.join(HERE, "distill", "world.geo.json")
+
+def parse_template(tpl):
+    runtime = re.findall(r"<script>.*?</script>", tpl, re.S)[-1]
+    figs = {}
+    for block in re.findall(r"<figure\b.*?</figure>", tpl, re.S):
+        m = re.search(r'data-fig="([\w-]+)"', block) or re.search(r'id="f([\w-]+)"', block)
+        if m:
+            figs[m.group(1)] = block.replace('class="fig-wide"', 'class="l-page"')
+    return runtime, figs
+
+def parse_captions(path):
+    """distill/figures.md -> {fid: (heading, caption_html)}.
+
+    Each `## fig:ID — Heading` section's body (up to the next `## fig:`) is the
+    caption. `**bold**` becomes <b>; raw HTML passes through. Anything before
+    the first `## fig:` (the file's intro) is ignored.
+    """
+    caps = {}
+    if not os.path.exists(path):
+        return caps
+    fid, head, buf = None, "", []
+
+    def flush():
+        if fid:
+            clean = [re.sub(r"<!--.*?-->", "", l).strip() for l in buf]
+            cap = " ".join(l for l in clean if l)
+            cap = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", cap)
+            caps[fid] = (head, cap)
+
+    for line in open(path, encoding="utf-8"):
+        m = re.match(r"^##\s+fig:([\w-]+)\s*(?:[—\-–]\s*(.*))?$", line.rstrip("\n"))
+        if m:
+            flush()
+            fid, head, buf = m.group(1), (m.group(2) or "").strip(), []
+        elif fid is not None:
+            buf.append(line)
+    flush()
+    return caps
+
+def build_figcaption(block, number, heading):
+    """Replace the figure's <figcaption> with `Figure N. <heading>`.
+
+    The number is always the post-order number (the single source of truth);
+    the heading is figures.md's if given, else the template figcaption's own
+    text. template.html stores no number, so nothing here can go stale.
+    """
+    m = re.search(r"<figcaption>(.*?)</figcaption>", block, re.S)
+    tpl_heading = re.sub(r"<[^>]+>", "", m.group(1)).strip() if m else ""
+    head = heading if heading else tpl_heading
+    label = f"<b>Figure {number}.</b> " if number else ""
+    newcap = f"<figcaption>{label}{head}</figcaption>"
+    if m:
+        return block[:m.start()] + newcap + block[m.end():]
+    return block
+
+def apply_sub(block, caption):
+    """Set the figure's grey sub-caption from figures.md (empty -> remove it)."""
+    if re.search(r'<p class="sub"', block):
+        if caption:
+            return re.sub(r'(<p class="sub"[^>]*>).*?(</p>)',
+                          lambda mm: f"{mm.group(1)}{caption}{mm.group(2)}",
+                          block, count=1, flags=re.S)
+        return re.sub(r'\s*<p class="sub"[^>]*>.*?</p>', "", block, count=1, flags=re.S)
+    if caption:
+        return re.sub(r'(</figcaption>)',
+                      lambda mm: f'{mm.group(1)}\n    <p class="sub">{caption}</p>',
+                      block, count=1)
+    return block
+
+def front_matter(md):
+    m = re.match(r"^---\n(.*?)\n---\n(.*)$", md, re.S)
+    if m:
+        return yaml.safe_load(m.group(1)) or {}, m.group(2)
+    return {}, md
+
+def main():
+    tpl = open(TEMPLATE, encoding="utf-8").read()
+    runtime, figs = parse_template(tpl)
+    caps = parse_captions(CAPTIONS)
+    data = open(FIGURES, encoding="utf-8").read()
+
+    raw = open(POST, encoding="utf-8").read()
+    fm, md = front_matter(raw)
+    md = re.sub(r"<!--.*?-->", "", md, flags=re.S)
+    body = markdown.markdown(md, extensions=["extra", "sane_lists", "toc"])
+
+    order = []
+    for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
+        if fid in figs and fid not in order:
+            order.append(fid)
+    fignum = {fid: i + 1 for i, fid in enumerate(order)}
+
+    missing, counts = [], {}
+    for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
+        counts[fid] = counts.get(fid, 0) + 1
+    dups = [f for f, c in counts.items() if c > 1]
+    if dups:
+        print("WARNING: figure token used more than once (only the first renders):",
+              ", ".join(sorted(dups)))
+
+    def repl(m):
+        fid = m.group(1)
+        if fid not in figs:
+            missing.append(fid)
+            return f"<!-- unknown figure: {fid} -->"
+        block = figs[fid]
+        heading, caption = caps.get(fid, (None, None))
+        block = build_figcaption(block, fignum.get(fid), heading)
+        if caption is not None:
+            block = apply_sub(block, caption)
+        return block
+
+    body = re.sub(r"<p>\s*\{\{\s*fig:([\w-]+)\s*\}\}\s*</p>", repl, body)
+    body = re.sub(r"\{\{\s*fig:([\w-]+)\s*\}\}", repl, body)
+
+    bad_refs = sorted({f for f in re.findall(r"\{\{\s*figref:([\w-]+)\s*\}\}", body)
+                       if f not in fignum})
+    body = re.sub(r"\{\{\s*figref:([\w-]+)\s*\}\}",
+                  lambda m: str(fignum.get(m.group(1), "?")), body)
+    if bad_refs:
+        print("WARNING: figref to a figure not shown in the post:", ", ".join(bad_refs))
+
+    if missing:
+        print("WARNING: unknown figure tokens:", ", ".join(sorted(set(missing))))
+        print("Available:", ", ".join(sorted(figs)))
+
+    title = fm.get("title", "Untitled")
+    subtitle = fm.get("subtitle", "")
+    disclaimer = fm.get("disclaimer", "")
+    dmap = {"title": title, "description": fm.get("description", subtitle),
+            "published": fm.get("published", ""), "authors": []}
+    for a in fm.get("authors", []):
+        dmap["authors"].append({
+            "author": a.get("name", ""), "authorURL": a.get("url", ""),
+            "affiliation": a.get("affiliation", ""), "affiliationURL": a.get("affiliationURL", "")})
+    front_json = jsonlib.dumps(dmap, ensure_ascii=False)
+
+    cache = os.path.join(HERE, ".chartjs.cache")
+    if not os.path.exists(cache):
+        urllib.request.urlretrieve(CHARTJS, cache)
+    chartjs = open(cache, encoding="utf-8").read()
+    runtime = runtime.replace("__FIGDATA__", data)
+    world = open(GEO, encoding="utf-8").read() if os.path.exists(GEO) else "null"
+
+    dtitle = f"<d-title>\n<h1>{title}</h1>\n"
+    if subtitle:
+        dtitle += f'<p class="l-body">{subtitle}</p>\n'
+    if disclaimer:
+        dtitle += f'<p class="l-body disclaimer">{disclaimer}</p>\n'
+    dtitle += "</d-title>\n"
+
+    out = f"""<!DOCTYPE html>
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+{MATHJAX}{DISTILL}{D3}<script>
+{chartjs}
+</script>
+<script>window.WORLD={world};</script>
+<style>{CHART_CSS}</style>
+</head>
+<body>
+<d-front-matter><script type="text/json" id="distill-front-matter">{front_json}</script></d-front-matter>
+{dtitle}<d-byline></d-byline>
+<d-article>
+{body}
+</d-article>
+<d-appendix></d-appendix>
+{runtime}
+</body>
+</html>
+"""
+    open(OUT, "w", encoding="utf-8").write(out)
+    used = len(re.findall(r"<figure\b", body))
+    print(f"Wrote {OUT} ({len(out)} bytes, {used} figures)")
+
+if __name__ == "__main__":
+    main()
