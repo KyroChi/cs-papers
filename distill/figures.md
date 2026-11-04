@@ -3,10 +3,10 @@
 Edit figure **headings** and **captions** here — this file overrides whatever is
 written in `template.html` at build time.
 
-- Each figure is a section beginning `## fig:ID — Heading`.
-- `ID` is an opaque token (e.g. `17`, `7f`, `worldmap`) that links this caption
-  to the chart in `template.html` and the `{{fig:ID}}` tag in `post.md`. The
-  digits in it are **not** a figure number — they're just part of the name.
+- Each figure is a section beginning `## fig:SLUG — Heading`.
+- `SLUG` is an opaque name (e.g. `conferences-and-phds`, `subs-per-person`,
+  `worldmap`) that links this caption to the chart in `template.html` and the
+  `{{fig:SLUG}}` tag in `post.md`. It is a name, **not** a figure number.
 - The figure's displayed number is assigned automatically from the order
   figures appear in `post.md`, so no number is written anywhere in this file.
 - The text after the `—` is the heading (shown bold after "Figure N.").
@@ -14,7 +14,7 @@ written in `template.html` at build time.
   smaller grey sub-line). Leave them blank for no caption.
 - `**bold**` and raw `<b>…</b>` both work in captions.
 
-Rebuild after editing:  `python3 build_post.py`
+Rebuild after editing:  `python3 scripts/build_post.py`  (or just `make`)
 
 <!-- Sections are in the order figures currently appear in post.md. -->
 
