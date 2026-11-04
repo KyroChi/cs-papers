@@ -26,7 +26,7 @@ import urllib.request
 import markdown
 import yaml
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE = os.path.join(HERE, "distill", "template.html")
 POST = os.path.join(HERE, "distill", "post.md")
 CAPTIONS = os.path.join(HERE, "distill", "figures.md")

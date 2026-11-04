@@ -11,7 +11,7 @@ import urllib.request
 
 URL = ("https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/"
        "geojson/ne_110m_admin_0_countries.geojson")
-OUT = os.path.join(os.path.dirname(__file__), "distill", "world.geo.json")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "distill", "world.geo.json")
 
 def round_coords(x, nd=2):
     if isinstance(x, (int, float)):

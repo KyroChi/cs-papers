@@ -61,13 +61,13 @@ make            # compute results/figures.json, then build distill/index.html
 
 | Dataset | What | Fetched by |
 |---|---|---|
-| [secemp9/arxiv-complete](https://huggingface.co/datasets/secemp9/arxiv-complete) (`metadata` config) | 3.15M arXiv papers (Cornell/CC0) | `download_data.py` |
-| [Paper Copilot](https://papercopilot.com) OpenReview archive ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) | NeurIPS/ICML/ICLR author affiliations | `download_conf_data.py` |
-| berenslab/iclr-dataset | ICLR submissions incl. rejected + decisions | `download_iclr_decisions.py` |
+| [secemp9/arxiv-complete](https://huggingface.co/datasets/secemp9/arxiv-complete) (`metadata` config) | 3.15M arXiv papers (Cornell/CC0) | `scripts/download_data.py` |
+| [Paper Copilot](https://papercopilot.com) OpenReview archive ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) | NeurIPS/ICML/ICLR author affiliations | `scripts/download_conf_data.py` |
+| berenslab/iclr-dataset | ICLR submissions incl. rejected + decisions | `scripts/download_iclr_decisions.py` |
 
 Input data is git-ignored and re-downloaded by the scripts; nothing under
-`data/` is committed. To explore the metadata directly, `run.py` is a DuckDB
-shell: `.venv/bin/python run.py -f queries/01_growth_by_year.sql`.
+`data/` is committed. To explore the metadata directly, `scripts/run.py` is a
+DuckDB shell: `.venv/bin/python scripts/run.py -f sql/queries/01_growth_by_year.sql`.
 
 ## For coding agents
 
@@ -78,19 +78,15 @@ download the full corpus; never hand-edit the generated page).
 ## Repo layout
 
 ```
-distill/post.md        the prose you write (Markdown + {{fig:SLUG}} tokens)
-distill/figures.md     figure headings + captions
-distill/template.html  the figure library: charts + the render script
-distill/world.geo.json static basemap for the world figure (committed input)
-distill/index.html     the built page (generated, git-ignored)
-results/               computed figure data (generated, git-ignored)
-build_figures.py       run the DuckDB queries -> results/figures.json
-build_post.py          post.md + figures.md + figures -> distill/index.html
-setup.sql, conf_setup.sql  DuckDB views over the metadata
-queries/               standalone DuckDB queries for ad-hoc analysis
-download_*.py           fetch the input datasets
-run.py                 DuckDB shell / query runner
-AGENTS.md              orientation for coding agents
+distill/      the post: post.md (prose), figures.md (captions),
+              template.html (charts + render script), world.geo.json (basemap);
+              index.html is the built page (generated, git-ignored)
+scripts/      build_figures.py (-> results/figures.json),
+              build_post.py (-> distill/index.html), build_geo.py,
+              download_*.py (fetch the datasets), run.py (DuckDB shell)
+sql/          setup.sql + conf_setup.sql (DuckDB views), queries/ (ad-hoc SQL)
+results/      computed figure data (generated, git-ignored)
+AGENTS.md     orientation for coding agents
 ```
 
 ## Requirements

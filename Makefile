@@ -11,15 +11,15 @@ setup:                 ## create venv and install deps
 	$(PY) -m pip install -q --upgrade pip -r requirements.txt
 
 data:                  ## download all external data (~1.7 GB, not committed)
-	$(PY) download_data.py            # arXiv metadata (1.6 GB)
-	$(PY) download_conf_data.py       # NeurIPS/ICML/ICLR author files (~70 MB)
-	$(PY) download_iclr_decisions.py  # ICLR accept/reject decisions
+	$(PY) scripts/download_data.py            # arXiv metadata (1.6 GB)
+	$(PY) scripts/download_conf_data.py       # NeurIPS/ICML/ICLR author files (~70 MB)
+	$(PY) scripts/download_iclr_decisions.py  # ICLR accept/reject decisions
 
 figures:               ## compute aggregates -> results/figures.json (+ archive)
-	$(PY) build_figures.py
+	$(PY) scripts/build_figures.py
 
 post:                  ## build distill/index.html from distill/post.md + figures
-	$(PY) build_post.py
+	$(PY) scripts/build_post.py
 
 all: figures post      ## rebuild findings and the distill document
 

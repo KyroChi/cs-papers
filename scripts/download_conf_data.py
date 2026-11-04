@@ -18,7 +18,7 @@ import urllib.request
 VENUES = ("nips", "icml", "iclr")
 TREE_API = "https://api.github.com/repos/papercopilot/openreview/git/trees/main?recursive=1"
 RAW = "https://raw.githubusercontent.com/papercopilot/openreview/main/"
-DEST = os.path.join(os.path.dirname(__file__), "data", "conf")
+DEST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "conf")
 
 def list_author_files():
     with urllib.request.urlopen(TREE_API) as r:

@@ -5,9 +5,9 @@ The views in setup.sql are (re)created every run, so `papers` and
 `papers_enriched` are always available to your query.
 
 Usage:
-    python run.py -f queries/01_growth_by_year.sql
-    python run.py "SELECT count(*) FROM papers"
-    python run.py            # drop into an interactive DuckDB SQL shell
+    python scripts/run.py -f sql/queries/01_growth_by_year.sql
+    python scripts/run.py "SELECT count(*) FROM papers"
+    python scripts/run.py            # drop into an interactive DuckDB SQL shell
 """
 import argparse
 import os
@@ -15,7 +15,7 @@ import sys
 
 import duckdb
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(HERE, "data", "arxiv_metadata.parquet")
 
 def connect():
@@ -27,11 +27,11 @@ def connect():
     con.execute("SET preserve_insertion_order=false")
     con.execute(f"SET temp_directory='{os.path.join(HERE, '.duckdb_tmp')}'")
     con.execute(f"SET file_search_path = '{HERE}'")
-    with open(os.path.join(HERE, "setup.sql")) as fh:
+    with open(os.path.join(HERE, "sql", "setup.sql")) as fh:
         con.execute(fh.read())
     import glob
     if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
-        with open(os.path.join(HERE, "conf_setup.sql")) as fh:
+        with open(os.path.join(HERE, "sql", "conf_setup.sql")) as fh:
             con.execute(fh.read())
     return con
 

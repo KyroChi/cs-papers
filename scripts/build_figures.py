@@ -13,7 +13,7 @@ import sys
 
 import duckdb
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "results", "figures.json")
 
 AUTH = (r"list_filter(regexp_split_to_array("
@@ -28,9 +28,9 @@ def main():
     con.execute("SET preserve_insertion_order=false")
     con.execute(f"SET temp_directory='{os.path.join(HERE, '.duckdb_tmp')}'")
     con.execute(f"SET file_search_path = '{HERE}'")
-    con.execute(open(os.path.join(HERE, "setup.sql")).read())
+    con.execute(open(os.path.join(HERE, "sql", "setup.sql")).read())
     if glob.glob(os.path.join(HERE, "data", "conf", "*.jsonl")):
-        con.execute(open(os.path.join(HERE, "conf_setup.sql")).read())
+        con.execute(open(os.path.join(HERE, "sql", "conf_setup.sql")).read())
 
     def rows(sql):
         r = con.sql(sql)

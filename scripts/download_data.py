@@ -19,7 +19,7 @@ URL = (
     "https://huggingface.co/datasets/secemp9/arxiv-complete/"
     "resolve/main/metadata/train-00000-of-00001.parquet"
 )
-DEST = os.path.join(os.path.dirname(__file__), "data", "arxiv_metadata.parquet")
+DEST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "arxiv_metadata.parquet")
 
 def _progress(block_num, block_size, total_size):
     done = block_num * block_size

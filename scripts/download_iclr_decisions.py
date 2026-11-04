@@ -16,7 +16,7 @@ import urllib.request
 
 TREE = "https://api.github.com/repos/berenslab/iclr-dataset/git/trees/main?recursive=1"
 RAW = "https://raw.githubusercontent.com/berenslab/iclr-dataset/main/"
-DEST = os.path.join(os.path.dirname(__file__), "data", "iclr_decisions")
+DEST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "iclr_decisions")
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)

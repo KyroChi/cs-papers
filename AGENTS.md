@@ -27,17 +27,17 @@ The published artifact is `distill/index.html` (self-contained, interactive).
 ## Build pipeline
 
 ```
-download_*.py  ->  data/            (external datasets, not committed)
-setup.sql / conf_setup.sql          (DuckDB views over the parquet/json)
-build_figures.py  ->  results/figures.json  (+ timestamped results/archive/)
-build_post.py     ->  distill/index.html
+scripts/download_*.py  ->  data/        (external datasets, not committed)
+sql/setup.sql, sql/conf_setup.sql        (DuckDB views over the parquet/json)
+scripts/build_figures.py  ->  results/figures.json  (+ results/archive/)
+scripts/build_post.py     ->  distill/index.html
 ```
 
 - `make setup` — venv + deps. `make data` — download (~1.7 GB). `make figures` —
   recompute `results/figures.json`. `make post` — rebuild the page. `make all` —
   figures + post. The data is already present under `data/` in this workspace.
-- Rebuild the page after editing prose or figures: `python3 build_post.py`.
-- `run.py` is an ad-hoc DuckDB shell: `python3 run.py -f queries/01_growth_by_year.sql`.
+- Rebuild the page after editing prose or figures: `python3 scripts/build_post.py`.
+- `scripts/run.py` is an ad-hoc DuckDB shell: `python3 scripts/run.py -f sql/queries/01_growth_by_year.sql`.
 
 ## The figure system (read before touching figures or numbers)
 
@@ -71,7 +71,7 @@ script); keep new charts on it for consistency.
 Build, then headless-render and check for JS errors and that charts drew:
 
 ```bash
-python3 build_post.py
+python3 scripts/build_post.py
 "<chrome>" --headless=new --disable-gpu --virtual-time-budget=7000 \
   --enable-logging=stderr "file://$PWD/distill/index.html" 2>&1 | grep -i 'Uncaught\|TypeError'
 ```
@@ -103,8 +103,8 @@ browser (or headless Chrome) is needed — not the claude.ai sandbox.
 ## Conventions
 
 - Keep code comment-free; document rationale here or in `README.md` instead.
-- Keep reproduction code intact (`build_figures.py`, `queries/`, `setup.sql`,
-  `conf_setup.sql`, `download_*.py`, `run.py`) so the post stays exactly
-  reproducible from scratch.
+- Keep reproduction code intact (`scripts/build_figures.py`, `sql/queries/`,
+  `sql/setup.sql`, `sql/conf_setup.sql`, `scripts/download_*.py`,
+  `scripts/run.py`) so the post stays exactly reproducible from scratch.
 - `distill/post.md` prose is the authors' own writing — fix typos, but don't
   rewrite voice or inject exposition unless asked.
