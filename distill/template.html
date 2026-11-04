@@ -108,26 +108,26 @@ figcaption b{font-weight:700;}
     <li>Growth is <b>collaborative</b>: solo-authored papers fell from <b>~44% (1991) to ~11% (2025)</b>; the median author count rose from 2 to 4.<span class="ref">Fig 2</span></li>
   </ul>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 1a.</b> Growth in submissions across all of arXiv</figcaption>
+  <figure class="fig-wide" data-fig="arxiv-growth">
+    <figcaption>Growth in submissions across all of arXiv</figcaption>
     <p class="sub">Papers by year of first submission, 1991–2025 (last complete year).</p>
     <div class="plot"><canvas id="f1a"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 1b.</b> Relative distribution of papers across major arXiv subjects</figcaption>
+  <figure class="fig-wide" data-fig="subject-shares">
+    <figcaption>Relative distribution of papers across major arXiv subjects</figcaption>
     <div class="bar"><button class="toggle" data-mode="pct" aria-pressed="true">share %</button><button class="toggle" data-mode="abs" aria-pressed="false">counts</button><span class="sub" style="margin:0">· click legend to toggle series</span></div>
     <div class="plot tall"><canvas id="f1b"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 1c.</b> Year-over-year growth rate — CS, Physics, Mathematics</figcaption>
+    <figcaption>Year-over-year growth rate — CS, Physics, Mathematics</figcaption>
     <p class="sub">Annual % change in submissions (from 2005; spikes capped at 60%).</p>
     <div class="plot tall"><canvas id="f1c"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 2.</b> Papers by number of authors</figcaption>
+  <figure class="fig-wide" data-fig="author-list-sizes">
+    <figcaption>Papers by number of authors</figcaption>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f2"></canvas></div>
   </figure>
@@ -142,26 +142,26 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 2b.</b> Papers by number of authors — CS only</figcaption>
+    <figcaption>Papers by number of authors — CS only</figcaption>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f2cs"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 3.</b> Growth of the top-5 CS sub-disciplines</figcaption>
+    <figcaption>Growth of the top-5 CS sub-disciplines</figcaption>
     <p class="sub">The five largest CS categories in 2025, tracked back over time.</p>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f3"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 4.</b> Papers submitted per CS author each year</figcaption>
+    <figcaption>Papers submitted per CS author each year</figcaption>
     <p class="sub">Mean (band = ±1 s.d.) and median annual output among authors active that year.</p>
     <div class="plot"><canvas id="f4"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 5.</b> Annual output by career total</figcaption>
+    <figcaption>Annual output by career total</figcaption>
     <p class="sub">Mean papers/year, with authors bucketed by cumulative CS papers to date (an author moves up a bucket as they accumulate papers).</p>
     <div class="plot"><canvas id="f5"></canvas></div>
   </figure>
@@ -178,24 +178,24 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 6a.</b> Submissions by institution region — absolute</figcaption>
+    <figcaption>Submissions by institution region — absolute</figcaption>
     <p class="sub">Each paper attributed to its author-majority region. Coverage 2021–2025.</p>
     <div class="plot"><canvas id="f6a"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 6b.</b> Submissions by institution region — share</figcaption>
+    <figcaption>Submissions by institution region — share</figcaption>
     <div class="plot"><canvas id="f6b"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 6c.</b> Growth indexed to 2021 (= 100)</figcaption>
+    <figcaption>Growth indexed to 2021 (= 100)</figcaption>
     <p class="sub">Each region relative to its own 2021 level — steeper is faster growth. Venue coverage shifts year to year (see notes).</p>
     <div class="plot"><canvas id="f6c"></canvas></div>
   </figure>
 
-  <figure class="fig-wide" id="f6cb">
-    <figcaption><b>Figure 6d.</b> Region growth (indexed) and share, side by side</figcaption>
+  <figure class="fig-wide" id="f6cb" data-fig="region-growth">
+    <figcaption>Region growth (indexed) and share, side by side</figcaption>
     <p class="sub">Left: submissions indexed to 2021 = 100 (steeper = faster growth). Right: share of submissions by region.</p>
     <div class="subplots">
       <div class="plot"><canvas id="f6cbl"></canvas></div>
@@ -204,7 +204,7 @@ figcaption b{font-weight:700;}
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7.</b> Seniority of submissions over time</figcaption>
+    <figcaption>Seniority of submissions over time</figcaption>
     <p class="sub"><b>Basis</b> — “first author” counts each paper once by who led it; “all authors” counts every authorship (a PI on many papers is tallied each time). Self-reported OpenReview position. Filter by region and venue.</p>
     <div class="bar"><span class="lbl">Basis</span>
       <button class="toggle" data-f7basis="first" aria-pressed="true">first author</button>
@@ -228,14 +228,14 @@ figcaption b{font-weight:700;}
     <div class="plot tall"><canvas id="f7"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 7c.</b> New PhD-student first-authors per year, by region</figcaption>
+  <figure class="fig-wide" data-fig="new-phds-by-region">
+    <figcaption>New PhD-student first-authors per year, by region</figcaption>
     <p class="sub">First year each PhD-student profile appears as a first author — a proxy for new publishing PhD students. 2021 omitted (left-censored: the data begins then).</p>
     <div class="plot"><canvas id="f7c"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7d.</b> Submissions per person per year, by seniority</figcaption>
+    <figcaption>Submissions per person per year, by seniority</figcaption>
     <p class="sub">Distinct papers a person is an author on each year, averaged within their self-reported position. Median is ~1 for every tier — most people are on one paper a year; the mean spreads them by seniority.</p>
     <div class="bar"><span class="lbl">Stat</span>
       <button class="toggle" data-f7dstat="mean" aria-pressed="true">mean</button>
@@ -244,8 +244,8 @@ figcaption b{font-weight:700;}
     <div class="plot tall"><canvas id="f7d"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 7f.</b> Mean submissions per person per year, by seniority</figcaption>
+  <figure class="fig-wide" data-fig="subs-per-person">
+    <figcaption>Mean submissions per person per year, by seniority</figcaption>
     <p class="sub">Average papers per person in each self-reported position — toggle between first-authored papers and all authorships. First-authorship concentrates among students; all-authorship rises with seniority.</p>
     <div class="bar"><span class="lbl">Count</span>
       <button class="toggle" data-f7fmetric="fa" aria-pressed="true">first-author</button>
@@ -254,20 +254,20 @@ figcaption b{font-weight:700;}
     <div class="plot tall"><canvas id="f7f"></canvas></div>
   </figure>
 
-  <figure class="fig-wide">
-    <figcaption><b>Figure 7g.</b> Authors per paper at the big-3</figcaption>
+  <figure class="fig-wide" data-fig="authors-per-conf-paper">
+    <figcaption>Authors per paper at the big-3</figcaption>
     <p class="sub">Authors per paper at the big-3 (NeurIPS · ICML · ICLR, 2021–2025): mean (dot) with a 25th–75th-percentile candle.</p>
     <div class="plot"><canvas id="f7g"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 7e.</b> First-author PhD-student submissions — China vs US</figcaption>
+    <figcaption>First-author PhD-student submissions — China vs US</figcaption>
     <p class="sub">Papers led by a PhD student, by the first author's region. China's first-author PhD output is growing faster; the US base is larger.</p>
     <div class="plot"><canvas id="f7e"></canvas></div>
   </figure>
 
-  <figure class="fig-wide" id="f17">
-    <figcaption><b>Figure 17.</b> Big-3 submissions and the PhD-student author base</figcaption>
+  <figure class="fig-wide" id="f17" data-fig="conferences-and-phds">
+    <figcaption>Big-3 submissions and the PhD-student author base</figcaption>
     <p class="sub">Left: papers submitted to NeurIPS, ICML, ICLR per year. Right: unique authors listing themselves as “PhD student” per year. (ICLR = all submissions; NeurIPS/ICML mostly accepted + opt-in.)</p>
     <div class="subplots">
       <div class="plot"><canvas id="f17l"></canvas></div>
@@ -276,8 +276,8 @@ figcaption b{font-weight:700;}
   </figure>
 
   <figure class="fig-wide" id="fworldmap">
-    <figcaption><b>Figure 18.</b> Unique PhD-student authors by country</figcaption>
-    <p class="sub">Distinct authors listing themselves as “PhD student”, by institution country (from email domains), per year. Colour = value on a log scale, <b>lightest = lowest, darkest = highest</b> (grey = no data). For the range, raw count sums 2021–2025. Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
+    <figcaption>Unique PhD-student authors by country</figcaption>
+    <p class="sub">Distinct authors listing themselves as “PhD student”, by institution country (from email domains), per year. Colour = value on a log scale, <b>dark purple = lowest, bright orange = highest</b> (grey = no data). For the range, raw count sums 2021–2025. Singapore &amp; Hong Kong are too small for the 110m basemap but appear in the list.</p>
     <div class="bar"><span class="lbl">Metric</span>
       <button class="toggle" data-wmmetric="growth" aria-pressed="false">growth rate</button>
       <button class="toggle" data-wmmetric="raw" aria-pressed="true">raw count</button>
@@ -304,26 +304,26 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 8.</b> Papers by number of authors — Math only</figcaption>
+    <figcaption>Papers by number of authors — Math only</figcaption>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f8"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 9.</b> Growth of the top-5 Math sub-disciplines</figcaption>
+    <figcaption>Growth of the top-5 Math sub-disciplines</figcaption>
     <p class="sub">The five largest Math categories in 2025, tracked back over time.</p>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f9"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 10.</b> Papers submitted per Math author each year</figcaption>
+    <figcaption>Papers submitted per Math author each year</figcaption>
     <p class="sub">Mean (band = ±1 s.d.) and median annual output among authors active that year.</p>
     <div class="plot"><canvas id="f10"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 11.</b> Annual output by career total — Math</figcaption>
+    <figcaption>Annual output by career total — Math</figcaption>
     <p class="sub">Mean papers/year, authors bucketed by cumulative Math papers to date.</p>
     <div class="plot"><canvas id="f11"></canvas></div>
   </figure>
@@ -336,14 +336,14 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 12.</b> ICLR outcomes over time — accepted / rejected / withdrawn</figcaption>
+    <figcaption>ICLR outcomes over time — accepted / rejected / withdrawn</figcaption>
     <p class="sub">Bar height = total submissions. Toggle to share % to read the accepted fraction directly.</p>
     <div class="bar"><button class="toggle" data-mode="abs" aria-pressed="true">counts</button><button class="toggle" data-mode="pct" aria-pressed="false">share %</button></div>
     <div class="plot tall"><canvas id="f12"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 13.</b> ICLR acceptance rate over time</figcaption>
+    <figcaption>ICLR acceptance rate over time</figcaption>
     <p class="sub">Accepted ÷ all submissions. Roughly flat near 30–32% since 2019 despite the submission explosion.</p>
     <div class="plot"><canvas id="f13"></canvas></div>
   </figure>
@@ -357,13 +357,13 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 14a.</b> Distinct PhD-student authors per year</figcaption>
+    <figcaption>Distinct PhD-student authors per year</figcaption>
     <p class="sub">Headcount — the dominant driver, up ~4.5× (2021→2025).</p>
     <div class="plot"><canvas id="f14a"></canvas></div>
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 14b.</b> Papers per PhD student per year</figcaption>
+    <figcaption>Papers per PhD student per year</figcaption>
     <p class="sub">Same unit, so comparable: all-authorship rose ~34% while first-author-only rose just ~16% — students aren't each leading many more papers.</p>
     <div class="plot"><canvas id="f14b"></canvas></div>
   </figure>
@@ -376,7 +376,7 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 16.</b> First-author papers per person per year</figcaption>
+    <figcaption>First-author papers per person per year</figcaption>
     <p class="sub">Per-person output, controlling for team size. Flat pre-2023 baseline; a small CS-led rise after ChatGPT.</p>
     <div class="plot"><canvas id="f16"></canvas></div>
   </figure>
@@ -399,13 +399,13 @@ figcaption b{font-weight:700;}
   </ul>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 15.</b> 2026 pace — arXiv submissions year-to-date (Jan–Aug)</figcaption>
+    <figcaption>2026 pace — arXiv submissions year-to-date (Jan–Aug)</figcaption>
     <p class="sub">Same Jan–Aug window each year, so 2026 is comparable rather than penalized for being partial.</p>
     <div class="plot"><canvas id="f15"></canvas></div>
   </figure>
 
   <figure class="fig-wide" id="fsen">
-    <figcaption><b>Figure 19.</b> Annual output by career total — CS (left) vs Mathematics (right)</figcaption>
+    <figcaption>Annual output by career total — CS (left) vs Mathematics (right)</figcaption>
     <p class="sub">Mean papers/year, with authors bucketed by cumulative papers to date (an author moves up a bucket as they accumulate papers).</p>
     <div class="subplots">
       <div class="plot"><canvas id="f5"></canvas></div>
@@ -414,14 +414,14 @@ figcaption b{font-weight:700;}
   </figure>
 
   <figure class="fig-wide">
-    <figcaption><b>Figure 20.</b> Are the 31+ solo authors veterans or newcomers?</figcaption>
-    <p class="sub">For the solo-2026 authors with 31+ career papers, years since their first-ever arXiv submission. CS darker blue, Math lighter blue.</p>
+    <figcaption>Are the 31+ solo authors veterans or newcomers?</figcaption>
+    <p class="sub">For the solo-2026 authors with 31+ career papers, years since their first-ever arXiv submission. Computer Science and Mathematics are shown in the legend.</p>
     <div class="plot"><canvas id="ftenure"></canvas></div>
   </figure>
 
   <figure class="fig-wide" id="fridge">
-    <figcaption><b>Figure 21.</b> Tenure by career-output bucket — solo 2026 authors</figcaption>
-    <p class="sub">Each row is a career-total bucket; the curve is the distribution of <b>years active on arXiv</b> for that bucket's solo-2026 authors, peak-normalized per row. CS darker blue, Math lighter blue.</p>
+    <figcaption>Tenure by career-output bucket — solo 2026 authors</figcaption>
+    <p class="sub">Each row is a career-total bucket; the curve is the distribution of <b>years active on arXiv</b> for that bucket's solo-2026 authors, peak-normalized per row. Computer Science and Mathematics are shown in the legend.</p>
     <div id="ridge" style="width:100%"></div>
   </figure>
 
@@ -489,8 +489,9 @@ figcaption b{font-weight:700;}
 
 <script>
 const DATA = __FIGDATA__;
-// Single Blues colormap for every figure, matching the world map (d3.interpolateBlues).
-const BL=t=>(typeof d3!=='undefined'&&d3.color?d3.color(d3.interpolateBlues(t)).formatHex():'#3987e5');
+// Single colormap for every figure: the first 80% of plasma (drops the pale
+// yellow tail), matching the world map. t in [0,1] -> plasma(0.8*t).
+const BL=t=>(typeof d3!=='undefined'&&d3.color?d3.color(d3.interpolatePlasma(0.8*t)).formatHex():'#cc4778');
 // seq(n): n colors, smooth light -> dark (ordered buckets, stacks).
 function seq(n){return n<=1?[BL(0.72)]:Array.from({length:n},(_,i)=>BL(0.22+0.70*(i/(n-1))));}
 function seqf(n){const r=seq(n);return i=>r[i%r.length];}
@@ -952,7 +953,7 @@ function initWorldMap(){
     const logs=Object.values(vals).map(Math.log);
     const lo=Math.min.apply(null,logs), hi=Math.max.apply(null,logs);
     const col=c=>{const v=vals[c]; if(v==null) return 'rgba(0,0,0,.07)';
-      const t=hi>lo?(Math.log(v)-lo)/(hi-lo):0.5; return d3.interpolateBlues(0.15+0.8*t);};
+      const t=hi>lo?(Math.log(v)-lo)/(hi-lo):0.5; return d3.interpolatePlasma(0.8*t);};
     gsel.attr('fill',f=>col(g2c[f.properties.name]));
     gsel.select('title').text(f=>{const c=g2c[f.properties.name];
       if(!c) return f.properties.name; return c+(vals[c]!=null?'  '+fmt(vals[c]):'  (n/a)');});

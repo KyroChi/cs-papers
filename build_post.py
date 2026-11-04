@@ -29,6 +29,7 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE = os.path.join(HERE, "distill", "template.html")
 POST = os.path.join(HERE, "distill", "post.md")
+CAPTIONS = os.path.join(HERE, "distill", "figures.md")
 FIGURES = os.path.join(HERE, "results", "figures.json")
 OUT = os.path.join(HERE, "distill", "index.html")
 CHARTJS = "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
@@ -45,7 +46,15 @@ d-article{grid-template-columns:[full-start] minmax(16px,1fr) [col-start] minmax
 d-article>*{grid-column:col-start / col-end !important;}
 d-title{display:block !important; max-width:var(--measure); margin-left:auto; margin-right:auto;}
 d-title>*{max-width:100% !important; white-space:normal !important; overflow-wrap:break-word;}
-d-byline{max-width:var(--measure); margin-left:auto; margin-right:auto;}
+/* distill auto-builds <d-byline> on its full-width grid, which overflows our
+   narrower centered column. Keep it in the text column, left-aligned, and drop
+   the empty Affiliations sub-column and the clipped "No DOI yet." column. */
+d-byline{display:block !important; max-width:var(--measure); margin-left:auto; margin-right:auto;}
+d-byline .byline.grid{display:flex !important; gap:48px; justify-content:flex-start; grid-column:unset !important;}
+d-byline .authors-affiliations.grid{display:block !important;}
+d-byline .authors-affiliations h3:nth-of-type(2){display:none;}  /* "Affiliations" */
+d-byline .affiliation{display:none;}
+d-byline .byline.grid>div:last-child{display:none;}              /* "DOI" column */
 d-article figure{margin:1.8em 0;}
 d-article figcaption{font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink); margin:0 0 2px;}
 d-article figcaption b{font-weight:700;}
@@ -100,11 +109,74 @@ def parse_template(tpl):
     runtime = re.findall(r"<script>.*?</script>", tpl, re.S)[-1]  # render code
     figs = {}
     for block in re.findall(r"<figure\b.*?</figure>", tpl, re.S):
-        m = re.search(r'id="f([\w-]+)"', block)
+        # Prefer an explicit data-fig slug; fall back to the first canvas id.
+        m = re.search(r'data-fig="([\w-]+)"', block) or re.search(r'id="f([\w-]+)"', block)
         if m:
             # distill: wide figures span the page column
             figs[m.group(1)] = block.replace('class="fig-wide"', 'class="l-page"')
     return runtime, figs
+
+
+def parse_captions(path):
+    """distill/figures.md -> {fid: (heading, caption_html)}.
+
+    Each `## fig:ID — Heading` section's body (up to the next `## fig:`) is the
+    caption. `**bold**` becomes <b>; raw HTML passes through. Anything before
+    the first `## fig:` (the file's intro) is ignored.
+    """
+    caps = {}
+    if not os.path.exists(path):
+        return caps
+    fid, head, buf = None, "", []
+
+    def flush():
+        if fid:
+            clean = [re.sub(r"<!--.*?-->", "", l).strip() for l in buf]
+            cap = " ".join(l for l in clean if l)
+            cap = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", cap)
+            caps[fid] = (head, cap)
+
+    for line in open(path, encoding="utf-8"):
+        m = re.match(r"^##\s+fig:([\w-]+)\s*(?:[—\-–]\s*(.*))?$", line.rstrip("\n"))
+        if m:
+            flush()
+            fid, head, buf = m.group(1), (m.group(2) or "").strip(), []
+        elif fid is not None:
+            buf.append(line)
+    flush()
+    return caps
+
+
+def build_figcaption(block, number, heading):
+    """Replace the figure's <figcaption> with `Figure N. <heading>`.
+
+    The number is always the post-order number (the single source of truth);
+    the heading is figures.md's if given, else the template figcaption's own
+    text. template.html stores no number, so nothing here can go stale.
+    """
+    m = re.search(r"<figcaption>(.*?)</figcaption>", block, re.S)
+    tpl_heading = re.sub(r"<[^>]+>", "", m.group(1)).strip() if m else ""
+    head = heading if heading else tpl_heading
+    label = f"<b>Figure {number}.</b> " if number else ""
+    newcap = f"<figcaption>{label}{head}</figcaption>"
+    if m:
+        return block[:m.start()] + newcap + block[m.end():]
+    return block
+
+
+def apply_sub(block, caption):
+    """Set the figure's grey sub-caption from figures.md (empty -> remove it)."""
+    if re.search(r'<p class="sub"', block):
+        if caption:
+            return re.sub(r'(<p class="sub"[^>]*>).*?(</p>)',
+                          lambda mm: f"{mm.group(1)}{caption}{mm.group(2)}",
+                          block, count=1, flags=re.S)
+        return re.sub(r'\s*<p class="sub"[^>]*>.*?</p>', "", block, count=1, flags=re.S)
+    if caption:  # no sub line existed -> add one right after the caption
+        return re.sub(r'(</figcaption>)',
+                      lambda mm: f'{mm.group(1)}\n    <p class="sub">{caption}</p>',
+                      block, count=1)
+    return block
 
 
 def front_matter(md):
@@ -117,12 +189,21 @@ def front_matter(md):
 def main():
     tpl = open(TEMPLATE, encoding="utf-8").read()
     runtime, figs = parse_template(tpl)
+    caps = parse_captions(CAPTIONS)
     data = open(FIGURES, encoding="utf-8").read()
 
     raw = open(POST, encoding="utf-8").read()
     fm, md = front_matter(raw)
     md = re.sub(r"<!--.*?-->", "", md, flags=re.S)         # drop authoring notes
     body = markdown.markdown(md, extensions=["extra", "sane_lists", "toc"])
+
+    # Number figures by order of first appearance in the post (so the distill
+    # post is self-consistent regardless of the template library's own numbers).
+    order = []
+    for fid in re.findall(r"\{\{\s*fig:([\w-]+)\s*\}\}", body):
+        if fid in figs and fid not in order:
+            order.append(fid)
+    fignum = {fid: i + 1 for i, fid in enumerate(order)}
 
     # inject figures
     missing, counts = [], {}
@@ -138,10 +219,26 @@ def main():
         if fid not in figs:
             missing.append(fid)
             return f"<!-- unknown figure: {fid} -->"
-        return figs[fid]
+        block = figs[fid]
+        heading, caption = caps.get(fid, (None, None))
+        # The number is assigned from post order; the heading comes from
+        # figures.md (falling back to the template's own figcaption text).
+        block = build_figcaption(block, fignum.get(fid), heading)
+        if caption is not None:   # caption given in figures.md (may be empty)
+            block = apply_sub(block, caption)
+        return block
 
     body = re.sub(r"<p>\s*\{\{\s*fig:([\w-]+)\s*\}\}\s*</p>", repl, body)
     body = re.sub(r"\{\{\s*fig:([\w-]+)\s*\}\}", repl, body)
+
+    # Resolve {{figref:ID}} prose references to the figure's assigned number.
+    bad_refs = sorted({f for f in re.findall(r"\{\{\s*figref:([\w-]+)\s*\}\}", body)
+                       if f not in fignum})
+    body = re.sub(r"\{\{\s*figref:([\w-]+)\s*\}\}",
+                  lambda m: str(fignum.get(m.group(1), "?")), body)
+    if bad_refs:
+        print("WARNING: figref to a figure not shown in the post:", ", ".join(bad_refs))
+
     if missing:
         print("WARNING: unknown figure tokens:", ", ".join(sorted(set(missing))))
         print("Available:", ", ".join(sorted(figs)))

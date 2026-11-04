@@ -1,8 +1,8 @@
 ---
-title: Who Fills arXiv
-subtitle: An interactive look at the growth of arXiv and the machine-learning conferences.
+title: Who is Writing all Those Papers!?
+subtitle: An interactive look at the growth of submissions to the arXiv and the machine-learning conferences.
 description: Who is behind the surge in arXiv and ML-conference submissions?
-published: October 13, 2026
+published: November 3, 2026
 disclaimer: This post reflects the personal views of the authors and not those of their employer.
 authors:
   - name: Kyle Chickering
@@ -12,21 +12,19 @@ authors:
 
 <!--
   Write prose in plain Markdown. Insert any figure with a token on its own line:
-      {{fig:7f}}
-  Available figure ids:
-    1a 1b 1c 2 2cs 3 4 5            (arXiv overall + CS)
-    6a 6b 6c 6cb 7 7c 7d 7e 7f 7g   (conferences: region + seniority)
-    8 9 10 11                       (mathematics)
-    12 13                           (ICLR peer review)
-    14a 14b 15 16 17 worldmap       (decomposition, PhD base, 2026 YTD)
-    sen tenure ridge                (2026 solo-authorship analysis)
+      {{fig:subs-per-person}}
+  Figures are auto-numbered by order of appearance; reference one in prose with
+      Figure {{figref:subs-per-person}}   (resolves to that figure's number)
+  The figure ids, headings and captions live in distill/figures.md. Only the
+  figures you reference here are shown.
   Rebuild with:  make post   (or  .venv/bin/python build_post.py )
-  Only the figures you reference are shown.
 -->
 
 More than 60 thousand papers were submitted to [ICLR in 2026](https://openreview.net/group?id=ICLR.cc/2027/Conference). Naturally the association between the rise of LLMs and this increase in paper submissions is conspicuous. We asked each other a simple question: "Who is writing all of these papers!?".
 
-Our initial hypothesis was that LLM assistance was leading to a dearth of solo-authored papers from non-affiliated (novice) researchers. However the data does not seem to support this conclusion. While we did find a substantial increase in solo-authored papers being submitted to the arXiv, this increase only began in 2026. This increase does not come anywhere close to explaining the exponential growth in arXiv and conference submissions over the last seven years. What does seem explanatory is simply a massive growth in the number of computer science PhD students, who submit papers as part of their technical training. Prior to 2026 it seems that nearly 100% of the exponential growth in paper submissions can be attributed simply to an expanding pool of PhD students. In the specific case of senior mathematicians we actually found that paper submissions have been declining, and that prior to 2026 LLM use did not seem to reverse this trend.
+Our initial hypothesis was that LLM assistance was leading to a dearth of solo-authored papers from non-affiliated (novice) researchers. However the data does not seem to support this conclusion. While we did find a substantial increase in solo-authored papers being submitted to the arXiv, this increase only began in 2026 and cannot explain the growth over the last seven years. What does seem explanatory is a massive increase in the number of computer science PhD students, who submit papers as part of their technical training.
+
+Prior to 2026 it seems that nearly 100% of the exponential growth in paper submissions can be attributed simply to an expanding pool of PhD students. In the specific case of senior mathematicians we actually found that paper submissions have been declining, and that prior to 2026 LLM use did not seem to reverse this trend.
 
 Using metadata from arXiv, NeurIPS, ICLR, and ICML we set out to understand these recent trends in paper submissions.
 
@@ -50,23 +48,23 @@ We begin by trying to understand the massive increase in the number of submissio
 - 2026 really is different. The anecdotal feeling that there is a massive increase in solo-authored papers, especially in CS, is supported by the data.
 
 ### An Exponential Growth in PhD Students
-We found that the exponential growth in papers (see Figure 17, left) is primarily driven by a concomitant growth in the raw number of PhD students studying computer science (see Figure 17, right). In the period of time between 2021 and 2025, our data indicate that submissions to NeurIPS grew by $4.0\times$, from 2,708 to 10,761. ICLR submissions grew by $4.5\times$, from 3,014 in 2021 to 13,697 in 2025. During that same period of time, the number of unique PhD authors submitting to these conferences grew by $4.5\times$, from 3,938 in 2021 to 17,881 in 2025. ICLR submissions in particular have grown at the exact same rate as the growth in the number of PhD students!
+We found that the exponential growth in papers (see Figure {{figref:conferences-and-phds}}, left) is primarily driven by a concomitant growth in the raw number of PhD students studying computer science (see Figure {{figref:conferences-and-phds}}, right). In the period of time between 2021 and 2025, our data indicate that submissions to NeurIPS grew by $4.0\times$, from 2,708 to 10,761. ICLR submissions grew by $4.5\times$, from 3,014 in 2021 to 13,697 in 2025. During that same period of time, the number of unique PhD authors submitting to these conferences grew by $4.5\times$, from 3,938 in 2021 to 17,881 in 2025. ICLR submissions in particular have grown at the exact same rate as the growth in the number of PhD students!
 
-{{fig:17}}
+{{fig:conferences-and-phds}}
 
 ### LLM Use is Not Explanatory
 
-This already suggests that LLM assistance may not be a significant contributing factor to the rise in paper submissions. We can provide further evidence in support of this conclusion by tracking the increase in first-author papers per-capita, sub-divided by seniority. Figure 7f shows that the mean first author submissions per-person per-year has risen between 2021 and 2025, but only modestly, from 0.721 to 0.768. 
+This already suggests that LLM assistance may not be a significant contributing factor to the rise in paper submissions. We can provide further evidence in support of this conclusion by tracking the increase in first-author papers per-capita, sub-divided by seniority. Figure {{figref:subs-per-person}} shows that the mean first author submissions per-person per-year has risen between 2021 and 2025, but only modestly, from 0.721 to 0.768. 
 
-{{fig:7f}}
+{{fig:subs-per-person}}
 
-When we look at submissions per-person per-year (i.e. not only first authorship), there is a notable increase in submissions for **both** faculty and PhD students. Perhaps LLM use is increasing research lab's inclusion of lab-mates on the authorship list. However we think it is much more likely that the increase in PhD students is nearly fully explanatory in this case as well, and the fact that the number of CS PhD students began to take off in 2022 is a coincidence, although almost certainly a coincidence spurred by the introduction of ChatGPT (i.e. we don't think that the ability to use AI to help write papers caused more students to pursue PhDs, but it's probably likely that increased excitement about AI led to universities increasing their CS program sizes). This is clearly reflected in the data (see Figure 7g). Between 2021 and 2025 the mean number of authors per paper has risen from 4.3 to 5.3, a full additional author per paper, on average. 
+When we look at submissions per-person per-year (i.e. not only first authorship), there is a notable increase in submissions for **both** faculty and PhD students. Perhaps LLM use is increasing research lab's inclusion of lab-mates on the authorship list. However we think it is much more likely that the increase in PhD students is nearly fully explanatory in this case as well, and the fact that the number of CS PhD students began to take off in 2022 is a coincidence, although almost certainly a coincidence spurred by the introduction of ChatGPT (i.e. we don't think that the ability to use AI to help write papers caused more students to pursue PhDs, but it's probably likely that increased excitement about AI led to universities increasing their CS program sizes). This is clearly reflected in the data (see Figure {{figref:authors-per-conf-paper}}). Between 2021 and 2025 the mean number of authors per paper has risen from 4.3 to 5.3, a full additional author per paper, on average. 
 
-{{fig:7g}}
+{{fig:authors-per-conf-paper}}
 
 ### PhD Student Growth by Region
 
-{{fig:6cb}}
+{{fig:region-growth}}
 
 {{fig:worldmap}}
 
@@ -74,7 +72,7 @@ We are able to quantify the number of new PhD students in CS-adjacent fields by 
 
 The rate at which PhD students is being added has a clear geographic bias. Both the United States and China are adding massive numbers of PhD students. In the period between 2021 and 2025, the United States added 20,094 graduate students and China added 9,592. While the US and China do not necessarily have the highest growth rates in PhD students world-wide, their growth rate remains significant, especially given how large these two countries are. China between 2021 and 2025 grew at a rate of 10.34x, while the United States grew at a rate of 3.72x.
 
-{{fig:7c}}
+{{fig:new-phds-by-region}}
 
 The rest of the world is not far behind. The UK, Germany, South Korea, and Hong Kong lead in the addition of graduate students. However the rate of growth in the number of graduate students in China is far outpacing the rate of growth in the number of graduate students in the United States or the rest of the world. Should these rates continue we expect the United States and China to have roughly the same number of graduate students submitting to the Big-3 conferences sometime in 2027.
 
@@ -84,18 +82,18 @@ We now turn to analyzing trends based on arXiv metadata. The arXiv data is riche
 
 The first obvious feature is that arXiv submissions have also risen exponentially in recent years. Further analysis quickly reveals that this is due largely to a massive growth in submitted CS papers.
 
-{{fig:1a}}
-{{fig:1b}}
+{{fig:arxiv-growth}}
+{{fig:subject-shares}}
 
 This trend is captured by comparing the year-over-year growth rates between the three most popular arXiv fields: CS, physics, and mathematics. Computer science is consistently growing about 6 to 20 percent faster than physics and math. Math in particular outpaced the growth of physics between 2005 and 2019, but CS outpaced both with the exception of 2011.
 
 Another salient feature we found was that there is more collaboration, measured by the length of author lists, than there has ever been before. Broadly across both CS and mathematics, author lists have grown.
 
-{{fig:2}}
+{{fig:author-list-sizes}}
 
 We explore the number of papers submitted to the arXiv by seniority. Here we measure "seniority" by counting the number of papers submitted by a given author. Here there is a noticeable difference between computer science and mathematics.
 
-For computer science (Figure, left) we can see that authors with more than 21 papers have seen a steady increase in the number of submitted papers per year since around 2015. Mathematics, on the other hand (Figure, right) has seen a stable number of submitted papers and if anything a slight decline over the same period.
+For computer science (Figure {{figref:sen}}, left) we can see that authors with more than 21 papers have seen a steady increase in the number of submitted papers per year since around 2015. Mathematics, on the other hand (Figure {{figref:sen}}, right) has seen a stable number of submitted papers and if anything a slight decline over the same period.
 
 {{fig:sen}}
 
@@ -163,6 +161,7 @@ Regardless of how we look at the data, it is clear that there has been a massive
 Recently arXiv released a blog post instituting a rate limit on paper submissions which cites AI assisted paper writing as a cause of the exponential growth in submissions. This is certainly one solution, but it is a solution targeted specifically at the use of LLMs. Thus, it will only address the "excess" paper submissions, and not the broader trend driven by an exponential growth in the number of CS PhD students! We predict that the rate limit will do very little to quell the growing tsunami landing upon our academic shores.
 
 # Acknowledgements
+We thank (in alphabetical order) M. Chen, M. Harvill, and S. Kuang for helpful discussion and proofreading of our work. 
 
 # References
 - arXiv. "Attention Authors: Updated Practice for Review Articles and Position Papers in arXiv CS Category." arXiv blog, October 31, 2025. <https://blog.arxiv.org/2025/10/31/attention-authors-updated-practice-for-review-articles-and-position-papers-in-arxiv-cs-category/>

@@ -24,3 +24,6 @@ scratch/
 # editor/session backups
 distill/*.bak.*
 *.bak
+
+# editor tilde backups
+*~
