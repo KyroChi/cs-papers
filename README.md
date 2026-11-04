@@ -93,7 +93,6 @@ setup.sql            DuckDB views over the arXiv parquet
 conf_setup.sql       DuckDB views over the conference author files
 build_figures.py     compute all figure aggregates (memory-capped)
 build_post.py        post.md + figures.md + figures -> distill/index.html
-build_html.py        render the figure library standalone (preview)
 run.py               ad-hoc SQL runner / shell
 download_*.py        fetch the external datasets
 AGENTS.md            orientation for coding agents

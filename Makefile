@@ -1,7 +1,9 @@
 # Reproduce the analysis and the distill document.
-# Usage: make setup && make data && make all
+# First time:  make setup && make data && make
+# Rebuild:     make            (compute figures, then build the post)
 PY := .venv/bin/python
 
+.DEFAULT_GOAL := all
 .PHONY: setup data figures post all clean
 
 setup:                 ## create venv and install deps
