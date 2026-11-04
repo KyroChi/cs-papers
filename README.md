@@ -1,106 +1,100 @@
-# Who Fills arXiv — cs-papers
+# Who is Writing all Those Papers!?
 
-Who is behind the dramatic rise in papers on arXiv and at the top machine-learning
-conferences (NeurIPS · ICML · ICLR)? This repo builds an interactive
-[distill](https://distill.pub)-style document from public metadata — **without
-downloading arXiv's 16 TiB corpus** (we use only the ~1.6 GB metadata config).
+The code behind the interactive blog post of the same name: who is behind the
+surge in submissions to arXiv and the top machine-learning conferences (NeurIPS,
+ICML, ICLR)? The whole analysis runs on public **metadata** — we never download
+arXiv's 16 TiB full-text corpus, only the ~1.6 GB metadata config.
 
-**→ Build the document with `make`**, which writes `distill/index.html` — a
-self-contained interactive page (open it in any browser, works offline). The
-rendered page and the computed `results/` are **generated, not committed** —
-run `make` to produce them (see [Reproduce](#reproduce)). Publishing to GitHub
-Pages therefore needs a build step (e.g. a CI workflow), not a raw checkout.
+The post is an interactive [distill.pub](https://distill.pub)-style page built
+from a DuckDB pipeline. You edit Markdown and a figure library; one command
+rebuilds the page.
 
-**Writing it:** [`distill/post.md`](distill/post.md) has a YAML front-matter
-block (title, subtitle, authors, published, disclaimer) followed by plain
-Markdown. Place a figure with a token on its own line, e.g.
-`{{fig:subs-per-person}}`, and reference one in prose with
-`{{figref:subs-per-person}}`. Figure headings and captions live in
-[`distill/figures.md`](distill/figures.md). Rebuild with `make post`.
-`build_post.py` emits a genuine [distill.pub](https://distill.pub) article
-(`<d-title>`/`<d-byline>`/`<d-article>`, `template.v2.js` + MathJax), injects the
-referenced figures (interactive Chart.js from `distill/template.html`), numbers
-them by order of appearance, and inlines the latest data + Chart.js. Figures you
-don't reference aren't shown. Agents: see [`AGENTS.md`](AGENTS.md).
-
-**Viewing:** open `distill/index.html` in a browser (`open distill/index.html`)
-or publish via GitHub Pages — both load the distill framework. Needs network
-for `template.v2.js`/MathJax, like the blog itself.
-
-## Findings in brief
-
-- arXiv submissions grew **~9× since 2000** (≈31k → ≈284k in 2025) and are still accelerating.
-- The rise is driven by **Computer Science** — specifically the AI/ML subfields — and by **teams, not solo authors**.
-- At the top ML venues, **China's submission share rose steeply** (~13% → ~23% by 2025), driven mainly by a **~9× rise in the number of PhD-student first authors** — not students each writing more.
-- Peer review **kept pace**: ICLR's acceptance rate held ~30–32% while submissions grew ~24×.
-- The surge is **not primarily an LLM artifact**: even crediting the entire post-2022 per-person uptick to LLMs, that explains ≤ ~10–13% of recent CS growth; the rest is more people.
-
-See the document's **Methods & data** section for definitions and caveats. All
-findings are directional, not causal.
-
-## Reproduce
+## Read the post
 
 ```bash
-make setup     # create .venv and install deps (needs Python 3.9+)
-make data      # download external data (~1.7 GB, not committed)
-make all       # compute results/figures.json and build distill/index.html
+make            # builds distill/index.html
+open distill/index.html
 ```
 
-Or step by step:
+The page is self-contained and works offline (it does fetch the distill
+framework and fonts from a CDN, like the live blog). It is **generated, so it is
+not committed** — run `make` to produce it. Building from a fresh clone needs the
+data first; see [Reproduce](#reproduce-from-scratch).
+
+## What it finds
+
+- Before 2026, arXiv's exponential growth tracks the exponential growth in the
+  number of CS PhD students, not LLM use and not solo authors.
+- First-author papers per person barely moved after ChatGPT. The rise in papers
+  per person comes from longer author lists, i.e. more collaboration.
+- 2026 breaks the pattern: a real jump in solo-authored papers, especially in
+  CS. Most of it comes from established authors (about 88% of the CS excess).
+- China is adding PhD-student authors far faster than the US and is on track to
+  overtake it around 2027.
+
+Numbers are directional, not causal; the post's **Methods & data** section and
+[`AGENTS.md`](AGENTS.md) spell out the definitions and caveats.
+
+## Edit the post
+
+Three files, then `make` to rebuild:
+
+- [`distill/post.md`](distill/post.md) — the prose. Front-matter (title,
+  subtitle, authors, date) then Markdown. Drop a figure with a token on its own
+  line, `{{fig:SLUG}}`, and cite its number in text with `{{figref:SLUG}}`.
+  Figures are numbered by the order they appear here.
+- [`distill/figures.md`](distill/figures.md) — each figure's heading and
+  caption. No numbers; those are assigned at build time.
+- `distill/template.html` — the figure library: one `<figure>` per chart plus
+  the script that draws them (Chart.js + d3).
+
+Run `make` and reload the page. Don't hand-edit `distill/index.html`; it is
+overwritten on every build.
+
+## Reproduce from scratch
 
 ```bash
-.venv/bin/python download_data.py            # arXiv metadata (1.6 GB parquet)
-.venv/bin/python download_conf_data.py       # NeurIPS/ICML/ICLR author files (~70 MB)
-.venv/bin/python download_iclr_decisions.py  # ICLR accept/reject decisions
-.venv/bin/python build_figures.py            # -> results/figures.json (+ archive/)
-.venv/bin/python build_post.py               # distill/post.md + figures -> distill/index.html
+make setup      # create .venv and install deps (Python 3.9+)
+make data       # download the input datasets (~1.7 GB, not committed)
+make            # compute results/figures.json, then build distill/index.html
 ```
 
-Ad-hoc querying (DuckDB SQL over the metadata): `.venv/bin/python run.py -f queries/01_growth_by_year.sql`, or `run.py "<sql>"`, or `run.py` for a shell.
+| Dataset | What | Fetched by |
+|---|---|---|
+| [secemp9/arxiv-complete](https://huggingface.co/datasets/secemp9/arxiv-complete) (`metadata` config) | 3.15M arXiv papers (Cornell/CC0) | `download_data.py` |
+| [Paper Copilot](https://papercopilot.com) OpenReview archive ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) | NeurIPS/ICML/ICLR author affiliations | `download_conf_data.py` |
+| berenslab/iclr-dataset | ICLR submissions incl. rejected + decisions | `download_iclr_decisions.py` |
 
-## Data
+Input data is git-ignored and re-downloaded by the scripts; nothing under
+`data/` is committed. To explore the metadata directly, `run.py` is a DuckDB
+shell: `.venv/bin/python run.py -f queries/01_growth_by_year.sql`.
 
-| Source | What | How to get it | Committed? |
-|---|---|---|---|
-| [secemp9/arxiv-complete](https://huggingface.co/datasets/secemp9/arxiv-complete) (`metadata` config) | 3.15M arXiv papers, Cornell/CC0 | `download_data.py` | No — re-download |
-| Paper Copilot OpenReview archive ([arXiv:2510.13201](https://arxiv.org/abs/2510.13201)) | NeurIPS/ICML/ICLR author affiliations | `download_conf_data.py` | No — re-download |
-| berenslab/iclr-dataset | ICLR submissions incl. rejected + decisions | `download_iclr_decisions.py` | No — re-download |
+## For coding agents
 
-**Policy:** external data is git-ignored and re-downloaded with the scripts. Any
-data we collect ourselves is versioned with **Git LFS** (see `.gitattributes`);
-install it once with `git lfs install`. Currently all inputs are external, so no
-LFS objects are stored yet.
+Read [`AGENTS.md`](AGENTS.md) first. It covers the build pipeline, how figures
+and numbering work, the methodology and caveats, and the hard rules (never
+download the full corpus; never hand-edit the generated page).
 
-## How the findings flow
-
-`build_figures.py` runs the DuckDB queries (capped at ≤1 GiB RAM, spilling to
-disk) and writes **`results/figures.json`** (the latest findings), plus a
-timestamped copy in **`results/archive/`** so every re-run is preserved.
-`build_post.py` renders `distill/post.md`, injects the referenced figures from
-`distill/template.html`, and inlines the *latest* `results/figures.json` +
-Chart.js into `distill/index.html`. So: `make figures` after new data, `make
-post` after editing prose, or `make all` for both.
-
-## Layout
+## Repo layout
 
 ```
-distill/post.md      the prose (Markdown; edit this) with {{fig:SLUG}} tokens
-distill/figures.md   figure headings + captions (edit this; no numbers)
-distill/template.html figure library: one <figure> per chart + the render script
-distill/index.html   built page (generated, git-ignored; run `make`)
+distill/post.md        the prose you write (Markdown + {{fig:SLUG}} tokens)
+distill/figures.md     figure headings + captions
+distill/template.html  the figure library: charts + the render script
 distill/world.geo.json static basemap for the world figure (committed input)
-results/             figures.json + archive/ (generated, git-ignored)
-queries/             standalone DuckDB SQL for the arXiv metadata questions
-setup.sql            DuckDB views over the arXiv parquet
-conf_setup.sql       DuckDB views over the conference author files
-build_figures.py     compute all figure aggregates (memory-capped)
-build_post.py        post.md + figures.md + figures -> distill/index.html
-run.py               ad-hoc SQL runner / shell
-download_*.py        fetch the external datasets
-AGENTS.md            orientation for coding agents
+distill/index.html     the built page (generated, git-ignored)
+results/               computed figure data (generated, git-ignored)
+build_figures.py       run the DuckDB queries -> results/figures.json
+build_post.py          post.md + figures.md + figures -> distill/index.html
+setup.sql, conf_setup.sql  DuckDB views over the metadata
+queries/               standalone DuckDB queries for ad-hoc analysis
+download_*.py           fetch the input datasets
+run.py                 DuckDB shell / query runner
+AGENTS.md              orientation for coding agents
 ```
 
 ## Requirements
 
-Python 3.9+, `duckdb` (`pip install -r requirements.txt`), and `git-lfs` for
-contributing self-collected data. MIT licensed (see `LICENSE`).
+Python 3.9+ and `duckdb` (`pip install -r requirements.txt`). Git LFS is set up
+for any self-collected data, though all current inputs are external. MIT
+licensed (see [`LICENSE`](LICENSE)).
